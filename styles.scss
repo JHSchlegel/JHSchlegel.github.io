@@ -1,0 +1,105 @@
+:root {
+    --card-bg: white;
+    --card-border: #e5e7eb;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --accent-color: #3b82f6;
+    --gpa-bg: #ecfdf5;
+    --gpa-text: #059669;
+  }
+  
+  [data-theme="dark"] {
+    --card-bg: #1f2937;
+    --card-border: #374151;
+    --text-primary: #f3f4f6;
+    --text-secondary: #d1d5db;
+    --accent-color: #60a5fa;
+    --gpa-bg: #064e3b;
+    --gpa-text: #34d399;
+  }
+  
+  .education-section {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+  }
+  
+  .education-card {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--card-border);
+    transition: all 0.3s ease;
+  }
+  
+  .education-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    border-color: var(--accent-color);
+  }
+  
+  .education-card h2 {
+    color: var(--accent-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .institution-info {
+    color: var(--text-secondary);
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .gpa-info {
+    display: inline-flex;
+    align-items: center;
+    background: var(--gpa-bg);
+    color: var(--gpa-text);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    margin: 0.5rem 0;
+    gap: 0.25rem;
+  }
+  
+  .education-card ul {
+    margin-top: 1.5rem;
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .education-card li {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .education-card i {
+    color: var(--accent-color);
+  }
+  
+  @media (max-width: 640px) {
+    .education-card {
+      padding: 1.5rem;
+    }
+    
+    .institution-info {
+      font-size: 0.875rem;
+    }
+  }
+/*-- scss:rules --*/
+.quarto-about-solana .about-image {
+    border-radius: 50%;
+    max-width: 250px;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
