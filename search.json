@@ -1,9 +1,30 @@
 [
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Blog",
+    "section": "",
+    "text": "No matching items"
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "Jan Schlegel",
     "section": "",
-    "text": "🎓 Master of Science (M.Sc. ETH) in Statistics\n\n🏛️ ETH Zurich | 📍 Zurich, Switzerland | 📅 Sep 2023 - Sep 2025\n\n\nGPA: 5.98 / 6.00\n\n\nRelevant Coursework: Machine Learning for Healthcare; Probabilistic AI; Statistical Learning Theory; Introduction to Machine Learning; Causality; Computational Statistics; Fundamentals of Mathematical Statistics; High Dimensional Statistics; Bayesian Statistics; Image Analysis and Computer Vision; Deep Learning; Time Series Analysis\nSemester Paper: Extrapolation and Distributional Robustness for Climate Downscaling\nMentor for New Students\n\n\n\n🎓 Special Student Statistics\n\n🏛️ ETH Zurich | 📍 Zurich, Switzerland | 📅 Feb 2022 - Feb 2023\n\n\nGPA: 6.00 / 6.00\n\n\nVoluntarily enrolled to take advanced courses in statistics\nCoursework: Applied Time Series, Applied Multivariate Statistics\n\n\n\n🎓 Bachelor of Arts in Business and Economics\n\n🏛️ University of Zurich (UZH) | 📍 Zurich, Switzerland | 📅 Sep 2019 - Feb 2023\n\n\nGPA: 5.87 / 6.00\n\n\nFinished the degree with 215 ECTS (instead of 180 ECTS)\nMajor in Banking and Finance (150 ECTS); Minor in Applied Probability and Statistics (30 ECTS)\nRelevant Coursework: Likelihood Inference; Statistical Modelling; Numerical Methods in Informatics; Introduction to Machine Learning; Introduction to Statistics; Introductory Econometrics Thesis: Portfolio Value at Risk Forecasting with GARCH-Type Models (Grade: 6.00/6.00)"
+    "text": "Hi there! I’m Jan, a Master’s student in Statistics at ETH Zurich with a passion for machine learning, healthcare applications, and probabilistic modeling. My journey combines rigorous academic training in statistics with hands-on experience in research and data analysis. I thrive on solving complex problems and am particularly interested in the intersection of machine learning and healthcare. With a strong foundation in both theoretical statistics and practical implementation, I’m always eager to tackle new challenges and contribute to meaningful projects. Currently seeking opportunities in machine learning and data science - let’s connect!"
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "Jan Schlegel",
+    "section": "Education",
+    "text": "Education\n\n\n🎓 Master of Science (M.Sc. ETH) in Statistics\n\n🏛️ ETH Zurich | 📍 Zurich, Switzerland | 📅 Sep 2023 - Sep 2025\n\n\nGPA: 5.98 / 6.00\n\n\nRelevant Coursework: Machine Learning for Healthcare; Probabilistic AI; Statistical Learning Theory; Introduction to Machine Learning; Causality; Computational Statistics; Fundamentals of Mathematical Statistics; High Dimensional Statistics; Bayesian Statistics; Image Analysis and Computer Vision; Deep Learning; Time Series Analysis\nSemester Paper: Extrapolation and Distributional Robustness for Climate Downscaling\nMentor for New Students\n\n\n\n🎓 Special Student Statistics\n\n🏛️ ETH Zurich | 📍 Zurich, Switzerland | 📅 Feb 2022 - Feb 2023\n\n\nGPA: 6.00 / 6.00\n\n\nVoluntarily enrolled to take advanced courses in statistics\nCoursework: Applied Time Series, Applied Multivariate Statistics\n\n\n\n🎓 Bachelor of Arts in Business and Economics\n\n🏛️ University of Zurich (UZH) | 📍 Zurich, Switzerland | 📅 Sep 2019 - Feb 2023\n\n\nGPA: 5.87 / 6.00\n\n\nFinished the degree with 215 ECTS (instead of 180 ECTS)\nMajor in Banking and Finance (150 ECTS)\nMinor in Applied Probability and Statistics (30 ECTS)\nRelevant Coursework: Likelihood Inference; Statistical Modelling; Numerical Methods in Informatics; Introduction to Machine Learning; Introduction to Statistics; Introductory Econometrics Thesis: Portfolio Value at Risk Forecasting with GARCH-Type Models (Grade: 6.00/6.00)"
+  },
+  {
+    "objectID": "about.html#experience",
+    "href": "about.html#experience",
+    "title": "Jan Schlegel",
+    "section": "Experience",
+    "text": "Experience\n\n\nResearch Assistant (Civilian Service)\n\n🏛️ University of Zurich (EBPI) | 📍 Zurich, Switzerland | 📅 Feb 2022 - Aug 2023\n\n\nConducted sophisticated data analysis and statistical modeling using R for epidemiological research\nLed the optimization and cleaning of statistical analysis R scripts, ensuring reproducibility and accuracy\nContributed to a significant research paper published in Nature Communications (2023): “Persistent humoral immune response in youth throughout the COVID-19 pandemic: prospective school-based cohort study”\n\n\n\nAccountant (Military Service)\n\n🏛️ Swiss Armed Forces | 📍 Kloten, Switzerland | 📅 Jul 2021 - Nov 2021\n\n\nSuccessfully balanced military service obligations while maintaining full-time academic studies\nDemonstrated exceptional time management and organizational skills\n\n\n\nTeaching Assistant\n\n🏛️ University of Zurich | 📍 Zurich, Switzerland | 📅 Sep 2020 - Jul 2021\n\n\nConducted bi-weekly interactive exercise classes in Analysis and Linear Algebra for first-year students\nEffectively communicated complex mathematical concepts to diverse student groups\nDeveloped strong presentation and educational communication skills"
   }
 ]
