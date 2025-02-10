@@ -1,0 +1,27 @@
+project:
+  type: website  
+  output-dir: C:\Users\Jan\Documents\JHSchlegel.github.io
+
+website:
+  title: "Jan Schlegel"
+  navbar:
+    pinned: true
+    right:
+      - text: About
+        href: about.qmd
+      - text: Blog
+        href: index.qmd
+      - icon: linkedin
+        href: https://www.linkedin.com/in/jan-heinrich-schlegel/
+      - icon: github
+        href: https://github.com/JHSchlegel
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: cyborg
+    css: styles.css
+    include-in-header:
+      - text: |
+          <meta name="color-scheme" content="dark light">
