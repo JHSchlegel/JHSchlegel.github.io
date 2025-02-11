@@ -1,6 +1,6 @@
 project:
   type: website  
-  output-dir: C:\Users\Jan\Documents\JHSchlegel.github.io
+  output-dir: "."
 
 website:
   title: "Jan Schlegel"
