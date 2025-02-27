@@ -1,2 +1,5 @@
 /.quarto/
 /_freeze/
+
+temp/
+temp.*
