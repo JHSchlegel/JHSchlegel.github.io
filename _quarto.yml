@@ -2,6 +2,11 @@ project:
   type: website  
   output-dir: "."
 
+execute:
+  freeze: auto
+  jupyter:
+    python: /home/janhsc/Documents/projects/JHSchlegel.github.io/.venv/bin/python
+
 website:
   title: "Jan Schlegel"
   navbar:
