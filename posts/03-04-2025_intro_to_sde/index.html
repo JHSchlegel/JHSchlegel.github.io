@@ -56,27 +56,7 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -336,12 +316,12 @@ window.Quarto = {
 </div>
 <section id="sec-introduction" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="sec-introduction"><span class="header-section-number">1</span> Introduction</h2>
-<p>Stochastic differential equations (SDEs) represent one of the most profound and mathematically elegant frameworks in modern probability theory and applied mathematics. These equations describe the evolution of random processes in continuous time, providing the mathematical foundation for modeling phenomena characterized by both deterministic trends and random fluctuations <span class="citation" data-cites="oksendal2003 karatzas1991">(<a href="#ref-oksendal2003" role="doc-biblioref">Øksendal 2003</a>; <a href="#ref-karatzas1991" role="doc-biblioref">Karatzas and Shreve 1991</a>)</span>.</p>
-<p>The theoretical development of SDE theory emerged from the intersection of probability theory, differential equations, and mathematical finance, culminating in the revolutionary work of Kiyoshi Itô in the 1940s. Itô’s groundbreaking construction of stochastic integration transformed our understanding of random processes and established the mathematical framework that now underpins modern quantitative finance, statistical physics, and machine learning <span class="citation" data-cites="ito1951 mckean1969">(<a href="#ref-ito1951" role="doc-biblioref">Itô 1951</a>; <a href="#ref-mckean1969" role="doc-biblioref">McKean 1969</a>)</span>.</p>
+<p>Stochastic differential equations (SDEs) represent one of the most profound and mathematically elegant frameworks in modern probability theory and applied mathematics. These equations describe the evolution of random processes in continuous time, providing the mathematical foundation for modeling phenomena characterized by both deterministic trends and random fluctuations <span class="citation" data-cites="oksendal2003 karatzas1991">(<a href="#ref-oksendal2003" role="doc-biblioref"><strong>oksendal2003?</strong></a>; <a href="#ref-karatzas1991" role="doc-biblioref"><strong>karatzas1991?</strong></a>)</span>.</p>
+<p>The theoretical development of SDE theory emerged from the intersection of probability theory, differential equations, and mathematical finance, culminating in the revolutionary work of Kiyoshi Itô in the 1940s. Itô’s groundbreaking construction of stochastic integration transformed our understanding of random processes and established the mathematical framework that now underpins modern quantitative finance, statistical physics, and machine learning <span class="citation" data-cites="ito1951 mckean1969">(<a href="#ref-ito1951" role="doc-biblioref"><strong>ito1951?</strong></a>; <a href="#ref-mckean1969" role="doc-biblioref"><strong>mckean1969?</strong></a>)</span>.</p>
 <section id="historical-development-and-motivation" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="historical-development-and-motivation"><span class="header-section-number">1.1</span> Historical Development and Motivation</h3>
-<p>The genesis of stochastic differential equations can be traced to Louis Bachelier’s pioneering 1900 thesis on option pricing, where he first applied Brownian motion to financial markets <span class="citation" data-cites="bachelier1900">(<a href="#ref-bachelier1900" role="doc-biblioref">Bachelier 1900</a>)</span>. However, it was not until Norbert Wiener’s rigorous mathematical construction of Brownian motion in the 1920s that the field gained its theoretical foundation <span class="citation" data-cites="wiener1923">(<a href="#ref-wiener1923" role="doc-biblioref">Wiener 1923</a>)</span>.</p>
-<p>The transformative breakthrough came with Itô’s development of stochastic calculus in the 1940s and 1950s. Itô recognized that classical calculus was inadequate for handling functions of Brownian motion due to their non-differentiable nature, leading to his construction of stochastic integration and the famous Itô’s lemma <span class="citation" data-cites="ito1951">(<a href="#ref-ito1951" role="doc-biblioref">Itô 1951</a>)</span>. This work established the mathematical machinery necessary for:</p>
+<p>The genesis of stochastic differential equations can be traced to Louis Bachelier’s pioneering 1900 thesis on option pricing, where he first applied Brownian motion to financial markets <span class="citation" data-cites="bachelier1900">(<a href="#ref-bachelier1900" role="doc-biblioref"><strong>bachelier1900?</strong></a>)</span>. However, it was not until Norbert Wiener’s rigorous mathematical construction of Brownian motion in the 1920s that the field gained its theoretical foundation <span class="citation" data-cites="wiener1923">(<a href="#ref-wiener1923" role="doc-biblioref"><strong>wiener1923?</strong></a>)</span>.</p>
+<p>The transformative breakthrough came with Itô’s development of stochastic calculus in the 1940s and 1950s. Itô recognized that classical calculus was inadequate for handling functions of Brownian motion due to their non-differentiable nature, leading to his construction of stochastic integration and the famous Itô’s lemma <span class="citation" data-cites="ito1951">(<a href="#ref-ito1951" role="doc-biblioref"><strong>ito1951?</strong></a>)</span>. This work established the mathematical machinery necessary for:</p>
 <ul>
 <li><strong>Rigorous treatment of random processes</strong>: Moving beyond heuristic arguments to mathematically precise formulations</li>
 <li><strong>Financial modeling</strong>: Providing the foundation for modern option pricing theory through the Black-Scholes model</li>
@@ -352,9 +332,9 @@ window.Quarto = {
 <section id="contemporary-relevance-and-applications" class="level3" data-number="1.2">
 <h3 data-number="1.2" class="anchored" data-anchor-id="contemporary-relevance-and-applications"><span class="header-section-number">1.2</span> Contemporary Relevance and Applications</h3>
 <p>In the 21st century, SDEs have experienced a renaissance driven by advances in computational methods and emerging applications in machine learning. Key contemporary developments include:</p>
-<p><strong>Mathematical Finance</strong>: SDEs form the backbone of modern derivatives pricing, risk management, and portfolio optimization. Models like the Heston stochastic volatility model and interest rate models (Vasicek, Cox-Ingersoll-Ross) are built on SDE foundations <span class="citation" data-cites="heston1993 cox1985">(<a href="#ref-heston1993" role="doc-biblioref">Heston 1993</a>; <a href="#ref-cox1985" role="doc-biblioref">Cox, Ingersoll Jr, and Ross 1985</a>)</span>.</p>
-<p><strong>Machine Learning and AI</strong>: Recent breakthroughs in generative modeling, particularly diffusion models for image generation, rely heavily on SDE theory. Neural ordinary differential equations (NODEs) and neural SDEs represent cutting-edge applications of stochastic analysis to deep learning <span class="citation" data-cites="chen2018 song2021">(<a href="#ref-chen2018" role="doc-biblioref">Chen et al. 2018</a>; <a href="#ref-song2021" role="doc-biblioref">Song et al. 2021</a>)</span>.</p>
-<p><strong>Scientific Computing</strong>: SDEs provide essential tools for modeling complex systems in physics, biology, and engineering where random effects play a crucial role <span class="citation" data-cites="gardiner2009">(<a href="#ref-gardiner2009" role="doc-biblioref">Gardiner 2009</a>)</span>.</p>
+<p><strong>Mathematical Finance</strong>: SDEs form the backbone of modern derivatives pricing, risk management, and portfolio optimization. Models like the Heston stochastic volatility model and interest rate models (Vasicek, Cox-Ingersoll-Ross) are built on SDE foundations <span class="citation" data-cites="heston1993 cox1985">(<a href="#ref-heston1993" role="doc-biblioref"><strong>heston1993?</strong></a>; <a href="#ref-cox1985" role="doc-biblioref"><strong>cox1985?</strong></a>)</span>.</p>
+<p><strong>Machine Learning and AI</strong>: Recent breakthroughs in generative modeling, particularly diffusion models for image generation, rely heavily on SDE theory. Neural ordinary differential equations (NODEs) and neural SDEs represent cutting-edge applications of stochastic analysis to deep learning <span class="citation" data-cites="chen2018 song2021">(<a href="#ref-chen2018" role="doc-biblioref"><strong>chen2018?</strong></a>; <a href="#ref-song2021" role="doc-biblioref"><strong>song2021?</strong></a>)</span>.</p>
+<p><strong>Scientific Computing</strong>: SDEs provide essential tools for modeling complex systems in physics, biology, and engineering where random effects play a crucial role <span class="citation" data-cites="gardiner2009">(<a href="#ref-gardiner2009" role="doc-biblioref"><strong>gardiner2009?</strong></a>)</span>.</p>
 </section>
 <section id="scope-and-mathematical-prerequisites" class="level3" data-number="1.3">
 <h3 data-number="1.3" class="anchored" data-anchor-id="scope-and-mathematical-prerequisites"><span class="header-section-number">1.3</span> Scope and Mathematical Prerequisites</h3>
@@ -1711,11 +1691,11 @@ Relative error: 3.84%</code></pre>
 <pre><code>Convergence Analysis:
 N       Euler Error     Milstein Error      Ratio
 ------------------------------------------------------------
-1000        0.371105        0.366835        1.01
-2000        0.368514        0.367438        1.00
-4000        0.368665        0.365833        1.01
-8000        0.369580        0.366111        1.01
-16000       0.372657        0.371818        1.00</code></pre>
+1000        0.368953        0.364022        1.01
+2000        0.370564        0.374559        0.99
+4000        0.368128        0.369403        1.00
+8000        0.374354        0.368210        1.02
+16000       0.371765        0.368645        1.01</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div id="fig-numerical-methods" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1732,9 +1712,9 @@ Figure&nbsp;8: Comparison of numerical methods for SDEs: Euler-Maruyama vs Milst
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Final comparison (N=16000):
-Euler-Maruyama error: 0.372657
-Milstein error: 0.371818
-Improvement factor: 1.00x</code></pre>
+Euler-Maruyama error: 0.371765
+Milstein error: 0.368645
+Improvement factor: 1.01x</code></pre>
 </div>
 </div>
 </section>
@@ -3037,7 +3017,7 @@ Figure&nbsp;14: Gaussian Processes as SDE solutions: Efficient inference via sta
 ========================================
 Standard GP time: 0.0043 seconds
 Kalman Filter time: 0.0004 seconds
-Speedup factor: 10.01x
+Speedup factor: 10.04x
 
 Key advantages of SDE representation:
 1. Linear complexity O(n) vs O(n³) for standard GP
@@ -3359,7 +3339,7 @@ Advantages over GANs:
 - Theoretical guarantees
 - Flexible sampling procedures</code></pre>
 </div>
-<div id="fig-diffusion-models" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-fig-height="16" data-execution_count="16" data-fig-width="18">
+<div id="fig-diffusion-models" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-fig-width="18" data-execution_count="16" data-fig-height="16">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-diffusion-models-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output cell-output-display">
@@ -3526,44 +3506,9 @@ Figure&nbsp;15
 <p>The comprehensive nature of this exploration draws upon decades of mathematical and computational research. Key references include foundational texts on stochastic calculus, numerical analysis, financial mathematics, and modern machine learning applications. The bibliography provides entry points for deeper investigation into each topic area covered in this treatise.</p>
 
 
-
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-bachelier1900" class="csl-entry" role="listitem">
-Bachelier, Louis. 1900. <span>“Th<span>é</span>orie de La Sp<span>é</span>culation.”</span> <em>Annales Scientifiques de l’<span>É</span>cole Normale Sup<span>é</span>rieure</em> 17: 21–86.
-</div>
-<div id="ref-chen2018" class="csl-entry" role="listitem">
-Chen, Ricky T. Q., Yulia Rubanova, Jesse Bettencourt, and David Duvenaud. 2018. <span>“Neural Ordinary Differential Equations.”</span> <em>Advances in Neural Information Processing Systems</em> 31: 6571–83.
-</div>
-<div id="ref-cox1985" class="csl-entry" role="listitem">
-Cox, John C., Jonathan E. Ingersoll Jr, and Stephen A. Ross. 1985. <span>“A Theory of the Term Structure of Interest Rates.”</span> <em>Econometrica: Journal of the Econometric Society</em> 53 (2): 385–407.
-</div>
-<div id="ref-gardiner2009" class="csl-entry" role="listitem">
-Gardiner, Crispin W. 2009. <em>Stochastic Methods: A Handbook for the Natural and Social Sciences</em>. 4th ed. Springer Series in Synergetics. Springer.
-</div>
-<div id="ref-heston1993" class="csl-entry" role="listitem">
-Heston, Steven L. 1993. <span>“A Closed-Form Solution for Options with Stochastic Volatility with Applications to Bond and Currency Options.”</span> <em>The Review of Financial Studies</em> 6 (2): 327–43.
-</div>
-<div id="ref-ito1951" class="csl-entry" role="listitem">
-Itô, Kiyoshi. 1951. <span>“On Stochastic Differential Equations.”</span> <em>Memoirs of the American Mathematical Society</em> 4: 1–51.
-</div>
-<div id="ref-karatzas1991" class="csl-entry" role="listitem">
-Karatzas, Ioannis, and Steven E. Shreve. 1991. <em>Brownian Motion and Stochastic Calculus</em>. 2nd ed. Vol. 113. Graduate Texts in Mathematics. Springer.
-</div>
-<div id="ref-mckean1969" class="csl-entry" role="listitem">
-McKean, Henry P. 1969. <em>Stochastic Integrals</em>. New York: Academic Press.
-</div>
-<div id="ref-oksendal2003" class="csl-entry" role="listitem">
-Øksendal, Bernt. 2003. <em>Stochastic Differential Equations: An Introduction with Applications</em>. 6th ed. Universitext. Springer.
-</div>
-<div id="ref-song2021" class="csl-entry" role="listitem">
-Song, Yang, Jascha Sohl-Dickstein, Diederik P. Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. 2021. <span>“Score-Based Generative Modeling Through Stochastic Differential Equations.”</span> <em>International Conference on Learning Representations</em>.
-</div>
-<div id="ref-wiener1923" class="csl-entry" role="listitem">
-Wiener, Norbert. 1923. <span>“Differential-Space.”</span> <em>Journal of Mathematics and Physics</em> 2 (1-4): 131–74.
-</div>
-</div></section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
