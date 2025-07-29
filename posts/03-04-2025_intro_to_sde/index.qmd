@@ -170,8 +170,8 @@ def simulate_brownian_motion(T, N, n_paths=5):
 
 # Simulation parameters
 T = 1.0  # Time horizon
-N = 1000  # Number of time steps
-n_paths = 100
+N = 500  # Number of time steps (reduced for faster rendering)
+n_paths = 50  # Reduced number of paths
 dt = T / N
 t = np.linspace(0, T, N + 1)
 
@@ -182,7 +182,7 @@ paths = simulate_brownian_motion(T, N, n_paths)
 fig, axes = plt.subplots(2, 3, figsize=(18, 12))
 
 # Sample paths
-axes[0, 0].plot(t, paths[:20].T, alpha=0.6, linewidth=0.8)
+axes[0, 0].plot(t, paths[:10].T, alpha=0.6, linewidth=0.8)
 axes[0, 0].plot(t, paths[0], 'r-', linewidth=2, label='Sample path')
 axes[0, 0].set_title('Sample Paths of Brownian Motion')
 axes[0, 0].set_xlabel('Time t')
@@ -262,8 +262,8 @@ for i, c in enumerate(scale_factors):
             scaled_path = paths[0, indices] / np.sqrt(c)
             t_plot = t[:len(indices)]
         else:
-            # Extend time for c > 1
-            extended_path = simulate_brownian_motion(T*c, int(N*c), 1)[0]
+            # Extend time for c > 1 (simplified for faster rendering)
+            extended_path = simulate_brownian_motion(T*c, int(N*c*0.5), 1)[0]
             scaled_path = extended_path / np.sqrt(c)
             t_plot = np.linspace(0, T, len(scaled_path))
     else:
@@ -1021,7 +1021,7 @@ This theorem provides the foundation for Monte Carlo methods in finance and conn
 #| fig-width: 15
 #| fig-height: 10
 
-def feynman_kac_mc(x0, T, mu_func, sigma_func, c_func, g_func, n_paths=10000, n_steps=1000):
+def feynman_kac_mc(x0, T, mu_func, sigma_func, c_func, g_func, n_paths=5000, n_steps=500):
     """
     Solve PDE using Feynman-Kac theorem via Monte Carlo.
     
@@ -1071,11 +1071,11 @@ def g_call(x, K=1.0):
 
 # Parameters
 T = 1.0
-x_values_base = np.linspace(-1, 3, 11)
+x_values_base = np.linspace(-1, 3, 7)  # Reduced points
 x_values_additional = np.array([0.5, 1.0, 1.5])
 x_values = np.sort(np.unique(np.concatenate((x_values_base, x_values_additional))))
 K = 1.0
-n_paths = 50000
+n_paths = 5000  # Reduced for faster rendering
 
 np.random.seed(42)
 
@@ -1129,8 +1129,8 @@ axes[0, 1].set_xlabel('Initial value x')
 axes[0, 1].set_ylabel('Relative Error')
 axes[0, 1].grid(True, alpha=0.3)
 
-# Sample paths for different initial conditions
-t = np.linspace(0, T, 1001)
+# Sample paths for different initial conditions  
+t = np.linspace(0, T, 501)  # Match n_steps + 1
 colors = ['blue', 'red', 'green']
 for i, (x0_str, color) in enumerate(zip(['0.5', '1.0', '1.5'], colors)):
     paths = sample_paths[x0_str]
@@ -1286,8 +1286,8 @@ mu_params = (mu, 0.0)  # a=μ, b=0
 sigma_params = (sigma, 0.0)  # c=σ, d=0
 
 # Convergence study
-step_sizes = np.array([1000, 2000, 4000, 8000, 16000])
-n_paths_convergence = 10000
+step_sizes = np.array([500, 1000, 2000, 4000, 8000])
+n_paths_convergence = 5000
 
 errors_euler = []
 errors_milstein = []
@@ -1478,13 +1478,13 @@ For many applications (e.g., option pricing), weak convergence is sufficient and
 #| fig-width: 15
 #| fig-height: 10
 
-def weak_convergence_study(payoff_func, step_sizes, n_paths=50000):
+def weak_convergence_study(payoff_func, step_sizes, n_paths=20000):
     """Study weak convergence for a given payoff function."""
     weak_errors_euler = []
     weak_errors_milstein = []
     
     # Reference solution with very fine discretization
-    N_ref = 32000
+    N_ref = 16000
     np.random.seed(42)
     X_ref = euler_maruyama_simulation(x0, T, N_ref, mu_params, sigma_params, n_paths)
     exact_expectation = np.mean(payoff_func(X_ref[:, -1]))
@@ -1532,7 +1532,7 @@ axes = axes.flatten()
 
 for i, (payoff_func, title) in enumerate(payoff_functions):
     weak_errors_euler, weak_errors_milstein, exact_value = weak_convergence_study(
-        payoff_func, step_sizes_weak, n_paths=20000)
+        payoff_func, step_sizes_weak, n_paths=10000)
     
     dt_values = T / step_sizes_weak
     
@@ -1648,7 +1648,7 @@ def calculate_greeks(S, K, T, r, sigma):
         'rho_call': rho_call, 'rho_put': rho_put
     }
 
-def monte_carlo_option_price(S0, K, T, r, sigma, n_paths=100000, option_type='call'):
+def monte_carlo_option_price(S0, K, T, r, sigma, n_paths=50000, option_type='call'):
     """Monte Carlo option pricing."""
     dt = T / 252  # Daily steps
     n_steps = int(T / dt)
@@ -2068,7 +2068,7 @@ def simulate_heston(S0, V0, mu, kappa, theta, sigma_v, rho, T, N, n_paths=1):
     
     return S, V
 
-def heston_option_pricing_mc(S0, V0, K, T, r, kappa, theta, sigma_v, rho, n_paths=100000):
+def heston_option_pricing_mc(S0, V0, K, T, r, kappa, theta, sigma_v, rho, n_paths=50000):
     """Monte Carlo option pricing under Heston model."""
     S, V = simulate_heston(S0, V0, r, kappa, theta, sigma_v, rho, T, 252, n_paths)
     
@@ -2092,7 +2092,7 @@ sigma_v = 0.3  # Volatility of volatility
 rho = -0.7  # Leverage effect
 T = 1.0
 N = 252
-n_paths = 10000
+n_paths = 5000
 
 np.random.seed(42)
 
