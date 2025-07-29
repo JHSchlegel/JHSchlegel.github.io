@@ -225,8 +225,8 @@ We construct a diversified portfolio of technology stocks to demonstrate our opt
 ```{python}
 #| label: fig-data-acquisition
 #| fig-cap: "Historical price data and returns for technology portfolio"
-#| fig-width: 18
-#| fig-height: 9
+#| fig-width: 16
+#| fig-height: 10
 
 # Define our portfolio universe
 tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'NFLX', 'AMD', 'CRM']
