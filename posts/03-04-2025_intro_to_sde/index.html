@@ -1691,11 +1691,11 @@ Relative error: 3.84%</code></pre>
 <pre><code>Convergence Analysis:
 N       Euler Error     Milstein Error      Ratio
 ------------------------------------------------------------
-1000        0.371105        0.366835        1.01
-2000        0.368514        0.367438        1.00
-4000        0.368665        0.365833        1.01
-8000        0.369580        0.366111        1.01
-16000       0.372657        0.371818        1.00</code></pre>
+1000        0.368953        0.364022        1.01
+2000        0.370564        0.374559        0.99
+4000        0.368128        0.369403        1.00
+8000        0.374354        0.368210        1.02
+16000       0.371765        0.368645        1.01</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div id="fig-numerical-methods" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1712,9 +1712,9 @@ Figure&nbsp;8: Comparison of numerical methods for SDEs: Euler-Maruyama vs Milst
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Final comparison (N=16000):
-Euler-Maruyama error: 0.372657
-Milstein error: 0.371818
-Improvement factor: 1.00x</code></pre>
+Euler-Maruyama error: 0.371765
+Milstein error: 0.368645
+Improvement factor: 1.01x</code></pre>
 </div>
 </div>
 </section>
@@ -3017,7 +3017,7 @@ Figure&nbsp;14: Gaussian Processes as SDE solutions: Efficient inference via sta
 ========================================
 Standard GP time: 0.0043 seconds
 Kalman Filter time: 0.0004 seconds
-Speedup factor: 10.01x
+Speedup factor: 10.04x
 
 Key advantages of SDE representation:
 1. Linear complexity O(n) vs O(n³) for standard GP

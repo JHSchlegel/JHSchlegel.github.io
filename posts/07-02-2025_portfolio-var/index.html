@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Jan Heinrich Schlegel">
-<meta name="dcterms.date" content="2023-02-16">
+<meta name="author" content="Jan Schlegel">
+<meta name="dcterms.date" content="2025-02-07">
 
-<title>Jan Schlegel – Portfolio Value at Risk Forecasting with GARCH-Type Models</title>
+<title>Jan Schlegel – Comparing Univariate and Multivariate Models for Value at Risk Forecasting</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -171,7 +171,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Portfolio Value at Risk Forecasting with GARCH-Type Models</h1>
+      <h1 class="title">Comparing Univariate and Multivariate Models for Value at Risk Forecasting</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">Simulation</div>
                 <div class="quarto-category">R</div>
@@ -185,14 +185,14 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Author</div>
       <div class="quarto-title-meta-contents">
-               <p>Jan Heinrich Schlegel </p>
+               <p>Jan Schlegel </p>
             </div>
     </div>
       
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">February 16, 2023</p>
+        <p class="date">February 7, 2025</p>
       </div>
     </div>
     
@@ -214,39 +214,23 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract"><span class="header-section-number">1</span> Abstract</a></li>
-  <li><a href="#sec-intro" id="toc-sec-intro" class="nav-link" data-scroll-target="#sec-intro"><span class="header-section-number">2</span> Introduction</a></li>
-  <li><a href="#sec-theoretical" id="toc-sec-theoretical" class="nav-link" data-scroll-target="#sec-theoretical"><span class="header-section-number">3</span> Theoretical Framework</a>
+  <li><a href="#sec-introduction" id="toc-sec-introduction" class="nav-link active" data-scroll-target="#sec-introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#sec-methodology" id="toc-sec-methodology" class="nav-link" data-scroll-target="#sec-methodology"><span class="header-section-number">2</span> Methodology</a>
   <ul class="collapse">
-  <li><a href="#sec-univariate" id="toc-sec-univariate" class="nav-link" data-scroll-target="#sec-univariate"><span class="header-section-number">3.1</span> Univariate Models</a></li>
-  <li><a href="#sec-factor-copula" id="toc-sec-factor-copula" class="nav-link" data-scroll-target="#sec-factor-copula"><span class="header-section-number">3.2</span> A Multivariate Factor Copula-DCC-GARCH Model</a></li>
-  <li><a href="#sec-comfort" id="toc-sec-comfort" class="nav-link" data-scroll-target="#sec-comfort"><span class="header-section-number">3.3</span> The COMFORT Model</a></li>
+  <li><a href="#sec-univariate" id="toc-sec-univariate" class="nav-link" data-scroll-target="#sec-univariate"><span class="header-section-number">2.1</span> Univariate Models</a></li>
+  <li><a href="#sec-multivariate" id="toc-sec-multivariate" class="nav-link" data-scroll-target="#sec-multivariate"><span class="header-section-number">2.2</span> Multivariate Models</a></li>
+  <li><a href="#sec-data" id="toc-sec-data" class="nav-link" data-scroll-target="#sec-data"><span class="header-section-number">2.3</span> Data</a></li>
+  <li><a href="#sec-VaR-forecasts" id="toc-sec-VaR-forecasts" class="nav-link" data-scroll-target="#sec-VaR-forecasts"><span class="header-section-number">2.4</span> Value at Risk Forecasts</a></li>
+  <li><a href="#sec-backtesting" id="toc-sec-backtesting" class="nav-link" data-scroll-target="#sec-backtesting"><span class="header-section-number">2.5</span> Backtesting</a></li>
+  <li><a href="#sec-comparison-PA" id="toc-sec-comparison-PA" class="nav-link" data-scroll-target="#sec-comparison-PA"><span class="header-section-number">2.6</span> Comparison of Predictive Ability</a></li>
   </ul></li>
-  <li><a href="#sec-methodology" id="toc-sec-methodology" class="nav-link" data-scroll-target="#sec-methodology"><span class="header-section-number">4</span> Methodology</a>
+  <li><a href="#sec-results" id="toc-sec-results" class="nav-link" data-scroll-target="#sec-results"><span class="header-section-number">3</span> Results</a>
   <ul class="collapse">
-  <li><a href="#sec-data" id="toc-sec-data" class="nav-link" data-scroll-target="#sec-data"><span class="header-section-number">4.1</span> Data</a></li>
-  <li><a href="#sec-var-forecasts" id="toc-sec-var-forecasts" class="nav-link" data-scroll-target="#sec-var-forecasts"><span class="header-section-number">4.2</span> Value at Risk Forecasts</a></li>
-  <li><a href="#sec-backtesting" id="toc-sec-backtesting" class="nav-link" data-scroll-target="#sec-backtesting"><span class="header-section-number">4.3</span> Backtesting</a></li>
+  <li><a href="#value-at-risk-backtests" id="toc-value-at-risk-backtests" class="nav-link" data-scroll-target="#value-at-risk-backtests"><span class="header-section-number">3.1</span> Value at Risk Backtests</a></li>
+  <li><a href="#conditional-predictive-ability-tests" id="toc-conditional-predictive-ability-tests" class="nav-link" data-scroll-target="#conditional-predictive-ability-tests"><span class="header-section-number">3.2</span> Conditional Predictive Ability Tests</a></li>
   </ul></li>
-  <li><a href="#sec-results" id="toc-sec-results" class="nav-link" data-scroll-target="#sec-results"><span class="header-section-number">5</span> Results</a></li>
-  <li><a href="#sec-conclusion" id="toc-sec-conclusion" class="nav-link" data-scroll-target="#sec-conclusion"><span class="header-section-number">6</span> Conclusion</a></li>
-  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix"><span class="header-section-number">7</span> Appendix</a>
-  <ul class="collapse">
-  <li><a href="#proofs" id="toc-proofs" class="nav-link" data-scroll-target="#proofs"><span class="header-section-number">7.1</span> Proofs</a>
-  <ul class="collapse">
-  <li><a href="#sec-appendix-pit" id="toc-sec-appendix-pit" class="nav-link" data-scroll-target="#sec-appendix-pit"><span class="header-section-number">7.1.1</span> Probability Integral Transform</a></li>
-  <li><a href="#sec-appendix-quantile-trafo" id="toc-sec-appendix-quantile-trafo" class="nav-link" data-scroll-target="#sec-appendix-quantile-trafo"><span class="header-section-number">7.1.2</span> Quantile Transform</a></li>
-  </ul></li>
-  <li><a href="#copulas" id="toc-copulas" class="nav-link" data-scroll-target="#copulas"><span class="header-section-number">7.2</span> Copulas</a>
-  <ul class="collapse">
-  <li><a href="#sec-appendix-cop-gauss" id="toc-sec-appendix-cop-gauss" class="nav-link" data-scroll-target="#sec-appendix-cop-gauss"><span class="header-section-number">7.2.1</span> Gaussian Copula</a></li>
-  <li><a href="#sec-appendix-cop-t" id="toc-sec-appendix-cop-t" class="nav-link" data-scroll-target="#sec-appendix-cop-t"><span class="header-section-number">7.2.2</span> Student t Copula</a></li>
-  </ul></li>
-  <li><a href="#distributions" id="toc-distributions" class="nav-link" data-scroll-target="#distributions"><span class="header-section-number">7.3</span> Distributions</a>
-  <ul class="collapse">
-  <li><a href="#sec-appendix-mixn" id="toc-sec-appendix-mixn" class="nav-link" data-scroll-target="#sec-appendix-mixn"><span class="header-section-number">7.3.1</span> Finite Normal Mixtures</a></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#sec-conclusion" id="toc-sec-conclusion" class="nav-link" data-scroll-target="#sec-conclusion"><span class="header-section-number">4</span> Conclusion</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">5</span> References</a></li>
   </ul>
 </nav>
     </div>
@@ -257,323 +241,307 @@ window.Quarto = {
 
 
 
-<section id="abstract" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Abstract</h1>
-<p>This thesis examines the value at risk (VaR) forecasting ability of various univariate and multivariate models for a long equity portfolio. All of the considered models involve a generalized autoregressive conditional heteroskedasticity (GARCH)-type structure. The resulting forecasts are checked for desirable properties using violation-based backtests and compared in terms of predictive ability. We find that the VaR forecasts of almost all univariate models are inadequate, while the multivariate models have few problems passing these backtests. However, we do not find evidence that the multivariate models systematically outperform their univariate counterparts with regards to predictive accuracy, or vice versa.</p>
-</section>
-<section id="sec-intro" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Introduction</h1>
-<p>The last four decades were shaped by many extreme events on the financial markets. Especially noteworthy incidents were the sudden market crash on the Black Monday, the dot-com bubble and the global financial crisis of 2008. All of these supposedly rare events pointed out that reducing systematic risk is paramount to ensure the stability of the financial system. Thus, the demand for more stringent regulation strongly increased which led to the introduction and consequent tightening of the Basel Accords. This framework makes use of so-called risk measures to determine the appropriate amount of risk capital that a institution has to hold. Even though a shift towards the severity-based expected shortfall (ES) can be observed, the value at risk (VaR) to this day remains the most popular measure for downside market risk (see <span class="citation" data-cites="embrechts_2014">Embrechts et al. (<a href="#ref-embrechts_2014" role="doc-biblioref">2014</a>)</span> for the differences between the VaR and the ES). When considering a long equity portfolio, the <span class="math inline">\(p\)</span>% VaR for period <span class="math inline">\(t\)</span> forecasted at time <span class="math inline">\(t-1\)</span> is defined as the negative <span class="math inline">\(p\)</span>-quantile of the conditional portfolio return distribution, i.e.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/var_visualization.png" class="img-fluid figure-img"></p>
+<figcaption>Value at Risk (VaR) is a crucial metric in modern financial risk management</figcaption>
+</figure>
+</div>
+<section id="sec-introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="sec-introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>The past four decades have been shaped by extreme events in financial markets, such as the Black Monday crash, the dot-com bubble, and the 2008 global financial crisis. These supposedly rare events highlighted that reducing systemic risk is crucial for financial stability <span class="citation" data-cites="embrechts_2014">(<a href="#ref-embrechts_2014" role="doc-biblioref">Embrechts et al. 2014</a>)</span>. This led to the introduction and tightening of the Basel Accords, which use risk measures to determine appropriate risk capital requirements for financial institutions.</p>
+<p>Value at Risk (VaR) remains the most popular measure for downside market risk, despite a shift towards the severity-based expected shortfall (ES) <span class="citation" data-cites="embrechts_2014">(<a href="#ref-embrechts_2014" role="doc-biblioref">Embrechts et al. 2014</a>)</span>. For a long equity portfolio, the <span class="math inline">\(p\)</span>% VaR for period <span class="math inline">\(t\)</span> forecasted at time <span class="math inline">\(t-1\)</span> is defined as the negative <span class="math inline">\(p\)</span>-quantile of the conditional portfolio return distribution:</p>
 <p><span id="eq-VaR_def"><span class="math display">\[
 \text{VaR}_t^p=-Q_p(r_{\text{PF},t}|\mathcal{F}_{t-1})=-\inf_x\{x\in\mathbb{R}:\mathbb{P}(r_{\text{PF},t}\leq x|\mathcal{F}_{t-1})\geq p\},\quad p\in(0,1).
 \tag{1}\]</span></span></p>
-<p>Hereby <span class="math inline">\(Q_p(\cdot)\)</span> denotes the quantile function and <span class="math inline">\(\mathcal{F}_{t-1}\)</span> is a filtration that represents all the information available at time <span class="math inline">\(t-1\)</span>. The parameter <span class="math inline">\(p\)</span> is the level of the VaR and indicates that with target probability <span class="math inline">\(p\)</span> the losses of the portfolio will exceed the VaR <span class="citation" data-cites="Paolella2006">(<a href="#ref-Paolella2006" role="doc-biblioref">Marc S. Paolella, Kuester, and Mittnik 2006</a>)</span>. We will follow <span class="citation" data-cites="Santos2013">Santos, Nogales, and Ruiz (<a href="#ref-Santos2013" role="doc-biblioref">2013</a>)</span> and consider the 1% and the 5% VaR level in our empirical analysis.</p>
-<p>Due to the practical relevance of this risk measure it is essential to determine how the VaR should be estimated such that it neither severely underestimates nor overestimates future losses. To this end, a plethora of models have been proposed to generate VaR forecasts, many of which involve the generalized autoregressive conditional heteroskedasticity (GARCH) model by <span class="citation" data-cites="bollerslev_garch">Bollerslev (<a href="#ref-bollerslev_garch" role="doc-biblioref">1986</a>)</span> or an extension thereof. These GARCH structures should account for volatility clustering and the so-called “leverage effect” which both are typically inherent in financial time series (see e.g. <span class="citation" data-cites="quant_risk_man">McNeil, Frey, and Embrechts (<a href="#ref-quant_risk_man" role="doc-biblioref">2015, chap. 3</a>)</span>). Moreover, one can either choose a univariate approach, where only the conditional portfolio variance is modelled, or a multivariate approach, where the joint dynamics of the portfolio constituents are modelled.</p>
-<p>The question whether the more complex multivariate models are to be preferred over the simpler univariate alternatives has been extensively discussed in literature. <span class="citation" data-cites="Santos2013">Santos, Nogales, and Ruiz (<a href="#ref-Santos2013" role="doc-biblioref">2013</a>)</span>, who considered three large portfolios, found that the multivariate models significantly outperform their univariate counterparts. Similarly, <span class="citation" data-cites="kole_forecasting">Kole et al. (<a href="#ref-kole_forecasting" role="doc-biblioref">2017</a>)</span> found that multivariate models have greater predictive ability but these differences are in most cases not high enough to be deemed significant. Further, they find that the choice of return frequency is more important than the choice of the model itself. In addition to the data frequency and the volatility or correlation model, the assumed distribution of the error terms often majorly impacts VaR forecasts. The importance of the assumed distribution of the innovations is highlighted in <span class="citation" data-cites="Paolella2006">Marc S. Paolella, Kuester, and Mittnik (<a href="#ref-Paolella2006" role="doc-biblioref">2006</a>)</span>, <span class="citation" data-cites="levyGARCH">Slim, Koubaa, and BenSaïda (<a href="#ref-levyGARCH" role="doc-biblioref">2017</a>)</span>, <span class="citation" data-cites="diks_density">Diks and Fang (<a href="#ref-diks_density" role="doc-biblioref">2020</a>)</span> or <span class="citation" data-cites="COMFORT_2022">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2022" role="doc-biblioref">2022</a>)</span> among others.</p>
-<p>A middle ground to fitting a GARCH-type model to all the constituents and a univariate model is to only provide equity factors, which should capture the main risks of the portfolio, with a GARCH structure. <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> introduced such a framework but failed to find significant advantages over more parsimonious univariate models. Moreover, none of the models they considered adequately forecasted the one-week-ahead VaR of a portfolio in terms of conditional coverage. We replicate their models and consider an equally weighted portfolio consisting of the same ten large cap single stocks they used. However, instead of the weekly return data <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> used, we based our analysis on daily returns as this is, as identified in <span class="citation" data-cites="kole_forecasting">Kole et al. (<a href="#ref-kole_forecasting" role="doc-biblioref">2017</a>)</span>, the data frequency which yields the most adequate VaR forecasts (out of the time intervals they considered).</p>
-<p>We extend the existing literature by comparing these factor copula-DCC-NGARCH models introduced in <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> to more established models such as the diagonal MixN(k)-GARCH presented in <span class="citation" data-cites="MN2004">Haas, Mittnik, and Paolella (<a href="#ref-MN2004" role="doc-biblioref">2004</a>)</span> or the COMFORT model class by <span class="citation" data-cites="COMFORT_2015">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2015" role="doc-biblioref">2015</a>)</span>. We show that, contrary to most univariate models, the forecasts generated by the multivariate models display desirable VaR properties in the form of correct unconditional coverage and independence of the violations. Further, we do not find enough evidence to justify stating that the multivariate approaches outperform the univariate procedures in terms of forecast ability, or vice versa. Additionally, we present a slightly modified version of the model class presented in <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> and compare it to the original models. Finally, we come up with a plausible explanation for the differences in forecasting ability between this original and the modified model class.</p>
-<p>The remainder of this thesis is structured as follows. Chapter <a href="#sec-theoretical" class="quarto-xref">Section&nbsp;3</a> examines the univariate and multivariate models. In Chapter <a href="#sec-methodology" class="quarto-xref">Section&nbsp;4</a> we present the data, shine a light on how the VaR estimates were created for each model and explain how the forecasts are backtested and compared. In Chapter <a href="#sec-results" class="quarto-xref">Section&nbsp;5</a> we discuss our empirical results. In Chapter <a href="#sec-conclusion" class="quarto-xref">Section&nbsp;6</a> we conclude.</p>
+<p>Here, <span class="math inline">\(Q_p(\cdot)\)</span> denotes the quantile function and <span class="math inline">\(\mathcal{F}_{t-1}\)</span> represents all information available at time <span class="math inline">\(t-1\)</span>. The parameter <span class="math inline">\(p\)</span> indicates that with target probability <span class="math inline">\(p\)</span>, the portfolio losses will exceed the VaR <span class="citation" data-cites="Paolella2006">(<a href="#ref-Paolella2006" role="doc-biblioref">Marc S. Paolella, Kuester, and Mittnik 2006</a>)</span>.</p>
+<p>Due to the practical relevance of VaR, it is essential to determine estimation methods that neither severely underestimate nor overestimate future losses. Many models use the generalized autoregressive conditional heteroskedasticity (GARCH) framework <span class="citation" data-cites="bollerslev_garch">(<a href="#ref-bollerslev_garch" role="doc-biblioref">Bollerslev 1986</a>)</span> or extensions to account for volatility clustering and the “leverage effect” in financial time series.</p>
+<p>A fundamental question in VaR modeling is whether more complex multivariate models outperform simpler univariate alternatives. <span class="citation" data-cites="Santos2013">Santos, Nogales, and Ruiz (<a href="#ref-Santos2013" role="doc-biblioref">2013</a>)</span> found that multivariate models significantly outperform univariate counterparts for large portfolios, while <span class="citation" data-cites="kole_forecasting">Kole et al. (<a href="#ref-kole_forecasting" role="doc-biblioref">2017</a>)</span> found that multivariate models have greater predictive ability, though differences are often not significant. They also found that data frequency is more important than model choice.</p>
+<p>This study compares factor copula-DCC-NGARCH models introduced by <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> with established models like the diagonal MixN(k)-GARCH <span class="citation" data-cites="MN2004">(<a href="#ref-MN2004" role="doc-biblioref">Haas, Mittnik, and Paolella 2004</a>)</span> and the COMFORT model class <span class="citation" data-cites="COMFORT_2015">(<a href="#ref-COMFORT_2015" role="doc-biblioref">Marc S. Paolella and Polak 2015</a>)</span>. We show that multivariate models display desirable VaR properties in terms of correct unconditional coverage and independence of violations, though we don’t find sufficient evidence to claim that multivariate approaches outperform univariate procedures in terms of forecast ability, or vice versa.</p>
 </section>
-<section id="sec-theoretical" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Theoretical Framework</h1>
-<p>This chapter will introduce the models that were used to forecast the value at risk (VaR) of a portfolio in our empirical application. First, some of the most popular univariate GARCH-type structures will be presented. Next, the multivariate models in form of the factor copula model class from <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> and the COMFORT model by <span class="citation" data-cites="COMFORT_2015">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2015" role="doc-biblioref">2015</a>)</span> are discussed. Note that there are far more GARCH-type models than the few that will be mentioned in this chapter (see e.g. <span class="citation" data-cites="GARCH_glossary">(<a href="#ref-GARCH_glossary" role="doc-biblioref"><strong>GARCH_glossary?</strong></a>)</span> for an extensive compendium). This chapter often makes use of the notion of a information set, denoted <span class="math inline">\(\mathcal{F}_{t-1}\)</span>, which in simple terms is just the information available at the end of time <span class="math inline">\(t-1\)</span> on which the forecast will be based i.e.&nbsp;in our case an observed sequence of past returns.</p>
-<section id="sec-univariate" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="sec-univariate"><span class="header-section-number">3.1</span> Univariate Models</h2>
-<p>For our univariate models we assume the following portfolio return dynamics:</p>
-<p><span id="eq-return-dynamics1"><span class="math display">\[
-r_{\text{PF},t}=\mu+\epsilon_t,
-\tag{2}\]</span></span></p>
-<p>where for all but the MixN(k)-GARCH we let</p>
-<p><span id="eq-return-dynamics2"><span class="math display">\[
-\epsilon_t = \sigma_t z_t, \quad z_t\stackrel{iid}{\sim}F(0,1),
-\tag{3}\]</span></span></p>
-<p>where <span class="math inline">\(F(0,1)\)</span> is some standardized distribution (i.e.&nbsp;zero-location and unit-scale), <span class="math inline">\(\mu\)</span> is the unconditional location and <span class="math inline">\(\sigma_t\)</span> is the scale parameter. In this framework the conditional variance <span class="math inline">\(\sigma_t^2=\mathbb{V}[r_{\text{PF},t}|\mathcal{F}_{t-1}]\)</span>, where <span class="math inline">\(\mathcal{F}_{t-1}=\{r_{\text{PF},1},...,r_{\text{PF},t-1}\}\)</span> denotes the information available at time <span class="math inline">\(t-1\)</span>, is assumed to be non-constant.</p>
-<p>A simple way to model this conditional variance is by means of a generalized autoregressive conditional heteroskedasticity (GARCH) process. This GARCH model introduced in <span class="citation" data-cites="bollerslev_garch">Bollerslev (<a href="#ref-bollerslev_garch" role="doc-biblioref">1986</a>)</span> is a generalisation of the ARCH model by <span class="citation" data-cites="engle-arch">Robert F. Engle (<a href="#ref-engle-arch" role="doc-biblioref">1982</a>)</span>. The most prominent version, the GARCH(1,1), can be formulated via</p>
+<section id="sec-methodology" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="sec-methodology"><span class="header-section-number">2</span> Methodology</h2>
+<section id="sec-univariate" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="sec-univariate"><span class="header-section-number">2.1</span> Univariate Models</h3>
+<p>For univariate models, we assume the following portfolio return dynamics:</p>
+<p><span class="math display">\[
+r_{\text{PF},t} = \mu + \epsilon_t
+\]</span></p>
+<p>where</p>
+<p><span class="math display">\[
+\epsilon_t = \sigma_t z_t, \quad z_t \stackrel{iid}{\sim} F(0,1)
+\]</span></p>
+<p>Here, <span class="math inline">\(F(0,1)\)</span> is a standardized distribution, <span class="math inline">\(\mu\)</span> is the unconditional location, and <span class="math inline">\(\sigma_t\)</span> is the scale parameter. The conditional variance <span class="math inline">\(\sigma_t^2 = \mathbb{V}[r_{\text{PF},t}|\mathcal{F}_{t-1}]\)</span> is modeled as non-constant.</p>
+<section id="garch-and-extensions" class="level4" data-number="2.1.1">
+<h4 data-number="2.1.1" class="anchored" data-anchor-id="garch-and-extensions"><span class="header-section-number">2.1.1</span> GARCH and Extensions</h4>
+<p>The standard GARCH(1,1) model <span class="citation" data-cites="bollerslev_garch">(<a href="#ref-bollerslev_garch" role="doc-biblioref">Bollerslev 1986</a>)</span> is formulated as:</p>
 <p><span id="eq-GARCH"><span class="math display">\[
-\sigma_t^2=\omega+\alpha\epsilon_{t-1}^2+\beta\sigma_{t-1}^2,
-\tag{4}\]</span></span></p>
-<p>where <span class="math inline">\(\omega&gt;0,\alpha\geq0\)</span>, and <span class="math inline">\(\beta\geq0\)</span>. In other words, in a GARCH(1,1) model the conditional volatility behaves similarly to how an ARMA(1,1) process would for the conditional mean. For covariance stationarity of the process the parameters have to fulfill <span class="math inline">\(\alpha+\beta&lt;1\)</span>. In our empirical application, we will only consider the GARCH(1,1) model with normal innovation terms i.e.&nbsp;<span class="math inline">\(z_t\stackrel{iid}{\sim}\mathcal{N}(0,1)\)</span> which will serve as our univariate benchmark. However, it is possible to define higher order GARCH(p,q) processes, but we will only regard the case where <span class="math inline">\(p=q=1\)</span>. Thus, henceforth whenever a GARCH-type model is mentioned without explicitly stating <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>, we will refer to the <span class="math inline">\(p=q=1\)</span> case.</p>
-<p>A relevant special case of the GARCH model is the exponentially weighted moving average (EWMA). It sets <span class="math inline">\(\omega=0\)</span> and the weights <span class="math inline">\(\alpha\)</span> are exponentially decaying and sum up to one:</p>
-<p><span id="eq-ewma"><span class="math display">\[
-\sigma^2_t=\lambda\sigma^2_{t-1}+(1-\lambda)\epsilon_t^2, \quad\lambda\in(0,1).
-\tag{5}\]</span></span></p>
-<p>This model formulation puts more weight on the most recent observations which can be beneficial in some cases. But note that this process is not covariance stationary and the variance is thus not mean-reverting since <span class="math inline">\(\lambda+(1-\lambda)=1\)</span>. This can pose a problem when large returns are observed as they will influence conditional volatility estimates for a long time <span class="citation" data-cites="score_EWMA">(<a href="#ref-score_EWMA" role="doc-biblioref"><strong>score_EWMA?</strong></a>)</span>. For our model comparison, we will be using daily data and therefore we will set the decaying factor <span class="math inline">\(\lambda = 0.94\)</span> in accordance with <span class="citation" data-cites="Riskmetrics">(<a href="#ref-Riskmetrics" role="doc-biblioref"><strong>Riskmetrics?</strong></a>)</span>.</p>
-<p>A well known stylized fact of stock returns is that negative news tends to increase volatility more than positive news of equal magnitude. To account for this so-called ‘leverage effect’ <span class="citation" data-cites="GJR">Glosten, Jagannathan, and Runkle (<a href="#ref-GJR" role="doc-biblioref">1993</a>)</span> created an asymmetric extension of the standard GARCH model which they called GJR-GARCH(1,1):</p>
+\sigma_t^2 = \omega + \alpha\epsilon_{t-1}^2 + \beta\sigma_{t-1}^2
+\tag{2}\]</span></span></p>
+<p>where <span class="math inline">\(\omega &gt; 0, \alpha \geq 0\)</span>, and <span class="math inline">\(\beta \geq 0\)</span>. For covariance stationarity, the parameters must satisfy <span class="math inline">\(\alpha + \beta &lt; 1\)</span>.</p>
+<p>A special case is the exponentially weighted moving average (EWMA):</p>
+<p><span id="eq-EWMA"><span class="math display">\[
+\sigma^2_t = \lambda\sigma^2_{t-1} + (1-\lambda)\epsilon_t^2, \quad \lambda \in (0,1)
+\tag{3}\]</span></span></p>
+<p>This formulation puts more weight on recent observations, but is not covariance stationary since <span class="math inline">\(\lambda + (1-\lambda) = 1\)</span>.</p>
+<p>To account for the “leverage effect” (negative news increasing volatility more than positive news of equal magnitude), we include the GJR-GARCH(1,1) model <span class="citation" data-cites="GJR">(<a href="#ref-GJR" role="doc-biblioref">Glosten, Jagannathan, and Runkle 1993</a>)</span>:</p>
 <p><span id="eq-GJR"><span class="math display">\[
-\sigma_t^2=\omega+(\alpha+\gamma I_{t-1})\epsilon_{t-1}^2+\beta\sigma_{t-1}^2,
-\tag{6}\]</span></span></p>
-<p>where <span class="math inline">\(\omega&gt;0\)</span>, <span class="math inline">\(\alpha+\gamma\geq0\)</span>, <span class="math inline">\(\beta\geq0\)</span> and</p>
-<p><span id="eq-indicator"><span class="math display">\[
-I_{t-1}=\mathbb{1}_{\{\epsilon_{t-1}&lt;0\}}=\begin{cases}
-0 &amp; \text{if } \epsilon_{t-1}\geq0\\
-1 &amp; \text{if } \epsilon_{t-1}&lt;0
-\end{cases}
-\tag{7}\]</span></span></p>
-<p>The process is thereby covariance stationary if <span class="math inline">\(\alpha+\beta+\frac{1}{2}\gamma&lt;1\)</span>. Obviously, if <span class="math inline">\(\gamma=0\)</span> this model reduces to the GARCH(1,1) from equation <a href="#eq-GARCH" class="quarto-xref">Equation&nbsp;4</a> which treats news symmetrically, i.e.&nbsp;bad news (<span class="math inline">\(\epsilon_{t-1}&lt;0\)</span>) have the same impact as good news (<span class="math inline">\(\epsilon_{t-1}\geq0\)</span>). In practice however, <span class="math inline">\(\gamma\)</span> is usually found to be positive <span class="citation" data-cites="GARCH_glossary">(<a href="#ref-GARCH_glossary" role="doc-biblioref"><strong>GARCH_glossary?</strong></a>)</span>. This leads to an asymmetric relationship since negative news is weighted with <span class="math inline">\(\alpha+\gamma\)</span> and positive news only with <span class="math inline">\(\alpha\)</span>. We decided to include this model in our comparison due to the great performance of the GJR with Student t innovations in <span class="citation" data-cites="Santos2013">Santos, Nogales, and Ruiz (<a href="#ref-Santos2013" role="doc-biblioref">2013</a>)</span>. Additionally, we tried out a GJR with the skewed-t distribution by <span class="citation" data-cites="skewt_Hansen">Hansen (<a href="#ref-skewt_Hansen" role="doc-biblioref">1994</a>)</span> for the error terms.</p>
-<p>Another way to capture the leverage effect is presented in <span class="citation" data-cites="NGARCH">Robert F. Engle and Ng (<a href="#ref-NGARCH" role="doc-biblioref">1993</a>)</span> which they termed the NGARCH(1,1) model:</p>
-<p><span id="eq-NGARCH"><span class="math display">\[
-\sigma_t^2=\omega + \alpha\sigma_{t-1}^2(\epsilon_{t-1}-\theta)^2 + \beta\sigma_{t-1}^2,
-\tag{8}\]</span></span></p>
-<p>where <span class="math inline">\(\omega&gt;0\)</span>, <span class="math inline">\(\alpha\geq 0\)</span> and <span class="math inline">\(\beta\geq 0\)</span>. For covariance stationarity <span class="math inline">\(\alpha(1+\theta^2)+\beta&lt;1\)</span> is required. It is apparent that for <span class="math inline">\(\theta&gt;0\)</span> negative innovations (<span class="math inline">\(\epsilon_{t-1}&lt;0\)</span>) have a larger impact on the conditional variance than positive errors of the same magnitude which causes this model to be asymmetric too <span class="citation" data-cites="christoffersen-FFCCopula">(<a href="#ref-christoffersen-FFCCopula" role="doc-biblioref">P. Christoffersen and Langlois 2013</a>)</span>. We will incorporate this model with a skewed-t distribution for the innovations as this is the same specification that <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> and <span class="citation" data-cites="christoffersen-FFCCopula">P. Christoffersen and Langlois (<a href="#ref-christoffersen-FFCCopula" role="doc-biblioref">2013</a>)</span> used in their factor copula models.</p>
-<p>The last class of univariate models that we included in our empirical comparison is the k-component mixed normal GARCH(1,1) (MixN(k)-GARCH) as introduced in <span class="citation" data-cites="MN2004">Haas, Mittnik, and Paolella (<a href="#ref-MN2004" role="doc-biblioref">2004</a>)</span>. We will only consider the case which was referred to as diagonal by <span class="citation" data-cites="MN2004">Haas, Mittnik, and Paolella (<a href="#ref-MN2004" role="doc-biblioref">2004</a>)</span> as they identified it to be the superior choice in terms of performance and interpretability. In this framework, the conditional distribution of the error term <span class="math inline">\(\epsilon_t\)</span> is assumed to be mixed normal (see <a href="#sec-appendix-mixn" class="quarto-xref">Section&nbsp;7.3.1</a>) with zero mean,</p>
-<p><span id="eq-MixN_GARCH_dist"><span class="math display">\[
-\epsilon_t|\mathcal{F}_{t-1}\sim\text{Mix}_k\text{N}(p_1,...,p_k, \mu_1,...,\mu_k, \sigma_{1,t}^2,...,\sigma_{k,t}^2),\quad \sum_{i=1}^k p_i\mu_i = 0,
-\tag{9}\]</span></span></p>
-<p>where <span class="math inline">\(p_i\in(0,1)\,\forall i\)</span>, <span class="math inline">\(\sum_{i=1}^kp_i=1\)</span> and <span class="math inline">\(\mathcal{F}_{t-1}=\{r_{\text{PF},1},...,r_{\text{PF},t-1}\}\)</span> is the information set at time <span class="math inline">\(t-1\)</span>. The associated conditional variances are given by GARCH processes:</p>
-<p><span id="eq-MixN_GARCH"><span class="math display">\[
-\sigma_{i,t}=\omega_i+\alpha_i\epsilon_{i,t-1}^2+\beta_i\sigma_{i,t-1}^2, \quad i=1,...,k.
-\tag{10}\]</span></span></p>
-<p>The <span class="math inline">\(k\geq 2\)</span> components that are used for the conditional variance each represent a different market condition <span class="citation" data-cites="levyGARCH">(<a href="#ref-levyGARCH" role="doc-biblioref">Slim, Koubaa, and BenSaïda 2017</a>)</span>. Hence, often a low number of components such as 2 or 3 is sufficient as discovered in <span class="citation" data-cites="MN2004">Haas, Mittnik, and Paolella (<a href="#ref-MN2004" role="doc-biblioref">2004</a>)</span>. In case of different means for the different components, a normal mixture density incorporates skewness and fat tails (or thin tails) <span class="citation" data-cites="MixN_Carol">(<a href="#ref-MixN_Carol" role="doc-biblioref"><strong>MixN_Carol?</strong></a>)</span>. This property enables the MixN(k)-GARCH model to produce sound VaR estimates as showcased in <span class="citation" data-cites="MN2004">Haas, Mittnik, and Paolella (<a href="#ref-MN2004" role="doc-biblioref">2004</a>)</span> and <span class="citation" data-cites="Paolella2006">Marc S. Paolella, Kuester, and Mittnik (<a href="#ref-Paolella2006" role="doc-biblioref">2006</a>)</span>.</p>
+\sigma_t^2 = \omega + (\alpha + \gamma I_{t-1})\epsilon_{t-1}^2 + \beta\sigma_{t-1}^2
+\tag{4}\]</span></span></p>
+<p>where <span class="math inline">\(I_{t-1} = \mathbb{I}_{\{\epsilon_{t-1} &lt; 0\}}\)</span> is an indicator function.</p>
+<p>Another asymmetric model is the NGARCH(1,1) <span class="citation" data-cites="NGARCH">(<a href="#ref-NGARCH" role="doc-biblioref">R. F. Engle and Ng 1993</a>)</span>:</p>
+<p><span class="math display">\[
+\sigma_t^2 = \omega + \alpha\sigma_{t-1}^2(\epsilon_{t-1} - \theta)^2 + \beta\sigma_{t-1}^2
+\]</span></p>
+<p>For <span class="math inline">\(\theta &gt; 0\)</span>, negative innovations have a larger impact on conditional variance than positive errors of the same magnitude.</p>
 </section>
-<section id="sec-factor-copula" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="sec-factor-copula"><span class="header-section-number">3.2</span> A Multivariate Factor Copula-DCC-GARCH Model</h2>
-<p>The models described in the previous section all forecasted future returns of a portfolio based on past portfolio returns. Alternatively, we can take a multivariate approach where we first model the constituents of the portfolio and only in a second step draw conclusions about the portfolio. One such model was proposed in <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> following the discoveries made about asymmetric tail dependency of weekly factor returns in <span class="citation" data-cites="christoffersen-FFCCopula">P. Christoffersen and Langlois (<a href="#ref-christoffersen-FFCCopula" role="doc-biblioref">2013</a>)</span>. Consequently, <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> make use of equity factors that should capture the main risks of stock returns to forecast the VaR of a portfolio of single stocks. More precisely, they utilize the Carhart four-factor model suggested in <span class="citation" data-cites="Carhart1997">Carhart (<a href="#ref-Carhart1997" role="doc-biblioref">1997</a>)</span> which adds a momentum factor to the linear three-factor model of <span class="citation" data-cites="FamaFrench">Fama and French (<a href="#ref-FamaFrench" role="doc-biblioref">1993</a>)</span>. Within this model, the return of a single stock <span class="math inline">\(k\)</span> in excess of the weekly risk free rate <span class="math inline">\(r_{f,t}\)</span> is given by</p>
+<section id="mixed-normal-garch" class="level4" data-number="2.1.2">
+<h4 data-number="2.1.2" class="anchored" data-anchor-id="mixed-normal-garch"><span class="header-section-number">2.1.2</span> Mixed Normal GARCH</h4>
+<p>We also include the k-component mixed normal GARCH(1,1) (MixN(k)-GARCH) <span class="citation" data-cites="MN2004">(<a href="#ref-MN2004" role="doc-biblioref">Haas, Mittnik, and Paolella 2004</a>)</span>, where the conditional distribution of the error term <span class="math inline">\(\epsilon_t\)</span> is assumed to be mixed normal with zero mean:</p>
+<p><span class="math display">\[
+\epsilon_t|\mathcal{F}_{t-1} \sim \text{Mix}_k\text{N}(p_1,...,p_k, \mu_1,...,\mu_k, \sigma_{1,t}^2,...,\sigma_{k,t}^2), \quad \sum_{i=1}^k p_i\mu_i = 0
+\]</span></p>
+<p>The associated conditional variances follow GARCH processes:</p>
+<p><span class="math display">\[
+\sigma_{i,t}^2 = \omega_i + \alpha_i\epsilon_{i,t-1}^2 + \beta_i\sigma_{i,t-1}^2, \quad i=1,...,k
+\]</span></p>
+</section>
+</section>
+<section id="sec-multivariate" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="sec-multivariate"><span class="header-section-number">2.2</span> Multivariate Models</h3>
+<section id="factor-copula-dcc-garch-model" class="level4" data-number="2.2.1">
+<h4 data-number="2.2.1" class="anchored" data-anchor-id="factor-copula-dcc-garch-model"><span class="header-section-number">2.2.1</span> Factor Copula-DCC-GARCH Model</h4>
+<p>The factor copula model proposed by <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> uses equity factors to capture the main risks of stock returns. It utilizes the Carhart four-factor model <span class="citation" data-cites="Carhart1997">(<a href="#ref-Carhart1997" role="doc-biblioref">Carhart 1997</a>)</span>, which adds a momentum factor to the Fama-French three-factor model <span class="citation" data-cites="FamaFrench">(<a href="#ref-FamaFrench" role="doc-biblioref">Fama and French 1993</a>)</span>:</p>
 <p><span id="eq-Carhart"><span class="math display">\[
-\begin{aligned}
-r_{k,t}-r_{f,t}&amp;=\alpha_{k,t}+\beta_{k, \text{RMRF}}\text{RMRF}_t+\beta_{k,\text{SMB}}\text{SMB}_t+\beta_{k,\text{HML}}\text{HML}_t+\beta_{k, \text{MOM}}\text{MOM}_t+\varepsilon_{k,t}\\
-&amp;=\alpha_{k,t}+\bm{\beta}_k'\bm{r}_{\text{F},t}+\varepsilon_{k,t},\qquad t=1,2,...,T,
-\end{aligned}
-\tag{11}\]</span></span></p>
-<p>where both the intercept <span class="math inline">\(\alpha_{k,t}\)</span> and the vector of factor loadings <span class="math inline">\(\bm{\beta}_k\)</span> are assumed to be constant over time. The vector of equity factors at time <span class="math inline">\(t\)</span>, <span class="math inline">\(\bm{r}_{\text{F},t}=(\text{RMRF}_t, \text{SMB}_t, \text{HML}_t,\text{MOM}_t)'\)</span>, consists of the market factor (RMRF), the size factor (SMB), the value factor (HML) and the momentum factor (MOM) (cf. <span class="citation" data-cites="Carhart1997">Carhart (<a href="#ref-Carhart1997" role="doc-biblioref">1997</a>)</span>). This leads to a reduction in dimensionality of the problem since only four factors have to be modelled instead of all constituents of the stock portfolio.</p>
-<p><span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> decided to not only model the conditional variances but also the dependence between the factors. One possible way to do this is by using the Dynamic Conditional Correlation (DCC) structure^[In contrast to <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span>, we will be using the DCC model of <span class="citation" data-cites="DCC">R. Engle (<a href="#ref-DCC" role="doc-biblioref">2002</a>)</span> instead of the cDCC model of <span class="citation" data-cites="cDCC">Aielli (<a href="#ref-cDCC" role="doc-biblioref">2013</a>)</span> due to its more established R implementation. The differences between these two models are relatively small according to <span class="citation" data-cites="christoffersen-FFCCopula">P. Christoffersen and Langlois (<a href="#ref-christoffersen-FFCCopula" role="doc-biblioref">2013</a>)</span>. introduced in <span class="citation" data-cites="DCC">R. Engle (<a href="#ref-DCC" role="doc-biblioref">2002</a>)</span> which is a dynamic extension of the Constant Conditional Correlation (CCC) model by <span class="citation" data-cites="CCC">Bollerslev (<a href="#ref-CCC" role="doc-biblioref">1990</a>)</span>. Let <span class="math inline">\(\bm{Y_t}=(y_{1,t}, y_{2,t},...,y_{n,t})'\)</span> be a vector consisting of the returns of n assets or of n factors at time <span class="math inline">\(t=1,...,T\)</span> and <span class="math inline">\(\bm{\mu}=\mathbb{E}[\bm{Y_t}|\mathcal{F}_{t-1}]\)</span> the corresponding mean vector which is assumed to be constant. The information set at time <span class="math inline">\(t-1\)</span> once again is denoted by <span class="math inline">\(\mathcal{F}_{t-1}\)</span> and consists of the past returns <span class="math inline">\(\{\bm{Y_1},...,\bm{Y_{t-1}}\}\)</span>.</p>
-<p>We can then define the conditional covariance matrix of <span class="math inline">\(\bm{r_t}\)</span> as <span class="math inline">\(\bm{\Sigma_t}\eqdef\mathbb{E}[(\bm{Y_t}-\bm{\mu})(\bm{Y_t}-\bm{\mu})'\|\mathcal{F}_{t-1}]\)</span>. The DCC model decomposes the dynamics of the conditional covariance matrix into standard deviations and correlation and can be written as:</p>
+r_{k,t} - r_{f,t} = \alpha_{k,t} + \beta_{k, \text{RMRF}}\text{RMRF}_t + \beta_{k,\text{SMB}}\text{SMB}_t + \beta_{k,\text{HML}}\text{HML}_t + \beta_{k, \text{MOM}}\text{MOM}_t + \varepsilon_{k,t}
+\tag{5}\]</span></span></p>
+<p>or in vector form:</p>
+<p><span id="eq-CarhartVec"><span class="math display">\[
+r_{k,t} - r_{f,t} = \alpha_{k,t} + \mathbf{\beta}_k'\mathbf{r}_{\text{F},t} + \varepsilon_{k,t}
+\tag{6}\]</span></span></p>
+<p>This reduces dimensionality by modeling only four factors instead of all portfolio constituents.</p>
+<p>For the factor dynamics, we use the Dynamic Conditional Correlation (DCC) structure <span class="citation" data-cites="DCC">(<a href="#ref-DCC" role="doc-biblioref">R. Engle 2002</a>)</span>, which decomposes the conditional covariance matrix into standard deviations and correlations:</p>
 <p><span id="eq-sigma_decomp"><span class="math display">\[
-\bm{Y}_{t}|\mathcal{F}_{t-1}\sim\mathcal{N}_n(\bm{\mu}, \bm{\Sigma_t}), \quad\bm{\Sigma_t}=\bm{D_t}\bm{\Gamma_t}\bm{D_t}
-\tag{12}\]</span></span></p>
-<p>where <span class="math inline">\(\bm{D_t}=\text{diag}(\sigma_{1,t},\sigma_{2,t},...,\sigma_{n,t})\)</span> i.e.&nbsp;a <span class="math inline">\(n\times n\)</span> diagonal matrix with the diagonal consisting of the square roots of the conditional variances of the assets or the factor returns. These conditional variances can be modelled using one of the univariate models from section <a href="#sec-univariate" class="quarto-xref">Section&nbsp;3.1</a>. <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> chose an AR(3)-NGARCH(1,1) model with the skewed-t distribution of <span class="citation" data-cites="skewt_Hansen">Hansen (<a href="#ref-skewt_Hansen" role="doc-biblioref">1994</a>)</span> for the innovations of all factor returns. We however tried out two different univariate models in our empirical application: a NGARCH(1,1) with skewed-t and a GARCH(1,1) with normal innovations, both without an ARMA term. Henceforward, these multivariate models will be named by first specifying the conditional correlation structure followed by the GARCH-type process used for the conditional variances e.g.&nbsp;DCC-GARCH or CCC-GJR.</p>
-<p>The <span class="math inline">\(n\times n\)</span> conditional correlation matrix <span class="math inline">\(\bm{\Gamma_t}\)</span> from equation <a href="#eq-sigma_decomp" class="quarto-xref">Equation&nbsp;12</a> is symmetric positive-definite and given by</p>
-<p><span id="eq-dcc_gamma"><span class="math display">\[
-\bm{\Gamma_t}\eqdef\mathbb{E}[\bm{z_t}\bm{z_t}'|\mathcal{F}_{t-1}]=\text{diag}(\bm{Q_t}^{-1/2})\,\bm{Q_t}\,\text{diag}(\bm{Q_t}^{-1/2})
-\tag{13}\]</span></span></p>
-<p>where <span class="math inline">\(\bm{z_t}\eqdef\bm{D_t}^{-1}(\bm{Y_t}-\bm{\mu})\)</span> are the standardized residuals. <span class="math inline">\(\bm{Q_t}\)</span> also is a <span class="math inline">\(n\times n\)</span> symmetric positive-definite matrix that fulfills</p>
-<p><span id="eq-dcc_Q"><span class="math display">\[
-\bm{Q_t} = (1-\alpha-\beta)\bar{\bm{Q}}+\alpha\bm{z_{t-1}}\bm{z_{t-1}}'+\beta\bm{Q_{t-1}},
-\quad \alpha,\beta\geq 0,
-\tag{14}\]</span></span></p>
-<p>where <span class="math inline">\(\bar{\bm{Q}}\eqdef\frac{1}{T}\sum_{t=1}^T\bm{z_t}\bm{z_t}'\)</span> is the <span class="math inline">\(n\times n\)</span> unconditional covariance matrix. Setting <span class="math inline">\(\alpha=\beta=0\)</span> in equation <a href="#eq-dcc_Q" class="quarto-xref">Equation&nbsp;14</a> yields the CCC model of <span class="citation" data-cites="CCC">Bollerslev (<a href="#ref-CCC" role="doc-biblioref">1990</a>)</span> where <span class="math inline">\(\bm{\Gamma_t}=\bm{\Gamma}=\bar{\bm{Q}}\)</span> for all <span class="math inline">\(t\)</span>.</p>
-<p>Possibly the biggest drawback of the DCC model as specified above is the underlying assumption of multivariate normality. In particular, <span class="citation" data-cites="christoffersen-FFCCopula">P. Christoffersen and Langlois (<a href="#ref-christoffersen-FFCCopula" role="doc-biblioref">2013</a>)</span> discovered that ignoring the multivariate non-normality inherent in weekly factor returns leads to severe underestimation of the Expected Shortfall of an equally weighted portfolio of factors. To encompass this non-normality and the aforementioned asymmetric tail dependence of weekly equity factors, <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span> stick to <span class="citation" data-cites="christoffersen-FFCCopula">P. Christoffersen and Langlois (<a href="#ref-christoffersen-FFCCopula" role="doc-biblioref">2013</a>)</span> and make use of so-called copulas to fit the joint conditional distribution of the factor returns. Copulas are functions that allow us to model the marginals (in our case the standardized residuals of the DCC-(N)GARCH model) individually and independently of the multivariate distribution making them incredibly flexible. The notion of Copulas is based on Sklar’s theorem which when applied to the standardized DCC-(N)GARCH residuals of our <span class="math inline">\(n\)</span> factor returns states that</p>
+\mathbf{Y}_{t}|\mathcal{F}_{t-1} \sim \mathcal{N}_n(\mathbf{\mu}, \mathbf{\Sigma_t}), \quad \mathbf{\Sigma_t} = \mathbf{D_t}\mathbf{\Gamma_t}\mathbf{D_t}
+\tag{7}\]</span></span></p>
+<p>where <span class="math inline">\(\mathbf{D_t} = \text{diag}(\sigma_{1,t},\sigma_{2,t},...,\sigma_{n,t})\)</span> contains the conditional standard deviations.</p>
+<p>To account for non-normality, we use copulas to model the joint conditional distribution of factor returns. Copulas allow modeling marginals independently of the multivariate distribution. By Sklar’s theorem:</p>
 <p><span id="eq-Sklar"><span class="math display">\[
-\bm{F_t}(\bm{z_t})=\bm{C_t}(F_{1,t}(z_{1,t}),...,F_{n,t}(z_{n,t})),
-\tag{15}\]</span></span></p>
-<p>where <span class="math inline">\(\bm{F_t}(\bm{z_t})\)</span> is the joint conditional distribution of the standardized residuals at time <span class="math inline">\(t\)</span>, <span class="math inline">\(F_{i,t}(\cdot)\)</span> is the conditional marginal distribution of the standardized residual of factor i at time <span class="math inline">\(t\)</span> and <span class="math inline">\(\bm{C_t}:[0,1]^n\rightarrow[0,1]\)</span> is the conditional copula that links these marginal distributions. As highlighted in <span class="citation" data-cites="Heinen_copula">Heinen and Valdesogo (<a href="#ref-Heinen_copula" role="doc-biblioref">2012</a>)</span>, we can only apply Sklar’s theorem to conditional distributions if we condition all marginals and the copula on the same information. This can be done by assuming that each marginal only depends on its own past and that the copula depends on the history of all four factors <span class="citation" data-cites="Heinen_copula">(<a href="#ref-Heinen_copula" role="doc-biblioref">Heinen and Valdesogo 2012</a>)</span>. As explained in e.g. <span class="citation" data-cites="Heinen_copula">Heinen and Valdesogo (<a href="#ref-Heinen_copula" role="doc-biblioref">2012</a>)</span> a copula can also be expressed as a multivariate distribution with <span class="math inline">\(\mathcal{U}(0,1)\)</span> margins</p>
-<p><span id="eq-Sklar_2"><span class="math display">\[
-\bm{C_t}(u_1,...,u_n)=\bm{F_t}(F_{1,t}^{-1}(u_{1,t}),...,F_{n,t}^{-1}(u_{n,t})),
-\tag{16}\]</span></span></p>
-<p>where <span class="math inline">\(u_{i,t}=F_{i,t}(\epsilon_{i,t})\)</span> is the probability integral transform (PIT) (see <a href="#sec-appendix-pit" class="quarto-xref">Section&nbsp;7.1.1</a>) of the standardized residuals of factor i at time <span class="math inline">\(t\)</span>. This formulation shows that if we can sample from the copula, we can sample from the corresponding multivariate distribution <span class="math inline">\(\bm{F_t}(\cdot)\)</span>. Thus, for Monte Carlo simulations one can first generate a vector of probabilities <span class="math inline">\(\bm{u_t}\eqdef(u_{1,t},...,u_{n,t})'\)</span> with conditional distribution <span class="math inline">\(\bm{C_t}(\cdot)\)</span> and then apply the quantile transform (see <a href="#sec-appendix-quantile-trafo" class="quarto-xref">Section&nbsp;7.1.2</a>) to these <span class="math inline">\(u_{i,t}\)</span> to return a sample vector <span class="math inline">\((F_{1,t}^{-1}(u_{1,t}),...,F_{n,t}^{-1}(u_{n,t}))'\)</span> from <span class="math inline">\(\bm{F_t}(\cdot)\)</span>.</p>
-<p>In summary, we follow <span class="citation" data-cites="Elements_of_FRM">P. Christoffersen (<a href="#ref-Elements_of_FRM" role="doc-biblioref">2011, chap. 9</a>)</span> and apply the following scheme to simulate future factor returns:</p>
-<ol type="1">
-<li>Fit a DCC model with a GARCH or NGARCH model for the conditional variances and extract the standardized residuals <span class="math inline">\(\bm{z_t}=(z_{1,t},...,z_{n,t})'\)</span>.</li>
-<li>Calculate probabilities <span class="math inline">\(u_{i,t}=F_{i,t}(z_{i,t})\)</span>, where <span class="math inline">\(F_{i,t}(\cdot)\)</span> is the conditional distribution that was estimated in the (N)GARCH model for the <span class="math inline">\(i\)</span>’th factor.</li>
-<li>Fit a copula to these probabilities. In our empirical application we consider the normal copula (see <a href="#sec-appendix-cop-gauss" class="quarto-xref">Section&nbsp;7.2.1</a>), the Student t copula (see <a href="#sec-appendix-cop-t" class="quarto-xref">Section&nbsp;7.2.2</a>) and the skewed-t copula. For more information about the Student t copula and the skewed-t copula consult <span class="citation" data-cites="t_copula">(<a href="#ref-t_copula" role="doc-biblioref"><strong>t_copula?</strong></a>)</span> and <span class="citation" data-cites="skewt_cop_R">(<a href="#ref-skewt_cop_R" role="doc-biblioref"><strong>skewt_cop_R?</strong></a>)</span>.</li>
-<li>Simulate a vector of probabilities <span class="math inline">\((\tilde{u}_{1,t}, ..., \tilde{u}_{n,t})'\)</span> from the conditional copula.</li>
-<li>Create simulated standardized residuals from the simulated copula probabilities using quantile transforms: <span class="math inline">\(\widetilde{\bm{z_{t}}}\eqdef(F_{1,t}^{-1}(\tilde{u}_{1,t}),...,F_{n,t}^{-1}(\tilde{u}_{n,t}))'\)</span>.</li>
-<li>To create factor returns from the simulated standardized residuals we use the forecasted dynamics obtained from the DCC model:</li>
-</ol>
-<p><span id="eq-back_rets"><span class="math display">\[
-\widetilde{\bm{r_{\text{F}, t}}}=\bm{\mu}+\bm{\Sigma_{t}}^{1/2}\,\widetilde{\bm{z_{t}}},
-\tag{17}\]</span></span></p>
-<p>where <span class="math inline">\(\bm{\Sigma_{t}}^{1/2}\)</span> denotes the matrix square root obtained through a Cholesky decomposition of the one-period-ahead forecast of the (DCC) covariance matrix of the factor returns and <span class="math inline">\(\bm{\mu}\)</span> the unconditional mean vector of the factor returns.</p>
-<p>Applying equation <a href="#eq-Carhart" class="quarto-xref">Equation&nbsp;11</a> to these simulated one-period-ahead factor returns yields forecasts of the returns of the single stocks (see <a href="#sec-var-forecasts" class="quarto-xref">Section&nbsp;4.2</a> for more information). Finally, it is straightforward to calculate the simulated one-day-ahead portfolio returns and the desired risk measures since this approach is simulation-based.</p>
+\mathbf{F_t}(\mathbf{z_t}) = \mathbf{C_t}(F_{1,t}(z_{1,t}),...,F_{n,t}(z_{n,t}))
+\tag{8}\]</span></span></p>
+<p>where <span class="math inline">\(\mathbf{F_t}(\mathbf{z_t})\)</span> is the joint conditional distribution, <span class="math inline">\(F_{i,t}(\cdot)\)</span> are the conditional marginals, and <span class="math inline">\(\mathbf{C_t}:[0,1]^n \rightarrow [0,1]\)</span> is the conditional copula.</p>
 </section>
-<section id="sec-comfort" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="sec-comfort"><span class="header-section-number">3.3</span> The COMFORT Model</h2>
-<p>In the previous section we presented the approach of using copulas to introduce non-normality (and heterogeneous tails when using e.g.&nbsp;the skewed-t copula) into a CCC or DCC structure. But one could also directly choose a non-Gaussian distribution for the CCC or DCC model. One possible way to implement this is by first fitting a normal CCC or DCC model to the stock returns and then in a second step fitting a multivariate, non-normal distribution to the filtered residuals obtained in the first step <span class="citation" data-cites="Paolella_TS_book">(<a href="#ref-Paolella_TS_book" role="doc-biblioref"><strong>Paolella_TS_book?</strong></a>)</span>. But this so-called quasi maximum likelihood approach is inferior to joint maximum likelihood estimation of all parameters <span class="citation" data-cites="Paolella_TS_book">(<a href="#ref-Paolella_TS_book" role="doc-biblioref"><strong>Paolella_TS_book?</strong></a>)</span>. Consequently, <span class="citation" data-cites="COMFORT_2015">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2015" role="doc-biblioref">2015</a>)</span> developed an efficient expectation-maximization (EM) type algorithm that allows for full maximum likelihood estimation of all parameters of the multivariate generalized hyperbolic (MGHyp) distribution. This uni-modal distribution is commonly used in finance literature and offers great flexibility <span class="citation" data-cites="COMFORT_2022">(<a href="#ref-COMFORT_2022" role="doc-biblioref">Marc S. Paolella and Polak 2022</a>)</span>. In particular, many popular distribution choices such as the multivariate normal, the multivariate Student t, the multivariate variance gamma or the normal inverse Gaussian (and many more) can be expressed as a limiting or special case of the MGHyp <span class="citation" data-cites="COMFORT_2022">(<a href="#ref-COMFORT_2022" role="doc-biblioref">Marc S. Paolella and Polak 2022</a>)</span>. For a more detailed breakdown of this distribution we refer to <span class="citation" data-cites="quant_risk_man">McNeil, Frey, and Embrechts (<a href="#ref-quant_risk_man" role="doc-biblioref">2015, chap. 6</a>)</span>, <span class="citation" data-cites="COMFORT_2015">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2015" role="doc-biblioref">2015</a>)</span> and <span class="citation" data-cites="COMFORT_2022">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2022" role="doc-biblioref">2022</a>)</span>. Applying the aforementioned multi-stage EM algorithm to a MGHyp distribution, for whose covariance matrix a CCC or DCC structure was used, results in the so-called Common Market Factor Non-Gaussian Returns (COMFORT) model as introduced in <span class="citation" data-cites="COMFORT_2015">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2015" role="doc-biblioref">2015</a>)</span>.</p>
-<p>Let <span class="math inline">\(\bm{Y_t}=(y_{1,t}, y_{2,t},...,y_{n,t})'\)</span> be an n-dimensional vector of returns of the constituents of a portfolio at time <span class="math inline">\(t=1,...,T\)</span>. The COMFORT model then has the form <span class="math inline">\(\bm{Y_t}\sim\text{MGHyp}(\bm{\mu},\bm{\gamma},\bm{\Sigma_t},\lambda_t,\chi_t, \psi_t)\)</span> and can be expressed as a continuous normal mixture in the following way:</p>
+<section id="comfort-model" class="level4" data-number="2.2.2">
+<h4 data-number="2.2.2" class="anchored" data-anchor-id="comfort-model"><span class="header-section-number">2.2.2</span> COMFORT Model</h4>
+<p>The Common Market Factor Non-Gaussian Returns (COMFORT) model <span class="citation" data-cites="COMFORT_2015">(<a href="#ref-COMFORT_2015" role="doc-biblioref">Marc S. Paolella and Polak 2015</a>)</span> uses a multivariate generalized hyperbolic (MGHyp) distribution with a CCC or DCC structure for the covariance matrix. This model can be expressed as a continuous normal mixture:</p>
 <p><span id="eq-COMFORT"><span class="math display">\[
-\bm{Y_t}=\bm{\mu}+\bm{\gamma} G_t + \bm{\varepsilon_t}, \qquad\bm{\varepsilon_t}=\bm{\Sigma_t}^{1/2}\sqrt{G_t}\bm{Z_t},
-\tag{18}\]</span></span></p>
-<p>where the mean vector <span class="math inline">\(\bm{\mu}\)</span> and the asymmetry vector <span class="math inline">\(\bm{\gamma}\)</span> are in <span class="math inline">\(\mathbb{R}^n\)</span> and <span class="math inline">\(\bm{Z_t}\stackrel{iid}{\sim}\mathcal{N}_n(\bm{0},\bm{I_n})\)</span> <span class="citation" data-cites="COMFORT_2022">(<a href="#ref-COMFORT_2022" role="doc-biblioref">Marc S. Paolella and Polak 2022</a>)</span>. Further, the symmetric positive-definite covariance matrix <span class="math inline">\(\bm{\Sigma_t}=\bm{D_t}\bm{\Gamma_t}\bm{D_t}\)</span> is modelled using a CCC or DCC structure (see <a href="#sec-factor-copula" class="quarto-xref">Section&nbsp;3.2</a>) where the matrix square root is taken by means of a Cholesky decomposition. Lastly, the mixing random variables <span class="math inline">\(G_t|\mathcal{F}_{t-1}\sim \text{GIG}(\lambda_t,\chi_t,\psi_t)\)</span>, where <span class="math inline">\(\mathcal{F}_{t-1} = \{\bm{Y_1},...,\bm{Y_{t-1}}\}\)</span> is the information set at time <span class="math inline">\(t-1\)</span>, follow a generalized inverse Gaussian (GIG) random variable and are independent of <span class="math inline">\(\bm{Z_t}\)</span> <span class="citation" data-cites="COMFORT_2022">(<a href="#ref-COMFORT_2022" role="doc-biblioref">Marc S. Paolella and Polak 2022</a>)</span>. Consult <span class="citation" data-cites="GIG">(<a href="#ref-GIG" role="doc-biblioref"><strong>GIG?</strong></a>)</span> for a detailed account on the GIG distribution or <span class="citation" data-cites="COMFORT_2022">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2022" role="doc-biblioref">2022</a>)</span> for more information about the GIG in the COMFORT model. This sequence <span class="math inline">\(\{G_t\}\)</span> can be interpreted as a common market factor because conditional on this common market factor, which incorporates jumps and news arrival, the returns are multivariate normal distributed <span class="citation" data-cites="Paolella_TS_book">(<a href="#ref-Paolella_TS_book" role="doc-biblioref"><strong>Paolella_TS_book?</strong></a>)</span>.</p>
-<p>In our empirical application in <a href="#sec-results" class="quarto-xref">Section&nbsp;5</a> we will only consider the CCC augmentation in which <span class="math inline">\(\bm{\Gamma_t}=\bm{\Gamma}\)</span> is time invariant. For the dynamics of the diagonal elements of <span class="math inline">\(\bm{D_t}\)</span> adjusted GARCH-type processes, which incorporate the common market factor, are used. More precisely, we will utilize the GARCH(1,1) and the GJR-GARCH(1,1) from <a href="#sec-univariate" class="quarto-xref">Section&nbsp;3.1</a> but with error term <span class="math inline">\(\epsilon_{i,t}=y_{i,t}-\mu_i-\gamma_i G_t\)</span> instead of <span class="math inline">\(\epsilon_{i,t}=y_{i,t}-\mu_i\)</span> for the <span class="math inline">\(i\)</span>’th portfolio constituent. Furthermore, we will only study the so-called multivariate variance-gamma (MVG) distribution which can be expressed as a MGHyp distribution with <span class="math inline">\(\lambda_t&gt;0\)</span>, <span class="math inline">\(\chi_t=0\)</span> and <span class="math inline">\(\psi_t=2\)</span> for all <span class="math inline">\(t\)</span> (see <span class="citation" data-cites="COMFORT_2022">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2022" role="doc-biblioref">2022</a>)</span>). This restriction of the shape parameters <span class="math inline">\(\chi_t\)</span> and <span class="math inline">\(\psi_t\)</span> is recommended by <span class="citation" data-cites="COMFORT_2015">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2015" role="doc-biblioref">2015</a>)</span> to circumvent potential numerical problems caused by otherwise relatively flat likelihoods.</p>
-<p>An important property of the MGHyp distribution is that it is closed under linear operations as shown in <span class="citation" data-cites="quant_risk_man">McNeil, Frey, and Embrechts (<a href="#ref-quant_risk_man" role="doc-biblioref">2015, chap. 6</a>)</span>. Thus, the returns of a portfolio consisting of our <span class="math inline">\(n\)</span> constituents with constant portfolio weights <span class="math inline">\(\textbf{w}=(\text{w}_1,\text{w}_2,...,\text{w}_n)'\in\mathbb{R}^n\setminus\bm{0}\)</span> are given by <span class="math inline">\(r_{\text{PF},t}=\textbf{w}'\bm{Y_t}\)</span> and are univariate GHyp distributed:</p>
+\mathbf{Y_t} = \mathbf{\mu} + \mathbf{\gamma} G_t + \mathbf{\varepsilon_t}, \quad \mathbf{\varepsilon_t} = \mathbf{\Sigma_t}^{1/2}\sqrt{G_t}\mathbf{Z_t}
+\tag{9}\]</span></span></p>
+<p>where <span class="math inline">\(\mathbf{Z_t} \stackrel{iid}{\sim} \mathcal{N}_n(\mathbf{0},\mathbf{I_n})\)</span> and the mixing random variables <span class="math inline">\(G_t|\mathcal{F}_{t-1} \sim \text{GIG}(\lambda_t,\chi_t,\psi_t)\)</span> follow a generalized inverse Gaussian distribution.</p>
+<p>An important property of the MGHyp distribution is that it is closed under linear operations. Therefore, portfolio returns <span class="math inline">\(r_{\text{PF},t} = \mathbf{w}'\mathbf{Y_t}\)</span> are univariate GHyp distributed:</p>
 <p><span id="eq-GHyp_PF"><span class="math display">\[
-r_{\text{PF},t}|\mathcal{F}_{t-1}\sim\text{GHyp}(\textbf{w}'\bm{\mu},\textbf{w}'\bm{\gamma},\textbf{w}'\bm{\Sigma_t}\textbf{w},\lambda_t,\chi_t, \psi_t).
-\tag{19}\]</span></span></p>
-<p>This property is especially useful in portfolio optimization and risk management and will be used in <a href="#sec-var-forecasts" class="quarto-xref">Section&nbsp;4.2</a> to estimate the VaR. We decided to include this model class because of the adequate VaR forecasts it generated in <span class="citation" data-cites="COMFORT_2022">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2022" role="doc-biblioref">2022</a>)</span>. Particularly, the empirical analysis in <span class="citation" data-cites="COMFORT_2022">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2022" role="doc-biblioref">2022</a>)</span> showed that the VaR estimates of this model class were superior to the ones of a CCC-GARCH structure that assumed multivariate normality.</p>
+r_{\text{PF},t}|\mathcal{F}_{t-1} \sim \text{GHyp}(\mathbf{w}'\mathbf{\mu},\mathbf{w}'\mathbf{\gamma},\mathbf{w}'\mathbf{\Sigma_t}\mathbf{w},\lambda_t,\chi_t, \psi_t)
+\tag{10}\]</span></span></p>
 </section>
 </section>
-<section id="sec-methodology" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Methodology</h1>
-<p>This chapter will present the data we considered for our empirical application. Further, we will describe how the VaR forecasts were generated and shine a light on some issues we faced. Finally, the violation based likelihood ratio tests of <span class="citation" data-cites="CCTest">P. F. Christoffersen (<a href="#ref-CCTest" role="doc-biblioref">1998</a>)</span> as well as a loss function based test in form of the conditional predictive ability (CPA) test by <span class="citation" data-cites="CPATests">Giacomini and White (<a href="#ref-CPATests" role="doc-biblioref">2006</a>)</span> will be introduced.</p>
-<section id="sec-data" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="sec-data"><span class="header-section-number">4.1</span> Data</h2>
-<p>This thesis assesses models based on their ability to forecast the VaR of a long portfolio. This portfolio is equally weighted and consists of the ten large cap single stocks also used in <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span>. However, we consider 2767 daily returns (instead of weekly returns) which were observed from January 2, 2001 to December 30, 2011. This data is freely available on Yahoo Finance. For reasons of numerical stability we will be working with daily percentage log returns i.e.&nbsp;</p>
-<p><span class="math display">\[r_t=100\cdot\log\left(\dfrac{P_t}{P_{t-1}}\right)\]</span></p>
-<p>where <span class="math inline">\(P_t\)</span> is the price at time t. Additionally, we require daily returns of the factors from the Carhart four-factor model for the same time frame. These returns are from Kenneth R. French’s data library. Note that these factor returns are in percent but nominal and first have to be converted to percentage log returns. In the following, whenever returns are mentioned we will refer to daily percentage log returns. Furthermore, the VaR forecasts will be the one-step-ahead percentage log return VaR.</p>
-<div id="tbl-summary-stats" class="cell quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-summary-stats-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: Summary statistics of daily factor, stock and portfolio percentage log returns
+<section id="sec-data" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="sec-data"><span class="header-section-number">2.3</span> Data</h3>
+<p>We use an equally weighted portfolio of ten large-cap stocks (identical to those used by <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span>): Boeing, Caterpillar, Chevron, Coca-Cola, Exxon, GE, IBM, Merck, P&amp;G, and UTC. However, we analyze 2,767 daily returns from January 2, 2001, to December 30, 2011, rather than weekly returns.</p>
+<p>The return data shows that most factors and stocks have means close to zero, with the median larger than the mean in most cases. The mean absolute deviation (MAD) is considerably smaller than the standard deviation, indicating the presence of outliers. Most returns are left-skewed with leptokurtic behavior, and all return distributions reject the assumption of normality based on Jarque-Bera statistics.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-acf-factors" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-acf-factors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/ACF_Plots_Factors.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-acf-factors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: ACF Plots of the Fama-French-Carhart Factors
 </figcaption>
-<div aria-describedby="tbl-summary-stats-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div>
-
-</div>
-</div>
 </figure>
 </div>
-<p>In Table <a href="#tbl-summary-stats" class="quarto-xref">Table&nbsp;1</a> the summary statistics for the daily factor, stocks and portfolio returns are presented. One can see that whilst the median is larger than the mean in most instances, both are close to zero for all factors and stocks in question. In addition, the mean absolute deviation (MAD) is considerably smaller than the standard deviation indicating the presence of outliers. Three of the four factors, six of the ten stocks and the portfolio are left skewed and thus have a longer left tail. All factors, stocks and the portfolio show leptokurtic behavior i.e.&nbsp;their kurtosis is larger than three. This signals that the return distributions have fatter tails than a Gaussian distribution would have. Besides, we can reject the assumption of univariate normality for all of the return distributions using the extraordinarily high Jarque-Bera statistics. Additionally, we checked for multivariate normality by constructing Q-Q plots (see ) of the robust squared Mahalanobis distances of the stock returns (factor returns) and the corresponding <span class="math inline">\(\chi^2_d\)</span> distribution with <span class="math inline">\(d=10\)</span> (<span class="math inline">\(d=4\)</span>) degrees of freedom. The relationship in these Q-Q plots is not linear at all indicating large multivariate outliers and multivariate non-normality.</p>
-<p>Moreover, the portfolio returns exhibit large volatility around their mean as shown in panel A of <a href="#fig-pf-plots" class="quarto-xref">Figure&nbsp;1</a>. Panel A further shows blatant volatility clustering indicating that the conditional variance is non-constant. In addition, it is apparent from Table <a href="#tbl-summary-stats" class="quarto-xref">Table&nbsp;1</a> that the portfolio returns are not normally distributed. Panel B graphically displays this observation and shows that the distribution of the portfolio percentage log returns is slightly left skewed and has long tails with some extreme values on either side. Interestingly, both the smallest and the largest portfolio returns were observed in October of 2008.</p>
-<div id="fig-pf-plots" class="quarto-layout-panel">
+</div>
+</div>
+<p>Figure <a href="#fig-acf-factors" class="quarto-xref">Figure&nbsp;1</a> shows autocorrelation function (ACF) plots for the factors. It is evident that the factors exhibit stronger autocorrelation in absolute returns than in the returns themselves, justifying the use of volatility models.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-md-chisq-plots" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-md-chisq-plots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/MD_Chisq_Plot.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-md-chisq-plots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Chi-Square Q-Q Plots of the Stock and Factor Returns
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Figure <a href="#fig-md-chisq-plots" class="quarto-xref">Figure&nbsp;2</a> shows Q-Q plots of the robust squared Mahalanobis distances against <span class="math inline">\(\chi^2\)</span> distributions. The non-linear relationship indicates large multivariate outliers and multivariate non-normality.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pf-plots" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-pf-plots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<p>Plot and histogram of the percentage log-returns of the equally weighted long equity portfolio</p>
+<img src="img/PF_plots.jpg" class="img-fluid figure-img">
 </div>
-</div>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-pf-plots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pf-plots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Portfolio Returns
 </figcaption>
 </figure>
 </div>
-<div id="fig-acf-plots-factors" class="quarto-layout-panel">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-acf-plots-factors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<p>ACF Plots of the Fama-French-Carhart Factors</p>
 </div>
 </div>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-acf-plots-factors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2
-</figcaption>
-</figure>
-</div>
-<p>Despite using daily and not weekly factor returns, the autocorrelation function (ACF) plots in <a href="#fig-acf-plots-factors" class="quarto-xref">Figure&nbsp;2</a> display a similar picture as the ones in <span class="citation" data-cites="christoffersen-FFCCopula">P. Christoffersen and Langlois (<a href="#ref-christoffersen-FFCCopula" role="doc-biblioref">2013</a>)</span>. It is evident that the factors exhibit stronger autocorrelation in absolute returns than in the returns themselves. In particular, panels A to D illustrate that whilst the ACF values for the returns mostly stay within the 95%-confidence bands, the absolute factor returns show significant autocorrelation for all lags considered. The same phenomenon can also be observed for the single stock returns and the portfolio returns (not displayed here) and can be seen as further justification for fitting a volatility model to the return series.</p>
+<p>Figure <a href="#fig-pf-plots" class="quarto-xref">Figure&nbsp;3</a> demonstrates blatant volatility clustering (Panel A) and that the portfolio returns are not normally distributed (Panel B).</p>
 </section>
-<section id="sec-var-forecasts" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="sec-var-forecasts"><span class="header-section-number">4.2</span> Value at Risk Forecasts</h2>
-<p>For all models in question we assume that the conditional mean is constant over time and thus will proceed without specifying an ARMA(p,q) process for the conditional mean. <span class="citation" data-cites="Santos2013">Santos, Nogales, and Ruiz (<a href="#ref-Santos2013" role="doc-biblioref">2013</a>)</span> took the same approach for the reason that the dynamic dependence of conditional means in daily portfolio returns is very weak if existent at all. Forecasting is done using a rolling window approach where the previous 1000 observations are used to predict the one step-ahead-VaR. The model parameters will be refit after every rolling window iteration as in <span class="citation" data-cites="Paolella2006">Marc S. Paolella, Kuester, and Mittnik (<a href="#ref-Paolella2006" role="doc-biblioref">2006</a>)</span>. The only exception is the skewed-t copula-DCC-GARCH model where we decided to reestimate the skewed-t copula parameters only every 20 rolling windows due to the high computational burden. Additionally, there were some numerical issues for the skewed-t copula with skewed-t NGARCH marginals which we could not resolve and thus only the version with normal GARCH marginals will be included.</p>
-<p>For all univariate GARCH models mentioned in <a href="#sec-univariate" class="quarto-xref">Section&nbsp;3.1</a> but the MixN(k)-GARCH we can rely on the following analytical formula to estimate the portfolio VaR:</p>
+<section id="sec-VaR-forecasts" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="sec-VaR-forecasts"><span class="header-section-number">2.4</span> Value at Risk Forecasts</h3>
+<p>For all models, we assume a constant conditional mean over time. Forecasting uses a rolling window approach with the previous 1,000 observations to predict the one-step-ahead VaR.</p>
+<p>For univariate GARCH models (except MixN(k)-GARCH), we use the analytical formula:</p>
 <p><span id="eq-VaR_uni"><span class="math display">\[
-\widehat{\text{VaR}_t^p} = -\mu_{\text{PF}}-\sigma_{\text{PF}, t} Q_p(z_t|\mathcal{F}_{t-1})
-\tag{20}\]</span></span></p>
-<p>where <span class="math inline">\(\sigma_{\text{PF}, t}\)</span> is the portfolio conditional standard deviation at time t and <span class="math inline">\(Q_p(z_t)\)</span> is the p-quantile of the conditional distribution of the standardized portfolio returns, <span class="math inline">\(z_t=(r_{\text{PF},t}-\mu_{\text{PF}})/\sigma_{\text{PF}, t}\)</span>. Note that formula <a href="#eq-VaR_uni" class="quarto-xref">Equation&nbsp;20</a> includes the unconditional mean instead of the conditional one due to our mean specification. In the MixN(k)-GARCH setting the VaR forecasts are generated by the ‘MSGARCH’ package of <span class="citation" data-cites="MSGARCH">(<a href="#ref-MSGARCH" role="doc-biblioref"><strong>MSGARCH?</strong></a>)</span> by applying the definition of the VaR from equation <a href="#eq-VaR_def" class="quarto-xref">Equation&nbsp;1</a> to the predictive mixed normal distribution of the portfolio returns.</p>
-<div id="tbl-ols" class="cell quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ols-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2: Parameter Estimates for the Carhart Four-Factor Model
+\widehat{\text{VaR}_t^p} = -\mu_{\text{PF}} - \sigma_{\text{PF}, t} Q_p(z_t|\mathcal{F}_{t-1})
+\tag{11}\]</span></span></p>
+<p>where <span class="math inline">\(\sigma_{\text{PF}, t}\)</span> is the conditional standard deviation and <span class="math inline">\(Q_p(z_t)\)</span> is the p-quantile of the standardized returns.</p>
+<p>For the factor copula-DCC-(N)GARCH models, we simulate factor returns, apply the Carhart model to generate single stock returns, and calculate the portfolio return. The VaR estimate is then the negative p-quantile of the simulated portfolio returns.</p>
+<p>For the COMFORT model, we use the p-quantile function of the corresponding conditional univariate GHyp distribution:</p>
+<p><span id="eq-COMFORT_VaR"><span class="math display">\[
+\widehat{\text{VaR}_t^p} = -Q_p(r_{\text{PF},t}|\mathcal{F}_{t-1})
+\tag{12}\]</span></span></p>
+</section>
+<section id="sec-backtesting" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="sec-backtesting"><span class="header-section-number">2.5</span> Backtesting</h3>
+<p>Backtesting checks whether the forecasts exhibit desirable properties. Following <span class="citation" data-cites="CCTest">Christoffersen (<a href="#ref-CCTest" role="doc-biblioref">1998</a>)</span>, we use three likelihood-ratio tests.</p>
+<p>Let <span class="math inline">\(I_t\)</span> be the indicator variable for a <span class="math inline">\(\text{VaR}_t^p\)</span> forecast:</p>
+<p><span class="math display">\[
+I_t = \mathbb{I}_{\{r_{\text{PF},t} &lt; -\text{VaR}_t^p\}} =
+\begin{cases}
+1 &amp; \text{if } r_{\text{PF},t} &lt; -\text{VaR}_t^p \\
+0 &amp; \text{otherwise}
+\end{cases}
+\]</span></p>
+<p>A sequence of VaR forecasts is efficient with respect to <span class="math inline">\(\mathcal{F}_{t-1}\)</span> if:</p>
+<p><span id="eq-cc"><span class="math display">\[
+\mathbb{E}[I_t|\mathcal{F}_{t-1}] = \mathbb{E}[I_t|I_{t-1},I_{t-2},...,I_1] = p, \quad t=1,2,...,T
+\tag{13}\]</span></span></p>
+<p>This is equivalent to testing that <span class="math inline">\(\{I_t\}_{t=1}^T \overset{\text{iid}}{\sim} \text{Bernoulli}(p)\)</span>.</p>
+<section id="unconditional-coverage-test" class="level4" data-number="2.5.1">
+<h4 data-number="2.5.1" class="anchored" data-anchor-id="unconditional-coverage-test"><span class="header-section-number">2.5.1</span> Unconditional Coverage Test</h4>
+<p>This tests whether the expected value of <span class="math inline">\(I_t\)</span> equals <span class="math inline">\(p\)</span>:</p>
+<p><span class="math display">\[
+H_0: \mathbb{E}[I_t] = p \quad \text{versus} \quad H_A: \mathbb{E}[I_t] \neq p
+\]</span></p>
+<p>The likelihood-ratio test statistic is:</p>
+<p><span id="eq-uc"><span class="math display">\[
+LR_{uc} = -2\log\left(\frac{L(p;I_1,I_2,...,I_T)}{L(\hat{p};I_1,I_2,...,I_T)}\right) \overset{\text{asy}}{\sim} \chi_1^2
+\tag{14}\]</span></span></p>
+<p>where <span class="math inline">\(\hat{p} = \frac{n_1}{n_0+n_1}\)</span> is the maximum likelihood estimate of <span class="math inline">\(p\)</span>.</p>
+</section>
+<section id="independence-test" class="level4" data-number="2.5.2">
+<h4 data-number="2.5.2" class="anchored" data-anchor-id="independence-test"><span class="header-section-number">2.5.2</span> Independence Test</h4>
+<p>This tests whether the indicator sequence is independently distributed, against a first-order Markov chain alternative:</p>
+<p><span id="eq-ind"><span class="math display">\[
+LR_{ind} = -2\log\left(\frac{L(\hat{\Pi}_2;I_2,...,I_T|I_1)}{L(\hat{\Pi}_1;I_2,...,I_T|I_1)}\right) \overset{\text{asy}}{\sim} \chi_1^2
+\tag{15}\]</span></span></p>
+<p>where <span class="math inline">\(\hat{\Pi}_1\)</span> and <span class="math inline">\(\hat{\Pi}_2\)</span> are the estimated transition probability matrices under the alternative and null hypotheses.</p>
+</section>
+<section id="conditional-coverage-test" class="level4" data-number="2.5.3">
+<h4 data-number="2.5.3" class="anchored" data-anchor-id="conditional-coverage-test"><span class="header-section-number">2.5.3</span> Conditional Coverage Test</h4>
+<p>This combines the unconditional coverage and independence tests:</p>
+<p><span id="eq-cc"><span class="math display">\[
+LR_{cc} = -2\log\left(\frac{L(p;I_2,...,I_T|I_1)}{L(\hat{\Pi}_1;I_2,...,I_T|I_1)}\right) \overset{\text{asy}}{\sim} \chi_2^2
+\tag{16}\]</span></span></p>
+<p>It can also be calculated as:</p>
+<p><span class="math display">\[
+LR_{cc} = LR_{uc} + LR_{ind}
+\]</span></p>
+</section>
+</section>
+<section id="sec-comparison-PA" class="level3" data-number="2.6">
+<h3 data-number="2.6" class="anchored" data-anchor-id="sec-comparison-PA"><span class="header-section-number">2.6</span> Comparison of Predictive Ability</h3>
+<p>To rank VaR estimates, we use the “tick” loss function:</p>
+<p><span class="math display">\[
+L_V(\theta_t, r_{\text{PF},t}) = (r_{\text{PF},t} + \theta_t)(p - \mathbb{I}_{\{r_{\text{PF},t} &lt; -\theta_t\}})
+\]</span></p>
+<p>This loss function has the property that:</p>
+<p><span id="eq-pred_ab"><span class="math display">\[
+Q_p(r_{\text{PF},t}|\mathcal{F}_{t-1}) = -\text{VaR}_t^p = \arg\min_{\theta_t} \mathbb{E}[L_V(\theta_t, r_{\text{PF},t})]
+\tag{17}\]</span></span></p>
+<p>For statistical inference, we use the conditional predictive ability (CPA) test <span class="citation" data-cites="CPATests">(<a href="#ref-CPATests" role="doc-biblioref">Giacomini and White 2006</a>)</span>. The null hypothesis of equal conditional predictive ability is:</p>
+<p><span class="math display">\[
+H_0: \mathbb{E}[\Delta L_{i,j,t}|\mathcal{F}_{t-1}] = 0 \quad \text{almost surely } \forall t
+\]</span></p>
+<p>where <span class="math inline">\(\Delta L_{i,j,t} = L_{V_{i,t}} - L_{V_{j,t}}\)</span> is the loss differential between models i and j.</p>
+<p>The test statistic is:</p>
+<p><span class="math display">\[
+GW_{i,j} = T\bar{Z}'\hat{\Omega}\bar{Z} \overset{d}{\rightarrow} \chi^2_q \quad \text{as } T \rightarrow \infty
+\]</span></p>
+<p>where <span class="math inline">\(Z_t = h_{t-1}\Delta L_{i,j,t}\)</span>, <span class="math inline">\(\bar{Z} = \frac{1}{T}\sum_{t=2}^T Z_t\)</span>, and <span class="math inline">\(\hat{\Omega} = \frac{1}{T}\sum_{t=2}^T Z_t Z_t'\)</span>.</p>
+</section>
+</section>
+<section id="sec-results" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="sec-results"><span class="header-section-number">3</span> Results</h2>
+<section id="value-at-risk-backtests" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="value-at-risk-backtests"><span class="header-section-number">3.1</span> Value at Risk Backtests</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-md-chisq-plot-OLS" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-md-chisq-plot-OLS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/MD_Chisq_Plot_OLS.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-md-chisq-plot-OLS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Chi-Square Q-Q Plot of the Carhart OLS Residuals
 </figcaption>
-<div aria-describedby="tbl-ols-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div>
-
-</div>
-</div>
 </figure>
 </div>
-<p>For the factor copula-DCC-(N)GARCH models in <a href="#sec-factor-copula" class="quarto-xref">Section&nbsp;3.2</a>, we proceed in the same way as <span class="citation" data-cites="Fortin2022">Fortin, Simonato, and Dionne (<a href="#ref-Fortin2022" role="doc-biblioref">2022</a>)</span>. Hence, we start off by calculating the ordinary least squares (OLS) estimates of equation <a href="#eq-Carhart" class="quarto-xref">Equation&nbsp;11</a>. These estimates are displayed in Table <a href="#tbl-ols" class="quarto-xref">Table&nbsp;2</a>. Striking are the high Jarque-Bera statistics for the OLS residuals indicating univariate non-normality. Further analysis of the OLS residuals shows that the residuals are slightly left skewed and highly leptokurtic. Moreover, we can see in, which looks very similar to Panel B of, that the OLS residuals clearly are not multivariate normal either. Additionally, residuals of firms from similar sectors tend to be stronger correlated than the residuals of those from different sectors.</p>
-<p>Next, we follow the procedure described in <a href="#sec-factor-copula" class="quarto-xref">Section&nbsp;3.2</a> to simulate a vector <span class="math inline">\(\tilde{\bm{r}}_{\text{F},t}\)</span>. We then simulate from the distribution of the OLS residuals <span class="math inline">\(\bm{F_\varepsilon}(\cdot)\)</span> by randomly drawing a bootstrap sample vector <span class="math inline">\(\bm{\tilde{\varepsilon}}_t=[\tilde{\varepsilon}_{1,t}, \tilde{\varepsilon}_{2,t},..., \tilde{\varepsilon}_{10,t}]\)</span>, <span class="math inline">\(t=1,2,...,T\)</span>. It is important to note that, as pointed out in <span class="citation" data-cites="value-at-risk-2009">P. Christoffersen (<a href="#ref-value-at-risk-2009" role="doc-biblioref">2009</a>)</span>, each draw of <span class="math inline">\(\bm{F_\varepsilon}(\cdot)\)</span> has to be a vector of error terms from the same day so that aforementioned dependencies between the OLS residuals of different stock returns are maintained. Further, we have to pay attention to data leakage and can therefore only use OLS residuals which have already been observed i.e.&nbsp;are part of the rolling window that is used for time <span class="math inline">\(t=1,2,...,T\)</span>. Using equation <a href="#eq-Carhart" class="quarto-xref">Equation&nbsp;11</a> then yields the simulated return of single stock k:</p>
-<p><span id="eq-simulated-return"><span class="math display">\[
-\tilde{r}_{k,t}=r_{f,t}+\alpha_{k,t}+\bm{\beta}_{k}'\tilde{\bm{r}}_{\text{F},t}+\bm{\tilde{\varepsilon}_{k,t}}.
-\tag{21}\]</span></span></p>
-<p>This procedure is repeated <span class="math inline">\(N=200'000\)</span> times. For each simulation we calculate the simulated return of the equal weighted portfolio. This yields a simulated portfolio return sample <span class="math inline">\(\{r_{\text{PF}}^n\}_{n=1}^N\)</span>. Finally, the VaR estimate is obtained as the negative <span class="math inline">\(p\)</span>-quantile of the simulated portfolio returns:</p>
-<p><span id="eq-var-estimate"><span class="math display">\[
-\widehat{\text{VaR}_t^p}=-Q_p(\{r_{\text{PF}}^n\}_{n=1}^N).
-\tag{22}\]</span></span></p>
-<p>Lastly, in the COMFORT framework we make use of the fact that when assuming a MGHyp distribution for <span class="math inline">\(\bm{Y_t}\)</span> (i.e.&nbsp;the returns of the constituents) the corresponding portfolio returns <span class="math inline">\(r_{\text{PF},t}=\textbf{w}'\bm{Y}\)</span> are univariate GHyp distributed (see <a href="#sec-comfort" class="quarto-xref">Section&nbsp;3.3</a>). Thus, according to <span class="citation" data-cites="COMFORT_2022">Marc S. Paolella and Polak (<a href="#ref-COMFORT_2022" role="doc-biblioref">2022</a>)</span> the VaR forecast can be calculated using the <span class="math inline">\(p\)</span>-quantile function <span class="math inline">\(Q_p(\cdot)\)</span> of the corresponding conditional univariate GHyp distribution (in our case the univariate Variance Gamma distribution) of the portfolio returns:</p>
-<p><span id="eq-COMFORT_VaR"><span class="math display">\[
-\widehat{\text{VaR}_t^p}=-Q_p(r_{\text{PF},t}|\mathcal{F}_{t-1})=-\inf_x\{x\in\mathbb{R}:\mathbb{P}(r_{\text{PF},t}\leq x|\mathcal{F}_{t-1})\geq p\},
-\tag{23}\]</span></span></p>
-<p>where <span class="math inline">\(\mathcal{F}_{t-1}=\{\bm{Y_1},...,\bm{Y_{t-1}}\}\)</span> is the information set at time <span class="math inline">\(t-1\)</span>.</p>
-</section>
-<section id="sec-backtesting" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="sec-backtesting"><span class="header-section-number">4.3</span> Backtesting</h2>
-<p>Backtesting is used to check whether the forecasts of the models evince some desirable properties. In doing so, we will follow the framework of <span class="citation" data-cites="CCTest">P. F. Christoffersen (<a href="#ref-CCTest" role="doc-biblioref">1998</a>)</span> which consists of three likelihood-ratio tests. Let <span class="math inline">\(I_t\)</span> be the indicator variable for a <span class="math inline">\(\text{VaR}_t^p\)</span> forecast made at time t-1, that is,</p>
-<p><span id="eq-indicator-var"><span class="math display">\[
-I_t=\mathbb{1}_{\{r_{\text{PF},t}&lt;-\text{VaR}_t^p\}}=\begin{cases}
-1 &amp; \text{if } r_{\text{PF},t}&lt;-\text{VaR}_t^p\\
-0 &amp; \text{otherwise}\\
-\end{cases}
-\tag{24}\]</span></span></p>
-<p>According to <span class="citation" data-cites="CCTest">P. F. Christoffersen (<a href="#ref-CCTest" role="doc-biblioref">1998</a>)</span>, a sequence of value at risk forecasts is then said to be efficient with respect to <span class="math inline">\(\mathcal{F}_{t-1}\)</span>, the information set at time <span class="math inline">\(t-1\)</span>, if</p>
-<p><span id="eq-cc"><span class="math display">\[
-\mathbb{E}[I_t|\mathcal{F}_{t-1}]=\mathbb{E}[I_t|I_{t-1},I_{t-2},...,I_1]=p,\quad t=1,2,...,T.
-\tag{25}\]</span></span></p>
-<p><span class="citation" data-cites="CCTest">P. F. Christoffersen (<a href="#ref-CCTest" role="doc-biblioref">1998</a>)</span> shows that testing whether a sequence of value at risk forecasts is efficient is equivalent to testing that <span class="math inline">\(\{I_t\}_{t=1}^T \overset{\mathrm{iid}}{\sim}\text{Bernoulli}(p)\)</span>. In case this property is fulfilled, the VaR forecast has correct conditional coverage. Although one could test for correct conditional coverage directly we will follow <span class="citation" data-cites="Paolella2006">Marc S. Paolella, Kuester, and Mittnik (<a href="#ref-Paolella2006" role="doc-biblioref">2006</a>)</span> and additionally provide intermediate test statistics which help to better understand deficiencies of the models.</p>
-<p>First, we test for the correct number of exceedances under independence. The corresponding hypothesis of correct conditional coverage can be written as</p>
-<p><span class="math display">\[H_0:\mathbb{E}[I_t]=p \quad\text{versus}\quad H_A:\mathbb{E}[I_t]\neq p,\]</span></p>
-<p>which is the result of applying the law of total expectation on equation <a href="#eq-cc" class="quarto-xref">Equation&nbsp;25</a>. Let <span class="math inline">\(n_1\)</span> be the number of violations i.e.&nbsp;ones in the indicator sequence <span class="math inline">\(\{I_t\}_{t=1}^T\)</span> and <span class="math inline">\(n_0\)</span> the number of zeros in the indicator sequence. The likelihood-ratio test statistic then is</p>
-<p><span id="eq-uc"><span class="math display">\[
-LR_{uc}=-2\log\bigg(\dfrac{L(p;I_1,I_2,...,I_T)}{L(\hat{p};I_1,I_2,...,I_T)}\bigg)\overset{\mathrm{asy}}{\sim}\chi_1^2,
-\tag{26}\]</span></span></p>
-<p>where <span class="math inline">\(\hat{p}=\hat{p}_{\text{ML}} = \frac{n_1}{n_0+n_1}\)</span> is the maximum likelihood estimate of <span class="math inline">\(p\)</span> and <span class="math inline">\(L(\cdot)\)</span> is the corresponding likelihood of a <span class="math inline">\(\mathcal{B}in(n_0+n_1,p)\)</span> distribution <span class="citation" data-cites="CCTest">(<a href="#ref-CCTest" role="doc-biblioref">P. F. Christoffersen 1998</a>)</span>.</p>
-</section>
-</section>
-<section id="sec-results" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Results</h1>
-</section>
-<section id="sec-conclusion" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Conclusion</h1>
-</section>
-<section id="appendix" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Appendix</h1>
-<section id="proofs" class="level2" data-number="7.1">
-<h2 data-number="7.1" class="anchored" data-anchor-id="proofs"><span class="header-section-number">7.1</span> Proofs</h2>
-<section id="sec-appendix-pit" class="level3" data-number="7.1.1">
-<h3 data-number="7.1.1" class="anchored" data-anchor-id="sec-appendix-pit"><span class="header-section-number">7.1.1</span> Probability Integral Transform</h3>
-</section>
-<section id="sec-appendix-quantile-trafo" class="level3" data-number="7.1.2">
-<h3 data-number="7.1.2" class="anchored" data-anchor-id="sec-appendix-quantile-trafo"><span class="header-section-number">7.1.2</span> Quantile Transform</h3>
-</section>
-</section>
-<section id="copulas" class="level2" data-number="7.2">
-<h2 data-number="7.2" class="anchored" data-anchor-id="copulas"><span class="header-section-number">7.2</span> Copulas</h2>
-<section id="sec-appendix-cop-gauss" class="level3" data-number="7.2.1">
-<h3 data-number="7.2.1" class="anchored" data-anchor-id="sec-appendix-cop-gauss"><span class="header-section-number">7.2.1</span> Gaussian Copula</h3>
-</section>
-<section id="sec-appendix-cop-t" class="level3" data-number="7.2.2">
-<h3 data-number="7.2.2" class="anchored" data-anchor-id="sec-appendix-cop-t"><span class="header-section-number">7.2.2</span> Student t Copula</h3>
-</section>
-</section>
-<section id="distributions" class="level2" data-number="7.3">
-<h2 data-number="7.3" class="anchored" data-anchor-id="distributions"><span class="header-section-number">7.3</span> Distributions</h2>
-<section id="sec-appendix-mixn" class="level3" data-number="7.3.1">
-
-
-
-
-</section>
-</section>
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">7.3.1 Finite Normal Mixtures</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-cDCC" class="csl-entry" role="listitem">
-Aielli, Gian Piero. 2013. <span>“Dynamic Conditional Correlation: On Properties and Estimation.”</span> <em>Journal of Business &amp; Economic Statistics</em> 31 (3): 282–99.
 </div>
+</div>
+<p>Figure <a href="#fig-md-chisq-plot-OLS" class="quarto-xref">Figure&nbsp;4</a> shows the Q-Q plot of OLS residuals, clearly indicating their non-normality.</p>
+<p>Table 1 shows that while all univariate models passed the likelihood ratio test of independence, only a few showed adequate conditional or unconditional coverage. In particular, only the skewed-t GJR-GARCH passed the test of conditional coverage for both VaR levels. In contrast, most multivariate models passed all likelihood ratio tests, with the exception of the multivariate normal (MN)-DCC-GARCH.</p>
+<p>It’s notable that using skewed-t NGARCH marginals in the factor copula framework leads to a very low percentage of violations compared to other models. Surprisingly, even using a normal copula with normal GARCH marginals for factor returns produces sound VaR estimates, possibly because much of the multivariate non-normality of stock returns might be captured in the bootstrapped OLS residuals.</p>
+<p>Models assuming normality of returns (GARCH, EWMA, and MN-DCC-GARCH) consistently show too many violations, with none displaying adequate conditional or unconditional coverage. For these models, the percentage of violations is higher than the corresponding VaR level. For the COMFORT and factor copula models, however, we observe fewer violations than expected.</p>
+<p>The most adequate coverage is achieved by the factor copula-DCC models with GARCH marginals for the 1% VaR level and by the COMFORT models for the 5% level. The factor skewed-t copula with GARCH marginals belongs to the three models with the most appropriate coverage for both VaR percentiles.</p>
+<p>Nearly all exceedances for the COMFORT models occurred during or after the 2008 financial crisis, despite passing the independence test. At the 1% VaR level, Gaussian models without leverage effects have approximately three times as many exceedances as expected. At the 5% VaR level, this discrepancy is smaller.</p>
+</section>
+<section id="conditional-predictive-ability-tests" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="conditional-predictive-ability-tests"><span class="header-section-number">3.2</span> Conditional Predictive Ability Tests</h3>
+<p>In terms of average tick loss, univariate models perform well despite their suboptimal backtesting results. The skewed-t GJR model had the lowest and the MN-DCC-GARCH the highest average loss for both VaR levels. Multivariate models achieve better ranks at the 1% level than at the 5% level, with factor copula-based models showing lower average loss than COMFORT models at both levels.</p>
+<p>Within the factor copula-DCC models, GARCH marginals achieved lower mean losses than skewed-t NGARCH marginals, reinforcing the hypothesis that bootstrapped OLS residuals account for much of the non-normality in stock returns.</p>
+<p>The CPA test results show that the MN-DCC-GARCH is significantly outperformed by every other model. Most rejections occur in univariate vs.&nbsp;univariate or multivariate vs.&nbsp;multivariate comparisons. For multivariate models, factor copula-DCC models using skewed-t NGARCH marginals have significantly higher predictive ability than their counterparts with normal GARCH marginals. The normal copula is superior for skewed-t NGARCH marginals, but for normal GARCH marginals, the t and skewed-t copula versions significantly outperform the normal copula.</p>
+<p>At the 5% VaR level, in addition to MN-DCC-GARCH, the MixN(3)-GARCH is also significantly outperformed by all other models. The Student t GJR-GARCH, skewed-t GJR-GARCH, and MixN(2)-GARCH all display significantly higher predictive ability than the COMFORT models.</p>
+<p>Interestingly, the skewed-t GJR-GARCH, which significantly outperformed every other univariate model, did not achieve significantly better VaR forecasts than the factor copula-DCC-(N)GARCH models.</p>
+</section>
+</section>
+<section id="sec-conclusion" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="sec-conclusion"><span class="header-section-number">4</span> Conclusion</h2>
+<p>Our study assessed various univariate and multivariate models for VaR forecasting. Most univariate models produced inadequate VaR estimates with too many violations, while most multivariate models displayed adequate coverage with independently occurring VaR exceedances.</p>
+<p>The CPA tests revealed that the MN-DCC-GARCH model is significantly outperformed by all other models, which is expected given the evident multivariate non-normality of stock returns. However, we found no general, significant outperformance of multivariate models over univariate ones, or vice versa, at either VaR level.</p>
+<p>One important finding is that using daily returns (higher frequency data) makes the factor copula-DCC-NGARCH models feasible for VaR forecasting, consistent with <span class="citation" data-cites="kole_forecasting">Kole et al. (<a href="#ref-kole_forecasting" role="doc-biblioref">2017</a>)</span> who found that data frequency is more important than model choice for VaR forecasts.</p>
+<p>We also found that replacing skewed-t NGARCH marginals with normal GARCH marginals for factor returns increased predictive accuracy and yielded better unconditional coverage. This may be because OLS residuals from the Carhart model capture most of the multivariate non-normality in stock returns.</p>
+<p>For future research, it would be interesting to examine how the factor copula-DCC-GARCH model performs with larger portfolios, which would highlight the advantage of its dimensionality reduction. The only computationally expensive parts—fitting the DCC-GARCH structure and the copula—depend only on the number of factors, not the portfolio size.</p>
+</section>
+<section id="references" class="level2" data-number="5">
+
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">5 References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-bollerslev_garch" class="csl-entry" role="listitem">
 Bollerslev, Tim. 1986. <span>“Generalized Autoregressive Conditional Heteroskedasticity.”</span> <em>Journal of Econometrics</em> 31 (3): 307–27.
-</div>
-<div id="ref-CCC" class="csl-entry" role="listitem">
-———. 1990. <span>“Modelling the Coherence in Short-Run Nominal Exchange Rates: A Multivariate Generalized ARCH Model.”</span> <em>The Review of Economics and Statistics</em> 72 (3): 498–505.
 </div>
 <div id="ref-Carhart1997" class="csl-entry" role="listitem">
 Carhart, Mark M. 1997. <span>“On Persistence in Mutual Fund Performance.”</span> <em>The Journal of Finance</em> 52 (1): 57–82.
 </div>
-<div id="ref-value-at-risk-2009" class="csl-entry" role="listitem">
-Christoffersen, Peter. 2009. <span>“Value–at–Risk Models.”</span> In <em>Handbook of Financial Time Series</em>, edited by Thomas Mikosch, Jens-Peter Kreiß, Richard A. Davis, and Torben Gustav Andersen, 1st ed., 753–66. Heidelberg: Springer Berlin.
-</div>
-<div id="ref-Elements_of_FRM" class="csl-entry" role="listitem">
-———. 2011. <em>Elements of Financial Risk Management</em>. Academic press.
-</div>
 <div id="ref-CCTest" class="csl-entry" role="listitem">
 Christoffersen, Peter F. 1998. <span>“Evaluating Interval Forecasts.”</span> <em>International Economic Review</em> 39 (4): 841–62.
-</div>
-<div id="ref-christoffersen-FFCCopula" class="csl-entry" role="listitem">
-Christoffersen, Peter, and Hugues Langlois. 2013. <span>“The Joint Dynamics of Equity Market Factors.”</span> <em>Journal of Financial and Quantitative Analysis</em> 48 (5): 1371–1404.
-</div>
-<div id="ref-diks_density" class="csl-entry" role="listitem">
-Diks, Cees, and Hao Fang. 2020. <span>“Comparing Density Forecasts in a Risk Management Context.”</span> <em>International Journal of Forecasting</em> 36 (2): 531–51.
 </div>
 <div id="ref-embrechts_2014" class="csl-entry" role="listitem">
 Embrechts, Paul, Giovanni Puccetti, Ludger Rüschendorf, Ruodu Wang, and Antonela Beleraj. 2014. <span>“An Academic Response to Basel 3.5.”</span> <em>Risks</em> 2 (1): 25–48.
 </div>
 <div id="ref-DCC" class="csl-entry" role="listitem">
 Engle, Robert. 2002. <span>“Dynamic Conditional Correlation: A Simple Class of Multivariate Generalized Autoregressive Conditional Heteroskedasticity Models.”</span> <em>Journal of Business &amp; Economic Statistics</em> 20 (3): 339–50.
-</div>
-<div id="ref-engle-arch" class="csl-entry" role="listitem">
-Engle, Robert F. 1982. <span>“Autoregressive Conditional Heteroscedasticity with Estimates of the Variance of United Kingdom Inflation.”</span> <em>Econometrica</em> 50 (4): 987–1007.
 </div>
 <div id="ref-NGARCH" class="csl-entry" role="listitem">
 Engle, Robert F, and Victor K Ng. 1993. <span>“Measuring and Testing the Impact of News on Volatility.”</span> <em>The Journal of Finance</em> 48 (5): 1749–78.
@@ -593,17 +561,8 @@ Glosten, Lawrence R., Ravi Jagannathan, and David E. Runkle. 1993. <span>“On t
 <div id="ref-MN2004" class="csl-entry" role="listitem">
 Haas, Markus, Stefan Mittnik, and Marc S Paolella. 2004. <span>“Mixed Normal Conditional Heteroskedasticity.”</span> <em>Journal of Financial Econometrics</em> 2 (2): 211–50.
 </div>
-<div id="ref-skewt_Hansen" class="csl-entry" role="listitem">
-Hansen, Bruce E. 1994. <span>“Autoregressive Conditional Density Estimation.”</span> <em>International Economic Review</em> 35 (3): 705–30.
-</div>
-<div id="ref-Heinen_copula" class="csl-entry" role="listitem">
-Heinen, Andréas, and Alfonso Valdesogo. 2012. <span>“Copula-Based Volatility Models.”</span> In <em>Handbook of Volatility Models and Their Applications</em>, 293–316. John Wiley &amp; Sons, Ltd.
-</div>
 <div id="ref-kole_forecasting" class="csl-entry" role="listitem">
 Kole, Erik, Thijs Markwat, Anne Opschoor, and Dick Van Dijk. 2017. <span>“Forecasting Value-at-Risk Under Temporal and Portfolio Aggregation.”</span> <em>Journal of Financial Econometrics</em> 15 (4): 649–77.
-</div>
-<div id="ref-quant_risk_man" class="csl-entry" role="listitem">
-McNeil, Alexander J, Rüdiger Frey, and Paul Embrechts. 2015. <em>Quantitative Risk Management: Concepts, Techniques and Tools – Revised Edition</em>. Princeton University Press.
 </div>
 <div id="ref-Paolella2006" class="csl-entry" role="listitem">
 Paolella, Marc S, Keith Kuester, and Stefan Mittnik. 2006. <span>“Value-at-Risk Prediction: A Comparison of Alternative Strategies.”</span> <em>Journal of Financial Econometrics</em> 4 (1): 53–89.
@@ -611,14 +570,8 @@ Paolella, Marc S, Keith Kuester, and Stefan Mittnik. 2006. <span>“Value-at-Ris
 <div id="ref-COMFORT_2015" class="csl-entry" role="listitem">
 Paolella, Marc S., and Paweł Polak. 2015. <span>“COMFORT: A Common Market Factor Non-Gaussian Returns Model.”</span> <em>Journal of Econometrics</em> 187 (2): 593–605.
 </div>
-<div id="ref-COMFORT_2022" class="csl-entry" role="listitem">
-Paolella, Marc S, and Pawel Polak. 2022. <span>“Density and Risk Prediction with Non-Gaussian COMFORT Models.”</span> <em>Swiss Finance Institute Research Paper</em>, no. 22-88.
-</div>
 <div id="ref-Santos2013" class="csl-entry" role="listitem">
 Santos, A. A. P., F. J. Nogales, and E. Ruiz. 2013. <span>“Comparing Univariate and Multivariate Models to Forecast Portfolio Value-at-Risk.”</span> <em>Journal of Financial Econometrics</em> 11 (2): 400–441.
-</div>
-<div id="ref-levyGARCH" class="csl-entry" role="listitem">
-Slim, Skander, Yosra Koubaa, and Ahmed BenSaïda. 2017. <span>“Value-at-Risk Under l<span>é</span>vy GARCH Models: Evidence from Global Stock Markets.”</span> <em>Journal of International Financial Markets, Institutions and Money</em> 46: 30–53.
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
