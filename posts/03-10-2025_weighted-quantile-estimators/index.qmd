@@ -1,0 +1,26 @@
+---
+title: "Weighted Quantile Estimators"
+abstract: "A deep dive into the theory and practice of weighted quantile estimators, including their statistical properties, use cases, and implementation in Python."
+categories:
+  - Statistics
+  - Python
+  - Data Science
+author: "Jan Schlegel"
+date: "2025-10-03"
+bibliography: references.bib
+format:
+  html:
+    code-fold: true
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    fig-width: 12
+    fig-height: 8
+    fig-dpi: 150
+    fig-format: png
+jupyter: python3
+---
+
+## Introduction
+
+This post will cover weighted quantile estimators.
