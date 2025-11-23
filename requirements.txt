@@ -1,2 +1,10 @@
 jupyter
 quarto
+numpy
+pandas
+matplotlib
+seaborn
+scipy
+plotnine
+numba
+torch
