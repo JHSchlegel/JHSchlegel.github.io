@@ -22,7 +22,9 @@ about:
 ---
 
 ::: {.custom-left}
-Hi there! I'm Jan, a Master's student in Statistics at ETH Zurich with a passion for machine learning, healthcare applications, and probabilistic modeling. My journey combines rigorous academic training in statistics with hands-on experience in research and data analysis. I thrive on solving complex problems and am particularly interested in the intersection of machine learning and healthcare. With a strong foundation in both theoretical statistics and practical implementation, I'm always eager to tackle new challenges and contribute to meaningful projects. Currently seeking opportunities in machine learning and data science - let's connect!
+Hi there! I'm Jan, a statistician and product manager based in Zurich. I recently completed my Master's in Statistics at ETH Zurich, specializing in probabilistic AI, high-dimensional statistics, and causality. My work focuses on understanding and improving how machine learning systems make decisions—from interpreting generative models to building robust methods for high-stakes applications like climate forecasting and reinsurance.
+
+When I'm not working on difficult (for me) problems, you'll find me running around Zurich, building PCs, or getting lost (intentionally) in GeoGuessr.
 :::
 
 ## Education
@@ -36,23 +38,11 @@ Hi there! I'm Jan, a Master's student in Statistics at ETH Zurich with a passion
 :::
 
 ::: {.gpa-badge}
-GPA: 5.98 / 6.00
+GPA: 5.99 / 6.00 
 :::
-- **Relevant Coursework:** Deep Learning; Image Analysis and Computer Vision; Machine Learning for Healthcare; Probabilistic AI; Statistical Learning Theory; Introduction to Machine Learning; Causality; Computational Statistics; Fundamentals of Mathematical Statistics; High Dimensional Statistics; Bayesian Statistics; Time Series Analysis
+- **Focus:** (Probabilistic) Machine Learning, Statistical Learning Theory, Computational Statistics, and Causality
+- **Thesis:** Mechanistic Interpretability in Text-to-Image Diffusion Models (Grade: 6.00/6.00)
 - **Semester Paper:** Extrapolation and Distributional Robustness for Climate Downscaling
-- **Mentor for New Students**
-:::
-::: {.education-card}
-### 🎓 Special Student Statistics
-::: {.meta-info}
-🏛️ ETH Zurich | 📍 Zurich, Switzerland | 📅 Feb 2022 - Feb 2023
-:::
-
-::: {.gpa-badge}
-GPA: 6.00 / 6.00
-:::
-- **Voluntarily enrolled to take advanced courses in statistics**
-- **Coursework:** Applied Time Series, Applied Multivariate Statistics
 :::
 
 ::: {.education-card}
@@ -62,13 +52,11 @@ GPA: 6.00 / 6.00
 :::
 
 ::: {.gpa-badge}
-GPA: 5.87 / 6.00
+GPA: 5.87 / 6.00 (Class Rank 1)
 :::
-- Finished the degree with 215 ECTS (instead of 180 ECTS)
-- **Major** in Banking and Finance (150 ECTS)
-- **Minor** in Applied Probability and Statistics (30 ECTS)
-- **Relevant Coursework:** Likelihood Inference; Statistical Modelling; Numerical Methods in Informatics; Introduction to Machine Learning; Introduction to Statistics; Introductory Econometrics
-**Thesis:** Portfolio Value at Risk Forecasting with GARCH-Type Models (Grade: 6.00/6.00)
+- **Major:** Banking and Finance; **Minor:** Statistics
+- **Thesis**: Portfolio Value at Risk Forecasting with Copula-GARCH Models (Grade: 6.00/6.00)
+- Completed 215 ECTS (vs. standard 180) with a strong focus on quantitative finance, statistics, and computing
 :::
 
 :::
@@ -78,32 +66,48 @@ GPA: 5.87 / 6.00
 ::: {.timeline-container}
 
 ::: {.education-card}
-### Research Assistant (Civilian Service)
+### 💼 Product Manager
+::: {.meta-info}
+🏛️ Swiss Re | 📍 Zurich, Switzerland | 📅 Feb 2026 - Present
+:::
+- Drive portfolio robust portfolio optimization initiatives across multiple product lines
+- Apply causal machine learning techniques to enhance risk assessment and decision-making processes
+- Transitioned to full-time role following successful quantitative internship
+:::
+
+::: {.education-card}
+### 💼 Quantitative Intern
+::: {.meta-info}
+🏛️ Swiss Re | 📍 Zurich, Switzerland | 📅 Oct 2025 - Jan 2026
+:::
+- Developed robust high-dimensional covariance estimation methods applicable to multiple reinsurance contexts
+- Designed robust portfolio optimization techniques tailored to reinsurance, providing actionable steering insights
+:::
+
+::: {.education-card}
+### 💼 Research Assistant (Civilian Service)
 ::: {.meta-info}
 🏛️ University of Zurich (EBPI) | 📍 Zurich, Switzerland | 📅 Feb 2022 - Aug 2023
 :::
-- Conducted sophisticated data analysis and statistical modeling using R for epidemiological research
--  Collaborated with interdisciplinary team of epidemiologists, statisticians, and public health experts
-- Contributed to research paper published in Nature Communications (2023): "Persistent humoral immune response in youth throughout the COVID-19 pandemic: prospective school-based cohort study"
+- Contributed to data and code management and reproducible statistical workflows for a COVID-19 cohort study published in *Nature Communications*
+- Applied statistical modelling techniques to complex longitudinal datasets and presented the results to principal investigators and the research team
 :::
 
 ::: {.education-card}
-### Accountant (Military Service)
+### 💼 Accountant (Military Service)
 ::: {.meta-info}
 🏛️ Swiss Armed Forces | 📍 Kloten, Switzerland | 📅 Jul 2021 - Nov 2021
 :::
-- Successfully balanced military service obligations while maintaining full-time academic studies
-- Demonstrated exceptional time management and organizational skills
+- Successfully balanced full-time university studies with mandatory military service obligations
+- Managed the complete accounting for a 150-person military unit
 :::
 
 ::: {.education-card}
-### Teaching Assistant
+### 💼 Teaching Assistant Mathematics
 ::: {.meta-info}
 🏛️ University of Zurich | 📍 Zurich, Switzerland | 📅 Sep 2020 - Jul 2021
 :::
-- Conducted bi-weekly interactive exercise classes in Analysis and Linear Algebra for first-year students
-- Effectively communicated complex mathematical concepts to diverse student groups
-- Developed strong presentation and educational communication skills
+- Led twice-weekly tutorials covering Analysis and Linear Algebra for groups of up to 30 students
 :::
 
 :::
