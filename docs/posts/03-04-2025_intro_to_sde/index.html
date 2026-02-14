@@ -232,20 +232,20 @@ window.Quarto = {
    
   <ul>
   <li><a href="#sec-introduction" id="toc-sec-introduction" class="nav-link active" data-scroll-target="#sec-introduction"><span class="header-section-number">1</span> Introduction</a>
-  <ul>
+  <ul class="collapse">
   <li><a href="#historical-development-and-motivation" id="toc-historical-development-and-motivation" class="nav-link" data-scroll-target="#historical-development-and-motivation"><span class="header-section-number">1.1</span> Historical Development and Motivation</a></li>
   <li><a href="#contemporary-relevance-and-applications" id="toc-contemporary-relevance-and-applications" class="nav-link" data-scroll-target="#contemporary-relevance-and-applications"><span class="header-section-number">1.2</span> Contemporary Relevance and Applications</a></li>
   <li><a href="#scope-and-mathematical-prerequisites" id="toc-scope-and-mathematical-prerequisites" class="nav-link" data-scroll-target="#scope-and-mathematical-prerequisites"><span class="header-section-number">1.3</span> Scope and Mathematical Prerequisites</a></li>
   </ul></li>
   <li><a href="#sec-foundations" id="toc-sec-foundations" class="nav-link" data-scroll-target="#sec-foundations"><span class="header-section-number">2</span> Mathematical Foundations</a>
-  <ul>
+  <ul class="collapse">
   <li><a href="#probability-spaces-and-filtrations" id="toc-probability-spaces-and-filtrations" class="nav-link" data-scroll-target="#probability-spaces-and-filtrations"><span class="header-section-number">2.1</span> Probability Spaces and Filtrations</a></li>
   <li><a href="#brownian-motion-and-the-wiener-process" id="toc-brownian-motion-and-the-wiener-process" class="nav-link" data-scroll-target="#brownian-motion-and-the-wiener-process"><span class="header-section-number">2.2</span> Brownian Motion and the Wiener Process</a></li>
   <li><a href="#multi-dimensional-brownian-motion" id="toc-multi-dimensional-brownian-motion" class="nav-link" data-scroll-target="#multi-dimensional-brownian-motion"><span class="header-section-number">2.3</span> Multi-dimensional Brownian Motion</a></li>
   <li><a href="#martingales-and-stopping-times" id="toc-martingales-and-stopping-times" class="nav-link" data-scroll-target="#martingales-and-stopping-times"><span class="header-section-number">2.4</span> Martingales and Stopping Times</a></li>
   </ul></li>
   <li><a href="#sec-ito-calculus" id="toc-sec-ito-calculus" class="nav-link" data-scroll-target="#sec-ito-calculus"><span class="header-section-number">3</span> Itô Calculus and Stochastic Integration</a>
-  <ul>
+  <ul class="collapse">
   <li><a href="#the-need-for-stochastic-calculus" id="toc-the-need-for-stochastic-calculus" class="nav-link" data-scroll-target="#the-need-for-stochastic-calculus"><span class="header-section-number">3.1</span> The Need for Stochastic Calculus</a></li>
   <li><a href="#construction-of-the-itô-integral" id="toc-construction-of-the-itô-integral" class="nav-link" data-scroll-target="#construction-of-the-itô-integral"><span class="header-section-number">3.2</span> Construction of the Itô Integral</a></li>
   <li><a href="#itôs-lemma-the-fundamental-theorem" id="toc-itôs-lemma-the-fundamental-theorem" class="nav-link" data-scroll-target="#itôs-lemma-the-fundamental-theorem"><span class="header-section-number">3.3</span> Itô’s Lemma: The Fundamental Theorem</a></li>
@@ -253,46 +253,36 @@ window.Quarto = {
   <li><a href="#applications-of-itôs-lemma" id="toc-applications-of-itôs-lemma" class="nav-link" data-scroll-target="#applications-of-itôs-lemma"><span class="header-section-number">3.5</span> Applications of Itô’s Lemma</a></li>
   </ul></li>
   <li><a href="#sec-sde-theory" id="toc-sec-sde-theory" class="nav-link" data-scroll-target="#sec-sde-theory"><span class="header-section-number">4</span> Stochastic Differential Equations: Theory and Existence</a>
-  <ul>
+  <ul class="collapse">
   <li><a href="#mathematical-definition-and-classification" id="toc-mathematical-definition-and-classification" class="nav-link" data-scroll-target="#mathematical-definition-and-classification"><span class="header-section-number">4.1</span> Mathematical Definition and Classification</a></li>
   <li><a href="#existence-and-uniqueness-theory" id="toc-existence-and-uniqueness-theory" class="nav-link" data-scroll-target="#existence-and-uniqueness-theory"><span class="header-section-number">4.2</span> Existence and Uniqueness Theory</a></li>
   <li><a href="#the-markov-property-and-generator" id="toc-the-markov-property-and-generator" class="nav-link" data-scroll-target="#the-markov-property-and-generator"><span class="header-section-number">4.3</span> The Markov Property and Generator</a></li>
   <li><a href="#feynman-kac-theorem" id="toc-feynman-kac-theorem" class="nav-link" data-scroll-target="#feynman-kac-theorem"><span class="header-section-number">4.4</span> Feynman-Kac Theorem</a></li>
   </ul></li>
   <li><a href="#sec-numerical-methods" id="toc-sec-numerical-methods" class="nav-link" data-scroll-target="#sec-numerical-methods"><span class="header-section-number">5</span> Numerical Methods for SDEs</a>
-  <ul>
+  <ul class="collapse">
   <li><a href="#euler-maruyama-scheme" id="toc-euler-maruyama-scheme" class="nav-link" data-scroll-target="#euler-maruyama-scheme"><span class="header-section-number">5.1</span> Euler-Maruyama Scheme</a></li>
   <li><a href="#milstein-scheme" id="toc-milstein-scheme" class="nav-link" data-scroll-target="#milstein-scheme"><span class="header-section-number">5.2</span> Milstein Scheme</a></li>
   <li><a href="#higher-order-methods-and-multi-dimensional-extensions" id="toc-higher-order-methods-and-multi-dimensional-extensions" class="nav-link" data-scroll-target="#higher-order-methods-and-multi-dimensional-extensions"><span class="header-section-number">5.3</span> Higher-Order Methods and Multi-dimensional Extensions</a></li>
   <li><a href="#weak-vs-strong-convergence" id="toc-weak-vs-strong-convergence" class="nav-link" data-scroll-target="#weak-vs-strong-convergence"><span class="header-section-number">5.4</span> Weak vs Strong Convergence</a></li>
   </ul></li>
   <li><a href="#sec-finance-applications" id="toc-sec-finance-applications" class="nav-link" data-scroll-target="#sec-finance-applications"><span class="header-section-number">6</span> Applications in Mathematical Finance</a>
-  <ul>
+  <ul class="collapse">
   <li><a href="#the-black-scholes-model" id="toc-the-black-scholes-model" class="nav-link" data-scroll-target="#the-black-scholes-model"><span class="header-section-number">6.1</span> The Black-Scholes Model</a></li>
-  <li><a href="#interest-rate-models" id="toc-interest-rate-models" class="nav-link" data-scroll-target="#interest-rate-models"><span class="header-section-number">6.2</span> Interest Rate Models</a>
-  <ul class="collapse">
-  <li><a href="#vasicek-model" id="toc-vasicek-model" class="nav-link" data-scroll-target="#vasicek-model"><span class="header-section-number">6.2.1</span> Vasicek Model</a></li>
-  <li><a href="#cox-ingersoll-ross-cir-model" id="toc-cox-ingersoll-ross-cir-model" class="nav-link" data-scroll-target="#cox-ingersoll-ross-cir-model"><span class="header-section-number">6.2.2</span> Cox-Ingersoll-Ross (CIR) Model</a></li>
-  </ul></li>
-  <li><a href="#stochastic-volatility-models" id="toc-stochastic-volatility-models" class="nav-link" data-scroll-target="#stochastic-volatility-models"><span class="header-section-number">6.3</span> Stochastic Volatility Models</a>
-  <ul class="collapse">
-  <li><a href="#heston-model" id="toc-heston-model" class="nav-link" data-scroll-target="#heston-model"><span class="header-section-number">6.3.1</span> Heston Model</a></li>
-  </ul></li>
+  <li><a href="#interest-rate-models" id="toc-interest-rate-models" class="nav-link" data-scroll-target="#interest-rate-models"><span class="header-section-number">6.2</span> Interest Rate Models</a></li>
+  <li><a href="#stochastic-volatility-models" id="toc-stochastic-volatility-models" class="nav-link" data-scroll-target="#stochastic-volatility-models"><span class="header-section-number">6.3</span> Stochastic Volatility Models</a></li>
   </ul></li>
   <li><a href="#sec-ml-applications" id="toc-sec-ml-applications" class="nav-link" data-scroll-target="#sec-ml-applications"><span class="header-section-number">7</span> SDEs in Modern Machine Learning</a>
-  <ul>
+  <ul class="collapse">
   <li><a href="#neural-ordinary-differential-equations-nodes" id="toc-neural-ordinary-differential-equations-nodes" class="nav-link" data-scroll-target="#neural-ordinary-differential-equations-nodes"><span class="header-section-number">7.1</span> Neural Ordinary Differential Equations (NODEs)</a></li>
   <li><a href="#neural-stochastic-differential-equations" id="toc-neural-stochastic-differential-equations" class="nav-link" data-scroll-target="#neural-stochastic-differential-equations"><span class="header-section-number">7.2</span> Neural Stochastic Differential Equations</a></li>
   <li><a href="#gaussian-processes-and-sdes" id="toc-gaussian-processes-and-sdes" class="nav-link" data-scroll-target="#gaussian-processes-and-sdes"><span class="header-section-number">7.3</span> Gaussian Processes and SDEs</a></li>
   <li><a href="#neural-processes-bridging-gps-and-neural-networks" id="toc-neural-processes-bridging-gps-and-neural-networks" class="nav-link" data-scroll-target="#neural-processes-bridging-gps-and-neural-networks"><span class="header-section-number">7.4</span> Neural Processes: Bridging GPs and Neural Networks</a></li>
   <li><a href="#diffusion-models-sdes-for-generative-ai" id="toc-diffusion-models-sdes-for-generative-ai" class="nav-link" data-scroll-target="#diffusion-models-sdes-for-generative-ai"><span class="header-section-number">7.5</span> Diffusion Models: SDEs for Generative AI</a></li>
-  <li><a href="#stochastic-neural-differential-equations" id="toc-stochastic-neural-differential-equations" class="nav-link" data-scroll-target="#stochastic-neural-differential-equations"><span class="header-section-number">7.6</span> Stochastic Neural Differential Equations</a>
-  <ul class="collapse">
-  <li><a href="#implementation-example-simple-neural-sde-in-pytorch" id="toc-implementation-example-simple-neural-sde-in-pytorch" class="nav-link" data-scroll-target="#implementation-example-simple-neural-sde-in-pytorch"><span class="header-section-number">7.6.1</span> Implementation Example: Simple Neural SDE in PyTorch</a></li>
-  </ul></li>
+  <li><a href="#stochastic-neural-differential-equations" id="toc-stochastic-neural-differential-equations" class="nav-link" data-scroll-target="#stochastic-neural-differential-equations"><span class="header-section-number">7.6</span> Stochastic Neural Differential Equations</a></li>
   </ul></li>
   <li><a href="#sec-conclusion" id="toc-sec-conclusion" class="nav-link" data-scroll-target="#sec-conclusion"><span class="header-section-number">8</span> Conclusion and Future Directions</a>
-  <ul>
+  <ul class="collapse">
   <li><a href="#key-contributions-and-insights" id="toc-key-contributions-and-insights" class="nav-link" data-scroll-target="#key-contributions-and-insights"><span class="header-section-number">8.1</span> Key Contributions and Insights</a></li>
   <li><a href="#future-research-directions" id="toc-future-research-directions" class="nav-link" data-scroll-target="#future-research-directions"><span class="header-section-number">8.2</span> Future Research Directions</a></li>
   <li><a href="#final-reflections" id="toc-final-reflections" class="nav-link" data-scroll-target="#final-reflections"><span class="header-section-number">8.3</span> Final Reflections</a></li>
@@ -316,12 +306,12 @@ window.Quarto = {
 </div>
 <section id="sec-introduction" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="sec-introduction"><span class="header-section-number">1</span> Introduction</h2>
-<p>Stochastic differential equations (SDEs) represent one of the most profound and mathematically elegant frameworks in modern probability theory and applied mathematics. These equations describe the evolution of random processes in continuous time, providing the mathematical foundation for modeling phenomena characterized by both deterministic trends and random fluctuations <span class="citation" data-cites="oksendal2003 karatzas1991">(<a href="#ref-oksendal2003" role="doc-biblioref"><strong>oksendal2003?</strong></a>; <a href="#ref-karatzas1991" role="doc-biblioref"><strong>karatzas1991?</strong></a>)</span>.</p>
-<p>The theoretical development of SDE theory emerged from the intersection of probability theory, differential equations, and mathematical finance, culminating in the revolutionary work of Kiyoshi Itô in the 1940s. Itô’s groundbreaking construction of stochastic integration transformed our understanding of random processes and established the mathematical framework that now underpins modern quantitative finance, statistical physics, and machine learning <span class="citation" data-cites="ito1951 mckean1969">(<a href="#ref-ito1951" role="doc-biblioref"><strong>ito1951?</strong></a>; <a href="#ref-mckean1969" role="doc-biblioref"><strong>mckean1969?</strong></a>)</span>.</p>
+<p>Stochastic differential equations (SDEs) represent one of the most profound and mathematically elegant frameworks in modern probability theory and applied mathematics. These equations describe the evolution of random processes in continuous time, providing the mathematical foundation for modeling phenomena characterized by both deterministic trends and random fluctuations <span class="citation" data-cites="oksendal2003 karatzas1991">[@oksendal2003; @karatzas1991]</span>.</p>
+<p>The theoretical development of SDE theory emerged from the intersection of probability theory, differential equations, and mathematical finance, culminating in the revolutionary work of Kiyoshi Itô in the 1940s. Itô’s groundbreaking construction of stochastic integration transformed our understanding of random processes and established the mathematical framework that now underpins modern quantitative finance, statistical physics, and machine learning <span class="citation" data-cites="ito1951 mckean1969">[@ito1951; @mckean1969]</span>.</p>
 <section id="historical-development-and-motivation" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="historical-development-and-motivation"><span class="header-section-number">1.1</span> Historical Development and Motivation</h3>
-<p>The genesis of stochastic differential equations can be traced to Louis Bachelier’s pioneering 1900 thesis on option pricing, where he first applied Brownian motion to financial markets <span class="citation" data-cites="bachelier1900">(<a href="#ref-bachelier1900" role="doc-biblioref"><strong>bachelier1900?</strong></a>)</span>. However, it was not until Norbert Wiener’s rigorous mathematical construction of Brownian motion in the 1920s that the field gained its theoretical foundation <span class="citation" data-cites="wiener1923">(<a href="#ref-wiener1923" role="doc-biblioref"><strong>wiener1923?</strong></a>)</span>.</p>
-<p>The transformative breakthrough came with Itô’s development of stochastic calculus in the 1940s and 1950s. Itô recognized that classical calculus was inadequate for handling functions of Brownian motion due to their non-differentiable nature, leading to his construction of stochastic integration and the famous Itô’s lemma <span class="citation" data-cites="ito1951">(<a href="#ref-ito1951" role="doc-biblioref"><strong>ito1951?</strong></a>)</span>. This work established the mathematical machinery necessary for:</p>
+<p>The genesis of stochastic differential equations can be traced to Louis Bachelier’s pioneering 1900 thesis on option pricing, where he first applied Brownian motion to financial markets <span class="citation" data-cites="bachelier1900">[@bachelier1900]</span>. However, it was not until Norbert Wiener’s rigorous mathematical construction of Brownian motion in the 1920s that the field gained its theoretical foundation <span class="citation" data-cites="wiener1923">[@wiener1923]</span>.</p>
+<p>The transformative breakthrough came with Itô’s development of stochastic calculus in the 1940s and 1950s. Itô recognized that classical calculus was inadequate for handling functions of Brownian motion due to their non-differentiable nature, leading to his construction of stochastic integration and the famous Itô’s lemma <span class="citation" data-cites="ito1951">[@ito1951]</span>. This work established the mathematical machinery necessary for:</p>
 <ul>
 <li><strong>Rigorous treatment of random processes</strong>: Moving beyond heuristic arguments to mathematically precise formulations</li>
 <li><strong>Financial modeling</strong>: Providing the foundation for modern option pricing theory through the Black-Scholes model</li>
@@ -332,9 +322,9 @@ window.Quarto = {
 <section id="contemporary-relevance-and-applications" class="level3" data-number="1.2">
 <h3 data-number="1.2" class="anchored" data-anchor-id="contemporary-relevance-and-applications"><span class="header-section-number">1.2</span> Contemporary Relevance and Applications</h3>
 <p>In the 21st century, SDEs have experienced a renaissance driven by advances in computational methods and emerging applications in machine learning. Key contemporary developments include:</p>
-<p><strong>Mathematical Finance</strong>: SDEs form the backbone of modern derivatives pricing, risk management, and portfolio optimization. Models like the Heston stochastic volatility model and interest rate models (Vasicek, Cox-Ingersoll-Ross) are built on SDE foundations <span class="citation" data-cites="heston1993 cox1985">(<a href="#ref-heston1993" role="doc-biblioref"><strong>heston1993?</strong></a>; <a href="#ref-cox1985" role="doc-biblioref"><strong>cox1985?</strong></a>)</span>.</p>
-<p><strong>Machine Learning and AI</strong>: Recent breakthroughs in generative modeling, particularly diffusion models for image generation, rely heavily on SDE theory. Neural ordinary differential equations (NODEs) and neural SDEs represent cutting-edge applications of stochastic analysis to deep learning <span class="citation" data-cites="chen2018 song2021">(<a href="#ref-chen2018" role="doc-biblioref"><strong>chen2018?</strong></a>; <a href="#ref-song2021" role="doc-biblioref"><strong>song2021?</strong></a>)</span>.</p>
-<p><strong>Scientific Computing</strong>: SDEs provide essential tools for modeling complex systems in physics, biology, and engineering where random effects play a crucial role <span class="citation" data-cites="gardiner2009">(<a href="#ref-gardiner2009" role="doc-biblioref"><strong>gardiner2009?</strong></a>)</span>.</p>
+<p><strong>Mathematical Finance</strong>: SDEs form the backbone of modern derivatives pricing, risk management, and portfolio optimization. Models like the Heston stochastic volatility model and interest rate models (Vasicek, Cox-Ingersoll-Ross) are built on SDE foundations <span class="citation" data-cites="heston1993 cox1985">[@heston1993; @cox1985]</span>.</p>
+<p><strong>Machine Learning and AI</strong>: Recent breakthroughs in generative modeling, particularly diffusion models for image generation, rely heavily on SDE theory. Neural ordinary differential equations (NODEs) and neural SDEs represent cutting-edge applications of stochastic analysis to deep learning <span class="citation" data-cites="chen2018 song2021">[@chen2018; @song2021]</span>.</p>
+<p><strong>Scientific Computing</strong>: SDEs provide essential tools for modeling complex systems in physics, biology, and engineering where random effects play a crucial role <span class="citation" data-cites="gardiner2009">[@gardiner2009]</span>.</p>
 </section>
 <section id="scope-and-mathematical-prerequisites" class="level3" data-number="1.3">
 <h3 data-number="1.3" class="anchored" data-anchor-id="scope-and-mathematical-prerequisites"><span class="header-section-number">1.3</span> Scope and Mathematical Prerequisites</h3>
@@ -3339,7 +3329,7 @@ Advantages over GANs:
 - Theoretical guarantees
 - Flexible sampling procedures</code></pre>
 </div>
-<div id="fig-diffusion-models" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-fig-height="16" data-fig-width="18" data-execution_count="16">
+<div id="fig-diffusion-models" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="16" data-fig-height="16" data-fig-width="18">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-diffusion-models-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output cell-output-display">

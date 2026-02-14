@@ -1,1626 +1,206 @@
 ---
-title: "Advanced Portfolio Optimization: From Markowitz to Expected Shortfall and Genetic Algorithms"
-abstract: "This comprehensive exploration of portfolio optimization covers the mathematical foundations from classical mean-variance optimization to modern approaches including Expected Shortfall (CVaR) optimization and genetic algorithms. We provide rigorous mathematical derivations, implement multiple optimization techniques in Python, and compare their performance on real market data with publication-ready visualizations throughout."
-
+title: "A Guide to Portfolio Optimization"
+abstract: "This post provides a practical introduction to portfolio optimization, focusing on the foundational Mean-Variance framework by Harry Markowitz. We'll explore the concepts of risk, return, the efficient frontier, and show how to implement it in Python."
 categories:
   - Finance
   - Python
   - Optimization
-  - Risk Management
 author: "Jan Schlegel"
 date: "2025-07-26"
-bibliography: references.bib
 format:
   html:
     code-fold: true
     toc: true
     toc-depth: 3
-    number-sections: true
-    fig-width: 12
-    fig-height: 8
-    fig-dpi: 150
+number-sections: true
+fig-width: 10
+fig-height: 7
+fig-dpi: 150
 jupyter: python3
 ---
 
 ![Portfolio optimization combines mathematical rigor with practical financial applications](img/portfolio_optimization_thumbnail.png)
 
-## Introduction {#sec-introduction}
-
-Portfolio optimization lies at the heart of modern financial theory, seeking to balance the eternal trade-off between risk and return. Since Harry Markowitz's seminal 1952 paper [@markowitz1952], which introduced the mean-variance framework and earned him the Nobel Prize in Economics, portfolio optimization has evolved dramatically to address the limitations and real-world complexities of financial markets.
-
-The classical Markowitz approach, while mathematically elegant, relies on several restrictive assumptions: normality of returns, quadratic utility functions, and the adequacy of variance as a risk measure. However, extensive empirical evidence demonstrates that financial returns exhibit fat tails, skewness, and time-varying volatility [@mandelbrot1963; @fama1965]. These stylized facts have motivated the development of alternative risk measures and optimization techniques.
-
-Expected Shortfall (ES), also known as Conditional Value at Risk (CVaR), has emerged as a coherent risk measure that addresses many limitations of Value at Risk (VaR) [@artzner1999; @rockafellar2000]. Unlike VaR, ES satisfies all axioms of coherent risk measures and provides information about the magnitude of losses beyond the VaR threshold. This makes ES-based portfolio optimization particularly attractive for risk management applications.
-
-Moreover, the computational complexity of portfolio optimization problems, especially when incorporating realistic constraints and non-convex objectives, has led to the adoption of metaheuristic algorithms. Genetic algorithms (GAs), inspired by natural selection and evolution, offer a powerful framework for solving complex optimization problems that may be intractable for traditional methods [@holland1975; @goldberg1989].
-
-This study provides a comprehensive analysis of three distinct portfolio optimization approaches:
-
-1. **Classical Mean-Variance Optimization**: The foundational Markowitz framework with its mathematical elegance and analytical solutions
-2. **Expected Shortfall Optimization**: A coherent alternative that captures tail risk more effectively  
-3. **Genetic Algorithm Optimization**: A metaheuristic approach capable of handling complex, non-convex optimization landscapes
-
-We implement these methods on a diversified portfolio of technology stocks, providing detailed mathematical derivations, Python implementations, and comparative performance analysis. Our contribution extends beyond simple implementation by providing rigorous mathematical foundations, publication-ready visualizations, and practical insights for portfolio managers and quantitative analysts.
-
-```{python}
+```python
 #| echo: false
 #| warning: false
 
-# Import required libraries
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import yfinance as yf
-import cvxpy as cp
 from scipy.optimize import minimize
-from scipy import stats
 import warnings
 warnings.filterwarnings('ignore')
 
 plt.style.use('seaborn-v0_8-whitegrid')
 sns.set_palette("husl")
 plt.rcParams['figure.dpi'] = 150
-plt.rcParams['savefig.dpi'] = 150
-plt.rcParams['savefig.bbox'] = 'tight'
-plt.rcParams['savefig.pad_inches'] = 0.1
-plt.rcParams['font.size'] = 12
-plt.rcParams['axes.titlesize'] = 14
-plt.rcParams['axes.labelsize'] = 12
-plt.rcParams['xtick.labelsize'] = 10
-plt.rcParams['ytick.labelsize'] = 10
-plt.rcParams['legend.fontsize'] = 10
-plt.rcParams['figure.constrained_layout.use'] = False
-
-# Set random seed for reproducibility
-np.random.seed(42)
 ```
 
-## Mathematical Foundations {#sec-foundations}
+## What is Portfolio Optimization?
 
-### Classical Mean-Variance Framework {#sec-markowitz}
+Portfolio optimization is the process of selecting the best portfolio (asset distribution), out of the set of all possible portfolios, according to some objective. The objective typically maximizes factors such as expected return, and minimizes costs like financial risk.
 
-The Markowitz mean-variance framework forms the cornerstone of modern portfolio theory. Consider a universe of $n$ risky assets with expected returns $\boldsymbol{\mu} = (\mu_1, \mu_2, \ldots, \mu_n)^T$ and covariance matrix $\boldsymbol{\Sigma} \in \mathbb{R}^{n \times n}$. A portfolio is defined by weight vector $\mathbf{w} = (w_1, w_2, \ldots, w_n)^T$ where $w_i$ represents the proportion of wealth invested in asset $i$.
+The idea was pioneered by Harry Markowitz in 1952, who laid the foundation for Modern Portfolio Theory (MPT). The core idea of MPT is that you can construct a portfolio of multiple assets that will have less risk than any single asset on its own. This is the power of diversification.
 
-The portfolio return is given by:
-$$
-r_p = \mathbf{w}^T \mathbf{r}
-$$ {#eq-portfolio-return}
+## The Basics: Risk and Return
 
-where $\mathbf{r} = (r_1, r_2, \ldots, r_n)^T$ is the vector of asset returns.
+When we talk about portfolio optimization, we are always trying to balance two things: **return** and **risk**.
 
-The expected portfolio return and variance are:
-$$
-\begin{align}
-\mathbb{E}[r_p] &= \mathbf{w}^T \boldsymbol{\mu} \\
-\text{Var}[r_p] &= \mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w}
-\end{align}
-$$ {#eq-portfolio-moments}
+*   **Return** is the profit you make from your investments. We usually look at the *expected return*, which is a weighted average of the expected returns of the individual assets in the portfolio.
+*   **Risk** is the uncertainty of the returns. The most common measure of risk is the **volatility**, which is the standard deviation of the returns.
 
-#### The Mean-Variance Optimization Problem
+A good portfolio is one that gives you the highest possible return for a given level of risk.
 
-The classical mean-variance optimization problem can be formulated in several equivalent ways. The most common formulation minimizes portfolio variance for a given target return:
+## Markowitz Mean-Variance Optimization
 
-$$
-\begin{align}
-\min_{\mathbf{w}} &\quad \frac{1}{2}\mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w} \\
-\text{s.t.} &\quad \mathbf{w}^T \boldsymbol{\mu} = \mu_p \\
-&\quad \mathbf{w}^T \mathbf{1} = 1
-\end{align}
-$$ {#eq-mv-problem}
+The classic approach to portfolio optimization is the **Mean-Variance framework**. It's a mathematical way to find the optimal portfolio by analyzing the trade-off between the mean (expected return) and the variance (risk) of a portfolio.
 
-where $\mu_p$ is the target expected return and $\mathbf{1}$ is a vector of ones.
+### The Efficient Frontier
 
-Using Lagrangian optimization, the analytical solution is:
-$$
-\mathbf{w}^* = \frac{A\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu} - B\boldsymbol{\Sigma}^{-1}\mathbf{1}}{AC - B^2}\mu_p + \frac{C\boldsymbol{\Sigma}^{-1}\mathbf{1} - B\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}}{AC - B^2}
-$$ {#eq-mv-solution}
+Imagine you have a bunch of stocks. You can create an infinite number of portfolios by combining them in different proportions. Each of these portfolios will have its own expected return and volatility.
 
-where:
-$$
-\begin{align}
-A &= \mathbf{1}^T \boldsymbol{\Sigma}^{-1} \mathbf{1} \\
-B &= \mathbf{1}^T \boldsymbol{\Sigma}^{-1} \boldsymbol{\mu} \\
-C &= \boldsymbol{\mu}^T \boldsymbol{\Sigma}^{-1} \boldsymbol{\mu}
-\end{align}
-$$ {#eq-mv-constants}
+If you plot all these possible portfolios on a chart with risk on the x-axis and return on the y-axis, you will get a region of points. The **efficient frontier** is the edge of this region that represents the set of portfolios with the highest expected return for a given level of risk.
 
-#### The Efficient Frontier
+No rational investor would choose a portfolio that is not on the efficient frontier, because there is always a portfolio on the frontier that offers a better return for the same or lower risk.
 
-The efficient frontier represents the set of portfolios that offer the highest expected return for each level of risk. The minimum variance of any portfolio with expected return $\mu_p$ is:
+### The Tangency Portfolio
 
-$$
-\sigma_p^2(\mu_p) = \frac{A\mu_p^2 - 2B\mu_p + C}{AC - B^2}
-$$ {#eq-efficient-frontier}
+To find the single "best" portfolio on the efficient frontier, we need to introduce the concept of a **risk-free asset** (like a government bond). The **tangency portfolio**, also known as the **maximum Sharpe ratio portfolio**, is the portfolio on the efficient frontier that gives the highest Sharpe ratio.
 
-### Expected Shortfall Framework {#sec-expected-shortfall}
+The **Sharpe ratio** is a measure of risk-adjusted return. It's calculated as:
 
-Expected Shortfall (ES), also known as Conditional Value at Risk (CVaR), addresses several limitations of Value at Risk and variance as risk measures. For a given confidence level $\alpha \in (0,1)$, ES is defined as the expected loss beyond the VaR threshold.
+$$ 	ext{Sharpe Ratio} = rac{	ext{Portfolio Return} - 	ext{Risk-Free Rate}}{	ext{Portfolio Volatility}} $$ 
 
-#### Mathematical Definition
+The tangency portfolio is "optimal" because it provides the best return per unit of risk. An investor can then combine this portfolio with the risk-free asset to achieve their desired level of risk.
 
-For a portfolio return $r_p$ with cumulative distribution function $F_{r_p}(x)$, the Value at Risk at confidence level $\alpha$ is:
-$$
-\text{VaR}_\alpha = -\inf\{x : F_{r_p}(x) \geq \alpha\} = -F_{r_p}^{-1}(\alpha)
-$$ {#eq-var-definition}
+## A Python Implementation
 
-The Expected Shortfall is then defined as:
-$$
-\text{ES}_\alpha = -\mathbb{E}[r_p | r_p \leq -\text{VaR}_\alpha] = -\frac{1}{\alpha}\int_0^\alpha F_{r_p}^{-1}(u) du
-$$ {#eq-es-definition}
+Let's see how this works in practice. We'll use Python to download some stock data and find the efficient frontier and the tangency portfolio.
 
-#### Coherent Risk Measure Properties
+First, let's get some data for a few tech stocks.
 
-Expected Shortfall satisfies all four axioms of coherent risk measures [@artzner1999]:
-
-1. **Translation Invariance**: $\rho(X + c) = \rho(X) - c$ for any constant $c$
-2. **Positive Homogeneity**: $\rho(\lambda X) = \lambda \rho(X)$ for $\lambda > 0$
-3. **Monotonicity**: If $X \leq Y$ almost surely, then $\rho(X) \geq \rho(Y)$
-4. **Subadditivity**: $\rho(X + Y) \leq \rho(X) + \rho(Y)$
-
-#### CVaR Optimization via Linear Programming
-
-A key insight from @rockafellar2000 is that CVaR optimization can be reformulated as a linear programming problem. For discrete scenarios, the CVaR optimization problem becomes:
-
-$$
-\begin{align}
-\min_{\mathbf{w}, \zeta, \mathbf{u}} &\quad \zeta + \frac{1}{\alpha T} \sum_{t=1}^T u_t \\
-\text{s.t.} &\quad -\mathbf{w}^T \mathbf{r}_t - \zeta \leq u_t, \quad t = 1, \ldots, T \\
-&\quad u_t \geq 0, \quad t = 1, \ldots, T \\
-&\quad \mathbf{w}^T \mathbf{1} = 1 \\
-&\quad \mathbf{w} \geq 0
-\end{align}
-$$ {#eq-cvar-lp}
-
-where $\zeta$ represents the VaR, $u_t$ are auxiliary variables representing the excess losses, and $T$ is the number of scenarios.
-
-### Genetic Algorithm Framework {#sec-genetic-algorithms}
-
-Genetic algorithms belong to the class of evolutionary algorithms inspired by natural selection. They are particularly useful for portfolio optimization when dealing with non-convex objectives, discrete constraints, or combinatorial problems.
-
-#### Basic GA Components
-
-1. **Chromosome Representation**: Portfolio weights encoded as real-valued vectors
-2. **Population**: A collection of candidate solutions (portfolios)
-3. **Fitness Function**: Objective function to be optimized (e.g., Sharpe ratio)
-4. **Selection**: Mechanism for choosing parents for reproduction
-5. **Crossover**: Combining genetic material from parents to create offspring
-6. **Mutation**: Random alterations to maintain genetic diversity
-7. **Replacement**: Strategy for replacing old population with new offspring
-
-#### GA Operators for Portfolio Optimization
-
-**Chromosome Encoding**: Each portfolio is represented as a chromosome $\mathbf{c} = (c_1, c_2, \ldots, c_n)$ where $c_i$ represents the weight in asset $i$.
-
-**Normalization**: To ensure $\sum_{i=1}^n w_i = 1$, we normalize:
-$$
-w_i = \frac{c_i}{\sum_{j=1}^n c_j}
-$$ {#eq-normalization}
-
-**Fitness Function**: We use the negative Sharpe ratio as fitness:
-$$
-f(\mathbf{w}) = -\frac{\mathbf{w}^T \boldsymbol{\mu} - r_f}{\sqrt{\mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w}}}
-$$ {#eq-fitness}
-
-where $r_f$ is the risk-free rate.
-
-**Crossover Operation**: Blend crossover (BLX-α) for real-valued chromosomes:
-$$
-\mathbf{c}_{child} = (1-\gamma)\mathbf{c}_{parent1} + \gamma\mathbf{c}_{parent2}
-$$ {#eq-crossover}
-
-where $\gamma \sim U[-\alpha, 1+\alpha]$ and $\alpha$ is typically 0.5.
-
-**Mutation Operation**: Gaussian mutation:
-$$
-c_i' = c_i + \mathcal{N}(0, \sigma_m^2)
-$$ {#eq-mutation}
-
-where $\sigma_m$ is the mutation strength parameter.
-
-## Data Acquisition and Preprocessing {#sec-data}
-
-We construct a diversified portfolio of technology stocks to demonstrate our optimization techniques. The selected assets represent different segments of the technology sector and exhibit varying risk-return profiles.
-
-```{python}
-#| label: fig-data-acquisition
-#| fig-cap: "Historical price data and returns for technology portfolio"
-#| fig-width: 16
-#| fig-height: 10
-
+```python
 # Define our portfolio universe
-tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'NFLX', 'AMD', 'CRM']
+tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA']
 start_date = '2020-01-01'
 end_date = '2024-07-01'
 
 # Download price data
-print("Downloading historical data...")
-raw_data = yf.download(tickers, start=start_date, end=end_date, auto_adjust=False)
-
-# Handle MultiIndex columns from yfinance
-if isinstance(raw_data.columns, pd.MultiIndex):
-    # Get adjusted close prices
-    data = raw_data['Adj Close']
-else:
-    # Single ticker case
-    data = raw_data
+data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
 
 # Calculate daily returns
 returns = data.pct_change().dropna()
 
-# Basic statistics
-print(f"Data period: {returns.index[0].strftime('%Y-%m-%d')} to {returns.index[-1].strftime('%Y-%m-%d')}")
-print(f"Number of observations: {len(returns)}")
-print(f"Number of assets: {len(returns.columns)}")
-
-# Create publication-quality visualization  
-fig, axes = plt.subplots(2, 2, figsize=(18, 9))
-plt.subplots_adjust(hspace=0.3, wspace=0.3)
-
-# Plot 1: Normalized price evolution
-normalized_prices = (data / data.iloc[0]) * 100
-for i, ticker in enumerate(tickers):
-    axes[0, 0].plot(normalized_prices.index, normalized_prices[ticker], 
-                    label=ticker, linewidth=2, alpha=0.8)
-axes[0, 0].set_title('Normalized Price Evolution (Base = 100)', fontweight='bold', fontsize=16)
-axes[0, 0].set_ylabel('Normalized Price', fontweight='bold', fontsize=14)
-axes[0, 0].legend(loc='upper left', ncol=2, fontsize=11)
-axes[0, 0].grid(True, alpha=0.3)
-
-# Plot 2: Correlation heatmap
-corr_matrix = returns.corr()
-im = axes[0, 1].imshow(corr_matrix, cmap='RdBu_r', aspect='equal', vmin=-1, vmax=1)
-axes[0, 1].set_title('Return Correlation Matrix', fontweight='bold', fontsize=16)
-axes[0, 1].set_xticks(range(len(tickers)))
-axes[0, 1].set_yticks(range(len(tickers)))
-axes[0, 1].set_xticklabels(tickers, rotation=45, ha='right', fontsize=10)
-axes[0, 1].set_yticklabels(tickers, fontsize=10)
-# Add colorbar
-cbar = plt.colorbar(im, ax=axes[0, 1], shrink=0.8)
-cbar.set_label('Correlation', fontweight='bold', fontsize=12)
-
-# Plot 3: Return distribution (selected assets)  
-selected_assets = ['AAPL', 'MSFT', 'GOOGL', 'TSLA']
-colors = plt.cm.Set1(np.linspace(0, 1, len(selected_assets)))
-for i, asset in enumerate(selected_assets):
-    if asset in returns.columns:
-        axes[1, 0].hist(returns[asset], bins=40, alpha=0.7, density=True, 
-                       label=asset, color=colors[i], edgecolor='white', linewidth=0.8)
-axes[1, 0].set_title('Daily Return Distributions', fontweight='bold', fontsize=16)
-axes[1, 0].set_xlabel('Daily Return', fontweight='bold', fontsize=14)
-axes[1, 0].set_ylabel('Density', fontweight='bold', fontsize=14)
-axes[1, 0].legend(fontsize=12)
-axes[1, 0].grid(True, alpha=0.3)
-
-# Plot 4: Risk-Return scatter
-mean_returns = returns.mean() * 252  # Annualized  
-volatilities = returns.std() * np.sqrt(252)  # Annualized
-
-colors = plt.cm.Set1(np.linspace(0, 1, len(tickers)))
-scatter = axes[1, 1].scatter(volatilities, mean_returns, s=120, alpha=0.8, c=colors, 
-                            edgecolors='white', linewidth=2, zorder=5)
-axes[1, 1].set_title('Risk-Return Profile', fontweight='bold', fontsize=16)
-axes[1, 1].set_xlabel('Annualized Volatility', fontweight='bold', fontsize=14)
-axes[1, 1].set_ylabel('Annualized Expected Return', fontweight='bold', fontsize=14)
-
-# Add labels for each point with better positioning
-for i, ticker in enumerate(tickers):
-    axes[1, 1].annotate(ticker, (volatilities[i], mean_returns[i]), 
-                       xytext=(5, 5), textcoords='offset points', fontsize=12, 
-                       fontweight='bold', ha='left')
-axes[1, 1].grid(True, alpha=0.3)
-
-plt.show()
-
-# Summary statistics
-print("\n" + "="*60)
-print("PORTFOLIO SUMMARY STATISTICS (Annualized)")
-print("="*60)
-summary_stats = pd.DataFrame({
-    'Expected Return': mean_returns,
-    'Volatility': volatilities,
-    'Sharpe Ratio': (mean_returns - 0.02) / volatilities,  # Assuming 2% risk-free rate
-    'Min Daily Return': returns.min(),
-    'Max Daily Return': returns.max(),
-    'Skewness': returns.skew(),
-    'Kurtosis': returns.kurtosis()
-})
-
-print(summary_stats.round(4))
+# Annualized mean returns and covariance matrix
+mean_returns = returns.mean() * 252
+cov_matrix = returns.cov() * 252
 ```
 
-## Covariance Matrix Estimation and Shrinkage {#sec-shrinkage}
+Now we have the returns data. Let's define some functions to calculate the portfolio performance and find the optimal portfolios.
 
-One of the fundamental challenges in portfolio optimization is the estimation of the covariance matrix. The sample covariance matrix, while unbiased, can be highly unstable, especially when the number of assets approaches the number of observations. This leads to extreme portfolio weights and poor out-of-sample performance.
+```python
+def portfolio_performance(weights, mean_returns, cov_matrix):
+    returns = np.sum(mean_returns * weights) * 252
+    std = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights))) * np.sqrt(252)
+    return returns, std
 
-### The Curse of Dimensionality in Covariance Estimation
+def neg_sharpe_ratio(weights, mean_returns, cov_matrix, risk_free_rate=0.02):
+    p_returns, p_std = portfolio_performance(weights, mean_returns, cov_matrix)
+    return -(p_returns - risk_free_rate) / p_std
 
-For a portfolio of $n$ assets with $T$ observations, the sample covariance matrix $\hat{\mathbf{\Sigma}}$ requires estimating $\frac{n(n+1)}{2}$ unique parameters. When $n$ is large relative to $T$, the sample covariance matrix becomes singular or poorly conditioned, leading to unstable portfolio optimization results.
+def max_sharpe_ratio(mean_returns, cov_matrix, risk_free_rate=0.02):
+    num_assets = len(mean_returns)
+    args = (mean_returns, cov_matrix, risk_free_rate)
+    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+    bound = (0.0, 1.0)
+    bounds = tuple(bound for asset in range(num_assets))
+    result = minimize(neg_sharpe_ratio, num_assets* [1./num_assets,], args=args,
+                        method='SLSQP', bounds=bounds, constraints=constraints)
+    return result
 
-#### Mathematical Framework
+def portfolio_volatility(weights, mean_returns, cov_matrix):
+    return portfolio_performance(weights, mean_returns, cov_matrix)[1]
 
-The sample covariance matrix is given by:
-$$
-\hat{\mathbf{\Sigma}} = \frac{1}{T-1}\sum_{t=1}^T (\mathbf{r}_t - \hat{\boldsymbol{\mu}})(\mathbf{r}_t - \hat{\boldsymbol{\mu}})^T
-$$ {#eq-sample-cov}
-
-However, this estimator has several problems:
-- **High variance**: Especially for small samples or high dimensions
-- **Extreme eigenvalues**: Leading to concentrated portfolios
-- **Instability**: Small changes in data cause large changes in optimal weights
-
-### Shrinkage Estimation
-
-Shrinkage estimation, pioneered by @ledoit2003improved and @ledoit2004well, provides a solution by combining the sample covariance matrix with a structured target matrix.
-
-#### Ledoit-Wolf Shrinkage
-
-The shrinkage estimator takes the form:
-$$
-\hat{\mathbf{\Sigma}}_{\text{shrink}} = (1-\rho)\hat{\mathbf{\Sigma}} + \rho\mathbf{F}
-$$ {#eq-shrinkage}
-
-where:
-- $\hat{\mathbf{\Sigma}}$ is the sample covariance matrix
-- $\mathbf{F}$ is the shrinkage target (e.g., identity matrix, single-factor model)
-- $\rho \in [0,1]$ is the shrinkage intensity
-
-#### Optimal Shrinkage Intensity
-
-@ledoit2004well derived the optimal shrinkage intensity that minimizes the expected quadratic loss:
-$$
-\rho^* = \frac{\sum_{i,j}\text{Var}(\hat{\sigma}_{ij})}{\sum_{i,j}(\hat{\sigma}_{ij} - f_{ij})^2}
-$$ {#eq-optimal-rho}
-
-where $f_{ij}$ are the elements of the target matrix $\mathbf{F}$.
-
-```{python}
-#| label: fig-shrinkage-analysis
-#| fig-cap: "Covariance matrix shrinkage estimation and portfolio impact"
-
-class CovarianceShrinkage:
-    """
-    Implementation of Ledoit-Wolf shrinkage estimation for covariance matrices.
-    """
-    
-    def __init__(self, returns_data):
-        """
-        Initialize shrinkage estimator.
-        
-        Parameters:
-        -----------
-        returns_data : pandas.DataFrame
-            Historical returns data
-        """
-        self.returns = returns_data
-        self.n_assets = len(returns_data.columns)
-        self.n_obs = len(returns_data)
-        
-    def sample_covariance(self):
-        """Calculate sample covariance matrix."""
-        return self.returns.cov().values
-    
-    def identity_target(self):
-        """Identity matrix target (Ledoit-Wolf)."""
-        sample_cov = self.sample_covariance()
-        trace = np.trace(sample_cov)
-        return (trace / self.n_assets) * np.eye(self.n_assets)
-    
-    def single_factor_target(self):
-        """Single factor model target."""
-        sample_cov = self.sample_covariance()
-        
-        # Estimate factor loadings via PCA
-        eigenvals, eigenvecs = np.linalg.eigh(sample_cov)
-        factor_loading = eigenvecs[:, -1] * np.sqrt(eigenvals[-1])
-        
-        # Single factor covariance matrix
-        factor_var = eigenvals[-1]
-        residual_var = np.mean(eigenvals[:-1])
-        
-        target = np.outer(factor_loading, factor_loading) + residual_var * np.eye(self.n_assets)
-        return target
-    
-    def constant_correlation_target(self):
-        """Constant correlation target."""
-        sample_cov = self.sample_covariance()
-        
-        # Average variance and correlation
-        avg_var = np.mean(np.diag(sample_cov))
-        avg_corr = (np.sum(sample_cov) - np.trace(sample_cov)) / (self.n_assets * (self.n_assets - 1))
-        
-        # Constant correlation matrix
-        target = avg_corr * np.ones((self.n_assets, self.n_assets))
-        np.fill_diagonal(target, 1.0)
-        target *= avg_var
-        
-        return target
-    
-    def optimal_shrinkage_intensity(self, target_matrix):
-        """
-        Calculate optimal shrinkage intensity (Ledoit-Wolf).
-        
-        Parameters:
-        -----------
-        target_matrix : numpy.ndarray
-            Target matrix for shrinkage
-            
-        Returns:
-        --------
-        float: Optimal shrinkage intensity
-        """
-        sample_cov = self.sample_covariance()
-        returns_centered = self.returns - self.returns.mean()
-        
-        # Calculate numerator: sum of variances of sample covariance elements
-        numerator = 0
-        for i in range(self.n_assets):
-            for j in range(self.n_assets):
-                if i == j:
-                    # Variance of sample variance
-                    xi_sq = (returns_centered.iloc[:, i]**2).values
-                    numerator += np.var(xi_sq) / self.n_obs
-                else:
-                    # Variance of sample covariance
-                    xi_xj = (returns_centered.iloc[:, i] * returns_centered.iloc[:, j]).values
-                    numerator += np.var(xi_xj) / self.n_obs
-        
-        # Calculate denominator: squared Frobenius norm of difference
-        denominator = np.sum((sample_cov - target_matrix)**2)
-        
-        # Optimal shrinkage intensity
-        rho = min(numerator / denominator, 1.0) if denominator > 0 else 0.0
-        return max(rho, 0.0)
-    
-    def shrinkage_estimator(self, target_type='identity'):
-        """
-        Compute shrinkage covariance matrix.
-        
-        Parameters:
-        -----------
-        target_type : str
-            Type of target matrix ('identity', 'single_factor', 'constant_corr')
-            
-        Returns:
-        --------
-        tuple: (shrinkage_matrix, shrinkage_intensity)
-        """
-        sample_cov = self.sample_covariance()
-        
-        if target_type == 'identity':
-            target = self.identity_target()
-        elif target_type == 'single_factor':
-            target = self.single_factor_target()
-        elif target_type == 'constant_corr':
-            target = self.constant_correlation_target()
-        else:
-            raise ValueError("Invalid target type")
-        
-        rho = self.optimal_shrinkage_intensity(target)
-        shrinkage_cov = (1 - rho) * sample_cov + rho * target
-        
-        return shrinkage_cov, rho
-
-# Initialize shrinkage estimator
-shrinkage_estimator = CovarianceShrinkage(returns)
-
-# Calculate different shrinkage estimators
-sample_cov = shrinkage_estimator.sample_covariance()
-identity_shrink, rho_identity = shrinkage_estimator.shrinkage_estimator('identity')
-factor_shrink, rho_factor = shrinkage_estimator.shrinkage_estimator('single_factor')
-const_corr_shrink, rho_const = shrinkage_estimator.shrinkage_estimator('constant_corr')
-
-# Create comprehensive visualization
-fig = plt.figure(figsize=(14, 10))
-gs = fig.add_gridspec(3, 3, hspace=0.4, wspace=0.3)
-
-# Plot 1: Sample covariance matrix
-ax1 = fig.add_subplot(gs[0, 0])
-im1 = ax1.imshow(sample_cov, cmap='RdBu_r', aspect='equal')
-ax1.set_title('Sample Covariance Matrix', fontweight='bold')
-ax1.set_xticks(range(0, len(tickers), 2))
-ax1.set_yticks(range(0, len(tickers), 2))
-ax1.set_xticklabels([tickers[i] for i in range(0, len(tickers), 2)], rotation=45)
-ax1.set_yticklabels([tickers[i] for i in range(0, len(tickers), 2)])
-
-# Plot 2: Identity shrinkage
-ax2 = fig.add_subplot(gs[0, 1])
-im2 = ax2.imshow(identity_shrink, cmap='RdBu_r', aspect='equal')
-ax2.set_title(f'Identity Shrinkage (ρ={rho_identity:.3f})', fontweight='bold')
-ax2.set_xticks(range(0, len(tickers), 2))
-ax2.set_yticks(range(0, len(tickers), 2))
-ax2.set_xticklabels([tickers[i] for i in range(0, len(tickers), 2)], rotation=45)
-ax2.set_yticklabels([tickers[i] for i in range(0, len(tickers), 2)])
-
-# Plot 3: Constant correlation shrinkage
-ax3 = fig.add_subplot(gs[0, 2])
-im3 = ax3.imshow(const_corr_shrink, cmap='RdBu_r', aspect='equal')
-ax3.set_title(f'Constant Corr. (ρ={rho_const:.3f})', fontweight='bold')
-ax3.set_xticks(range(0, len(tickers), 2))
-ax3.set_yticks(range(0, len(tickers), 2))
-ax3.set_xticklabels([tickers[i] for i in range(0, len(tickers), 2)], rotation=45)
-ax3.set_yticklabels([tickers[i] for i in range(0, len(tickers), 2)])
-
-# Plot 4: Eigenvalue comparison
-ax4 = fig.add_subplot(gs[1, :])
-eigenvals_sample = np.linalg.eigvals(sample_cov)
-eigenvals_identity = np.linalg.eigvals(identity_shrink)
-eigenvals_const = np.linalg.eigvals(const_corr_shrink)
-
-x = np.arange(len(eigenvals_sample))
-ax4.plot(x, np.sort(eigenvals_sample)[::-1], 'o-', label='Sample', linewidth=2, markersize=4)
-ax4.plot(x, np.sort(eigenvals_identity)[::-1], 's-', label='Identity Shrinkage', linewidth=2, markersize=4)
-ax4.plot(x, np.sort(eigenvals_const)[::-1], '^-', label='Constant Correlation', linewidth=2, markersize=4)
-ax4.set_title('Eigenvalue Comparison', fontweight='bold')
-ax4.set_xlabel('Eigenvalue Index')
-ax4.set_ylabel('Eigenvalue')
-ax4.set_yscale('log')
-ax4.legend(frameon=True, fancybox=True, shadow=True)
-
-# Plot 5: Portfolio weight comparison
-ax5 = fig.add_subplot(gs[2, :2])
-
-# Calculate minimum variance portfolios for each estimator
-def min_var_weights(cov_matrix):
-    inv_cov = np.linalg.inv(cov_matrix)
-    ones = np.ones((len(cov_matrix), 1))
-    weights = (inv_cov @ ones) / (ones.T @ inv_cov @ ones)
-    return weights.flatten()
-
-weights_sample = min_var_weights(sample_cov)
-weights_identity = min_var_weights(identity_shrink)
-weights_const = min_var_weights(const_corr_shrink)
-
-x = np.arange(len(tickers))
-width = 0.25
-
-ax5.bar(x - width, weights_sample, width, label='Sample', alpha=0.8)
-ax5.bar(x, weights_identity, width, label='Identity Shrinkage', alpha=0.8)
-ax5.bar(x + width, weights_const, width, label='Constant Correlation', alpha=0.8)
-
-ax5.set_title('Minimum Variance Portfolio Weights', fontweight='bold')
-ax5.set_xlabel('Assets')
-ax5.set_ylabel('Portfolio Weight')
-ax5.set_xticks(x)
-ax5.set_xticklabels(tickers, rotation=45)
-ax5.legend(frameon=True, fancybox=True, shadow=True)
-
-# Plot 6: Condition number comparison
-ax6 = fig.add_subplot(gs[2, 2])
-cond_numbers = [
-    np.linalg.cond(sample_cov),
-    np.linalg.cond(identity_shrink),
-    np.linalg.cond(const_corr_shrink)
-]
-methods = ['Sample', 'Identity\nShrinkage', 'Constant\nCorrelation']
-colors = ['#ff7f0e', '#2ca02c', '#d62728']
-
-bars = ax6.bar(methods, cond_numbers, color=colors, alpha=0.8, edgecolor='black')
-ax6.set_title('Condition Numbers', fontweight='bold')
-ax6.set_ylabel('Condition Number')
-ax6.set_yscale('log')
-
-# Add value labels on bars
-for bar, value in zip(bars, cond_numbers):
-    height = bar.get_height()
-    ax6.text(bar.get_x() + bar.get_width()/2., height,
-             f'{value:.0f}', ha='center', va='bottom', fontweight='bold')
-
-plt.show()
-
-# Print numerical results
-print("\n" + "="*70)
-print("COVARIANCE MATRIX SHRINKAGE ANALYSIS")
-print("="*70)
-
-print(f"\nShrinkage Intensities:")
-print(f"Identity Target: {rho_identity:.4f}")
-print(f"Single Factor Target: {rho_factor:.4f}")
-print(f"Constant Correlation Target: {rho_const:.4f}")
-
-print(f"\nCondition Numbers:")
-print(f"Sample Covariance: {np.linalg.cond(sample_cov):.2f}")
-print(f"Identity Shrinkage: {np.linalg.cond(identity_shrink):.2f}")
-print(f"Constant Correlation: {np.linalg.cond(const_corr_shrink):.2f}")
-
-print(f"\nPortfolio Concentration (Max Weight):")
-print(f"Sample Covariance: {np.max(np.abs(weights_sample)):.4f}")
-print(f"Identity Shrinkage: {np.max(np.abs(weights_identity)):.4f}")
-print(f"Constant Correlation: {np.max(np.abs(weights_const)):.4f}")
+def min_variance(mean_returns, cov_matrix):
+    num_assets = len(mean_returns)
+    args = (mean_returns, cov_matrix)
+    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+    bound = (0.0, 1.0)
+    bounds = tuple(bound for asset in range(num_assets))
+    result = minimize(portfolio_volatility, num_assets* [1./num_assets,], args=args,
+                        method='SLSQP', bounds=bounds, constraints=constraints)
+    return result
 ```
 
-## Mean-Variance Optimization Implementation {#sec-mv-implementation}
+Now we can find the efficient frontier by simulating many random portfolios and also by optimizing for the minimum variance for a range of target returns.
 
-We implement the classical Markowitz mean-variance optimization framework, providing both analytical and numerical solutions.
+```python
+#| label: fig-efficient-frontier
+#| fig-cap: "Mean-variance efficient frontier with the tangency portfolio."
+#| fig-width: 10
+#| fig-height: 8
 
-```{python}
-#| label: fig-markowitz-optimization
-#| fig-cap: "Mean-variance efficient frontier and optimal portfolios"
+# Find the tangency portfolio (maximum Sharpe ratio)
+max_sharpe = max_sharpe_ratio(returns.mean(), returns.cov())
+max_sharpe_weights = max_sharpe['x']
+max_sharpe_ret, max_sharpe_std = portfolio_performance(max_sharpe_weights, returns.mean(), returns.cov())
 
-class MarkowitzOptimizer:
-    """
-    Classical Markowitz mean-variance optimizer with analytical and numerical solutions.
-    """
-    
-    def __init__(self, returns_data):
-        """
-        Initialize the optimizer with historical returns data.
-        
-        Parameters:
-        -----------
-        returns_data : pandas.DataFrame
-            Historical returns data with assets as columns
-        """
-        self.returns = returns_data
-        self.mean_returns = returns_data.mean() * 252  # Annualized
-        self.cov_matrix = returns_data.cov() * 252     # Annualized
-        self.n_assets = len(returns_data.columns)
-        
-        # Calculate key matrices for analytical solution
-        self.inv_cov = np.linalg.inv(self.cov_matrix)
-        self.ones = np.ones((self.n_assets, 1))
-        
-        # Calculate constants A, B, C for analytical solution
-        self.A = float(self.ones.T @ self.inv_cov @ self.ones)
-        self.B = float(self.ones.T @ self.inv_cov @ self.mean_returns.values.reshape(-1, 1))
-        self.C = float(self.mean_returns.values.T @ self.inv_cov @ self.mean_returns.values)
-        
-        self.discriminant = self.A * self.C - self.B**2
-        
-    def min_variance_portfolio(self):
-        """
-        Calculate the global minimum variance portfolio.
-        
-        Returns:
-        --------
-        dict: Portfolio weights, expected return, and volatility
-        """
-        weights = (self.inv_cov @ self.ones) / self.A
-        weights = weights.flatten()
-        
-        expected_return = np.sum(weights * self.mean_returns)
-        volatility = np.sqrt(weights.T @ self.cov_matrix @ weights)
-        
-        return {
-            'weights': pd.Series(weights, index=self.returns.columns),
-            'expected_return': expected_return,
-            'volatility': volatility,
-            'sharpe_ratio': (expected_return - 0.02) / volatility
-        }
-    
-    def tangency_portfolio(self, risk_free_rate=0.02):
-        """
-        Calculate the tangency (maximum Sharpe ratio) portfolio.
-        
-        Parameters:
-        -----------
-        risk_free_rate : float
-            Risk-free rate for Sharpe ratio calculation
-            
-        Returns:
-        --------
-        dict: Portfolio weights, expected return, and volatility
-        """
-        excess_returns = self.mean_returns - risk_free_rate
-        weights = (self.inv_cov @ excess_returns) / (self.ones.T @ self.inv_cov @ excess_returns)
-        weights = weights.flatten()
-        
-        expected_return = np.sum(weights * self.mean_returns)
-        volatility = np.sqrt(weights.T @ self.cov_matrix @ weights)
-        
-        return {
-            'weights': pd.Series(weights, index=self.returns.columns),
-            'expected_return': expected_return,
-            'volatility': volatility,
-            'sharpe_ratio': (expected_return - risk_free_rate) / volatility
-        }
-    
-    def efficient_portfolio(self, target_return):
-        """
-        Calculate efficient portfolio for a given target return.
-        
-        Parameters:
-        -----------
-        target_return : float
-            Target expected return
-            
-        Returns:
-        --------
-        dict: Portfolio weights, expected return, and volatility
-        """
-        # Analytical solution
-        lambda1 = (self.C - self.B * target_return) / self.discriminant
-        lambda2 = (self.A * target_return - self.B) / self.discriminant
-        
-        weights = lambda1 * (self.inv_cov @ self.ones).flatten() + \
-                 lambda2 * (self.inv_cov @ self.mean_returns.values)
-        
-        expected_return = np.sum(weights * self.mean_returns)
-        volatility = np.sqrt(weights.T @ self.cov_matrix @ weights)
-        
-        return {
-            'weights': pd.Series(weights, index=self.returns.columns),
-            'expected_return': expected_return,
-            'volatility': volatility,
-            'sharpe_ratio': (expected_return - 0.02) / volatility
-        }
-    
-    def efficient_frontier(self, n_points=100):
-        """
-        Generate the efficient frontier.
-        
-        Parameters:
-        -----------
-        n_points : int
-            Number of points on the efficient frontier
-            
-        Returns:
-        --------
-        pandas.DataFrame: Expected returns, volatilities, and Sharpe ratios
-        """
-        min_ret = self.mean_returns.min()
-        max_ret = self.mean_returns.max()
-        
-        target_returns = np.linspace(min_ret, max_ret, n_points)
-        efficient_portfolios = []
-        
-        for target_ret in target_returns:
-            try:
-                portfolio = self.efficient_portfolio(target_ret)
-                efficient_portfolios.append({
-                    'Expected_Return': portfolio['expected_return'],
-                    'Volatility': portfolio['volatility'],
-                    'Sharpe_Ratio': portfolio['sharpe_ratio']
-                })
-            except:
-                continue
-        
-        return pd.DataFrame(efficient_portfolios)
+# Find the minimum variance portfolio
+min_var = min_variance(returns.mean(), returns.cov())
+min_var_weights = min_var['x']
+min_var_ret, min_var_std = portfolio_performance(min_var_weights, returns.mean(), returns.cov())
 
-# Initialize optimizer
-mv_optimizer = MarkowitzOptimizer(returns)
 
-# Calculate special portfolios
-min_var_portfolio = mv_optimizer.min_variance_portfolio()
-tangency_portfolio = mv_optimizer.tangency_portfolio()
+# Simulate random portfolios
+n_portfolios = 30000
+results = np.zeros((3, n_portfolios))
+weights_record = []
+for i in range(n_portfolios):
+    weights = np.random.random(len(tickers))
+    weights /= np.sum(weights)
+    weights_record.append(weights)
+    portfolio_return = np.sum(returns.mean() * weights) * 252
+    portfolio_std_dev = np.sqrt(np.dot(weights.T, np.dot(returns.cov() * 252, weights)))
+    results[0,i] = portfolio_return
+    results[1,i] = portfolio_std_dev
+    results[2,i] = (portfolio_return - 0.02) / portfolio_std_dev
 
-# Generate efficient frontier
-efficient_frontier = mv_optimizer.efficient_frontier()
+plt.figure(figsize=(10, 8))
+plt.scatter(results[1,:], results[0,:], c=results[2,:], cmap='viridis', marker='o', s=10, alpha=0.3)
+plt.colorbar(label='Sharpe Ratio')
 
-# Create Nature-quality visualization
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 8))
-plt.subplots_adjust(hspace=0.35, wspace=0.3)
+# Plot tangency and min variance portfolios
+plt.scatter(max_sharpe_std, max_sharpe_ret, marker='*', color='r', s=200, label='Maximum Sharpe ratio')
+plt.scatter(min_var_std, min_var_ret, marker='*', color='g', s=200, label='Minimum variance')
 
-# Plot 1: Efficient frontier with special portfolios
-ax1.plot(efficient_frontier['Volatility'], efficient_frontier['Expected_Return'], 
-         'b-', linewidth=3, label='Efficient Frontier', alpha=0.9)
-ax1.scatter(volatilities, mean_returns, alpha=0.7, s=80, c='gray', 
-           label='Individual Assets', edgecolors='white', linewidth=1)
-ax1.scatter(min_var_portfolio['volatility'], min_var_portfolio['expected_return'], 
-            color='red', s=150, marker='*', label='Min Variance', zorder=5, 
-            edgecolors='white', linewidth=2)
-ax1.scatter(tangency_portfolio['volatility'], tangency_portfolio['expected_return'], 
-            color='gold', s=150, marker='*', label='Tangency', zorder=5,
-            edgecolors='white', linewidth=2)
+# Plot individual assets
+for i, txt in enumerate(tickers):
+    plt.scatter(np.sqrt(cov_matrix.iloc[i,i]), mean_returns[i], label=txt, s=50)
 
-# Add selected asset labels with better styling
-selected_tickers = ['AAPL', 'MSFT', 'GOOGL', 'TSLA']
-for i, ticker in enumerate(tickers):
-    if ticker in selected_tickers:
-        ax1.annotate(ticker, (volatilities[i], mean_returns[i]), 
-                    xytext=(5, 5), textcoords='offset points', fontsize=10, 
-                    fontweight='bold', ha='left')
-
-ax1.set_xlabel('Volatility (Annualized)', fontweight='bold', fontsize=12)
-ax1.set_ylabel('Expected Return (Annualized)', fontweight='bold', fontsize=12)
-ax1.set_title('Mean-Variance Efficient Frontier', fontweight='bold', fontsize=14)
-ax1.legend(fontsize=10)
-ax1.spines['top'].set_visible(False)
-ax1.spines['right'].set_visible(False)
-
-# Plot 2: Portfolio weights comparison
-portfolio_weights = pd.DataFrame({
-    'Min Variance': min_var_portfolio['weights'],  
-    'Tangency': tangency_portfolio['weights']
-})
-
-x = np.arange(len(tickers))
-width = 0.35
-
-bars1 = ax2.bar(x - width/2, portfolio_weights['Min Variance'], width, 
-               label='Min Variance', alpha=0.8, edgecolor='white', linewidth=1)
-bars2 = ax2.bar(x + width/2, portfolio_weights['Tangency'], width, 
-               label='Tangency', alpha=0.8, edgecolor='white', linewidth=1)
-
-ax2.set_xlabel('Assets', fontweight='bold', fontsize=12)
-ax2.set_ylabel('Portfolio Weight', fontweight='bold', fontsize=12)
-ax2.set_title('Optimal Portfolio Weights', fontweight='bold', fontsize=14)
-ax2.set_xticks(x)
-ax2.set_xticklabels(tickers, rotation=45, ha='right')
-ax2.legend(fontsize=10)
-ax2.spines['top'].set_visible(False)
-ax2.spines['right'].set_visible(False)
-
-# Plot 3: Risk-return trade-off
-sharpe_ratios = efficient_frontier['Sharpe_Ratio']
-ax3.plot(efficient_frontier['Volatility'], sharpe_ratios, 'g-', linewidth=3, alpha=0.9)
-ax3.axhline(y=tangency_portfolio['sharpe_ratio'], color='gold', linestyle='--', 
-           linewidth=2, label='Max Sharpe Ratio', alpha=0.9)
-ax3.scatter(tangency_portfolio['volatility'], tangency_portfolio['sharpe_ratio'], 
-           color='gold', s=150, marker='*', zorder=5, edgecolors='white', linewidth=2)
-
-ax3.set_xlabel('Volatility', fontweight='bold', fontsize=12)
-ax3.set_ylabel('Sharpe Ratio', fontweight='bold', fontsize=12)
-ax3.set_title('Sharpe Ratio along Efficient Frontier', fontweight='bold', fontsize=14)
-ax3.legend(fontsize=10)
-ax3.spines['top'].set_visible(False)
-ax3.spines['right'].set_visible(False)
-
-# Plot 4: Portfolio composition pie chart
-top_weights = tangency_portfolio['weights'].abs().nlargest(6)
-other_weight = 1 - top_weights.sum()
-
-if other_weight > 0.01:
-    plot_weights = top_weights.tolist() + [other_weight]
-    plot_labels = top_weights.index.tolist() + ['Others']
-else:
-    plot_weights = top_weights.tolist()
-    plot_labels = top_weights.index.tolist()
-
-colors = plt.cm.Set3(np.linspace(0, 1, len(plot_weights)))
-wedges, texts, autotexts = ax4.pie(plot_weights, labels=plot_labels, autopct='%1.1f%%', 
-                                   colors=colors, startangle=90, 
-                                   wedgeprops=dict(edgecolor='white', linewidth=2))
-
-ax4.set_title('Tangency Portfolio Composition', fontweight='bold', fontsize=14)
-
-# Style the text
-for autotext in autotexts:
-    autotext.set_color('black')
-    autotext.set_fontweight('bold')
-    autotext.set_fontsize(10)
-
+plt.title('Efficient Frontier')
+plt.xlabel('Volatility')
+plt.ylabel('Expected Return')
+plt.legend()
+plt.grid(True)
 plt.show()
-
-# Print results
-print("\n" + "="*60)
-print("MEAN-VARIANCE OPTIMIZATION RESULTS")
-print("="*60)
-
-print(f"\nMinimum Variance Portfolio:")
-print(f"Expected Return: {min_var_portfolio['expected_return']:.4f}")
-print(f"Volatility: {min_var_portfolio['volatility']:.4f}")
-print(f"Sharpe Ratio: {min_var_portfolio['sharpe_ratio']:.4f}")
-
-print(f"\nTangency Portfolio (Maximum Sharpe Ratio):")
-print(f"Expected Return: {tangency_portfolio['expected_return']:.4f}")
-print(f"Volatility: {tangency_portfolio['volatility']:.4f}")
-print(f"Sharpe Ratio: {tangency_portfolio['sharpe_ratio']:.4f}")
-
-print(f"\nTop 5 holdings in Tangency Portfolio:")
-top_holdings = tangency_portfolio['weights'].abs().nlargest(5)
-for asset, weight in top_holdings.items():
-    print(f"{asset}: {weight:.4f} ({weight*100:.1f}%)")
 ```
 
-## Expected Shortfall (CVaR) Optimization {#sec-cvar-implementation}
+The plot above shows the efficient frontier. The colored points are thousands of randomly generated portfolios. The red star is the tangency portfolio (the one with the highest Sharpe ratio), and the green star is the global minimum variance portfolio. The individual stocks are also plotted. As you can see, you can get a better risk-return trade-off by diversifying.
 
-Expected Shortfall optimization addresses the limitations of mean-variance optimization by focusing on tail risk. We implement both historical simulation and parametric approaches.
+## Beyond Mean-Variance
 
-```{python}
-#| label: fig-cvar-optimization
-#| fig-cap: "Expected Shortfall optimization and comparison with mean-variance"
+The Mean-Variance framework is a great starting point, but it has its limitations. It assumes that returns are normally distributed and that variance is a good measure of risk. In reality, financial returns often have "fat tails," meaning that extreme events are more common than a normal distribution would suggest.
 
-class CVaROptimizer:
-    """
-    Expected Shortfall (CVaR) portfolio optimizer using convex optimization.
-    """
-    
-    def __init__(self, returns_data, alpha=0.05):
-        """
-        Initialize CVaR optimizer.
-        
-        Parameters:
-        -----------
-        returns_data : pandas.DataFrame
-            Historical returns data
-        alpha : float
-            Confidence level for CVaR calculation (default 5%)
-        """
-        self.returns = returns_data
-        self.alpha = alpha
-        self.n_assets = len(returns_data.columns)
-        self.n_scenarios = len(returns_data)
-        
-    def calculate_portfolio_cvar(self, weights, returns_data=None):
-        """
-        Calculate portfolio CVaR for given weights.
-        
-        Parameters:
-        -----------
-        weights : array-like
-            Portfolio weights
-        returns_data : pandas.DataFrame, optional
-            Returns data (uses self.returns if not provided)
-            
-        Returns:
-        --------
-        tuple: (CVaR, VaR, expected_return, volatility)
-        """
-        if returns_data is None:
-            returns_data = self.returns
-            
-        # Calculate portfolio returns
-        portfolio_returns = (returns_data * weights).sum(axis=1)
-        
-        # Calculate VaR
-        var = np.percentile(portfolio_returns, self.alpha * 100)
-        
-        # Calculate CVaR (Expected Shortfall)
-        cvar = portfolio_returns[portfolio_returns <= var].mean()
-        
-        # Calculate expected return and volatility
-        expected_return = portfolio_returns.mean() * 252
-        volatility = portfolio_returns.std() * np.sqrt(252)
-        
-        return -cvar * np.sqrt(252), -var * np.sqrt(252), expected_return, volatility
-    
-    def optimize_cvar(self, target_return=None, max_weight=1.0):
-        """
-        Optimize portfolio to minimize CVaR.
-        
-        Parameters:
-        -----------
-        target_return : float, optional
-            Target expected return constraint
-        max_weight : float
-            Maximum weight per asset
-            
-        Returns:
-        --------
-        dict: Optimal weights and portfolio metrics
-        """
-        # Decision variables
-        w = cp.Variable(self.n_assets)  # Portfolio weights
-        zeta = cp.Variable()            # VaR
-        u = cp.Variable(self.n_scenarios)  # Auxiliary variables for CVaR
-        
-        # Portfolio returns for each scenario
-        portfolio_returns = self.returns.values @ w
-        
-        # Objective: minimize CVaR
-        objective = cp.Minimize(zeta + (1 / (self.alpha * self.n_scenarios)) * cp.sum(u))
-        
-        # Constraints
-        constraints = [
-            # CVaR constraints
-            -portfolio_returns - zeta <= u,
-            u >= 0,
-            # Portfolio constraints
-            cp.sum(w) == 1,
-            w >= 0,
-            w <= max_weight
-        ]
-        
-        # Add return constraint if specified
-        if target_return is not None:
-            expected_portfolio_return = (self.returns.mean().values @ w) * 252
-            constraints.append(expected_portfolio_return >= target_return)
-        
-        # Solve optimization problem
-        problem = cp.Problem(objective, constraints)
-        problem.solve(solver=cp.CLARABEL, verbose=False)
-        
-        if problem.status != cp.OPTIMAL:
-            raise ValueError(f"Optimization failed with status: {problem.status}")
-        
-        # Extract results
-        optimal_weights = w.value
-        cvar, var, expected_return, volatility = self.calculate_portfolio_cvar(optimal_weights)
-        
-        return {
-            'weights': pd.Series(optimal_weights, index=self.returns.columns),
-            'cvar': cvar,
-            'var': var,
-            'expected_return': expected_return,
-            'volatility': volatility,
-            'sharpe_ratio': (expected_return - 0.02) / volatility
-        }
-    
-    def cvar_efficient_frontier(self, n_points=50):
-        """
-        Generate CVaR efficient frontier.
-        
-        Parameters:
-        -----------
-        n_points : int
-            Number of points on the frontier
-            
-        Returns:
-        --------
-        pandas.DataFrame: CVaR efficient frontier
-        """
-        # Calculate return range
-        min_ret = (self.returns.mean() * 252).min()
-        max_ret = (self.returns.mean() * 252).max()
-        
-        target_returns = np.linspace(min_ret * 0.5, max_ret * 0.9, n_points)
-        efficient_portfolios = []
-        
-        for target_ret in target_returns:
-            try:
-                portfolio = self.optimize_cvar(target_return=target_ret)
-                efficient_portfolios.append({
-                    'Expected_Return': portfolio['expected_return'],
-                    'CVaR': portfolio['cvar'],
-                    'VaR': portfolio['var'],
-                    'Volatility': portfolio['volatility'],
-                    'Sharpe_Ratio': portfolio['sharpe_ratio']
-                })
-            except:
-                continue
-        
-        return pd.DataFrame(efficient_portfolios)
+To address these issues, more advanced methods have been developed:
 
-# Initialize CVaR optimizer
-cvar_optimizer = CVaROptimizer(returns, alpha=0.05)
+*   **CVaR Optimization:** Instead of minimizing variance, this method minimizes Conditional Value-at-Risk (CVaR), which is the expected loss in the worst-case scenarios. This is better at capturing tail risk.
+*   **Genetic Algorithms:** These are optimization techniques inspired by natural evolution. They can be used to solve very complex portfolio optimization problems with many constraints.
 
-# Optimize for minimum CVaR
-min_cvar_portfolio = cvar_optimizer.optimize_cvar()
+These methods are more complex, but they can provide a more robust and realistic approach to portfolio optimization.
 
-# Generate CVaR efficient frontier
-cvar_frontier = cvar_optimizer.cvar_efficient_frontier()
+## Conclusion
 
-# Create comprehensive visualization
-fig, axes = plt.subplots(2, 2, figsize=(18, 12))
-
-# Plot 1: Compare efficient frontiers (Mean-Variance vs CVaR)
-axes[0, 0].plot(efficient_frontier['Volatility'], efficient_frontier['Expected_Return'], 
-               'b-', linewidth=3, label='Mean-Variance Frontier', alpha=0.8)
-axes[0, 0].plot(cvar_frontier['Volatility'], cvar_frontier['Expected_Return'], 
-               'r-', linewidth=3, label='CVaR Frontier', alpha=0.8)
-
-# Add optimal portfolios
-axes[0, 0].scatter(tangency_portfolio['volatility'], tangency_portfolio['expected_return'], 
-                  color='gold', s=200, marker='*', label='MV Tangency', zorder=5)
-axes[0, 0].scatter(min_cvar_portfolio['volatility'], min_cvar_portfolio['expected_return'], 
-                  color='red', s=200, marker='s', label='Min CVaR', zorder=5)
-
-axes[0, 0].set_xlabel('Volatility (Annualized)')
-axes[0, 0].set_ylabel('Expected Return (Annualized)')
-axes[0, 0].set_title('Efficient Frontiers: Mean-Variance vs CVaR', fontsize=16, fontweight='bold')
-axes[0, 0].legend()
-axes[0, 0].grid(True, alpha=0.3)
-
-# Plot 2: CVaR vs Volatility trade-off
-axes[0, 1].scatter(cvar_frontier['Volatility'], cvar_frontier['CVaR'], 
-                  c=cvar_frontier['Expected_Return'], cmap='viridis', s=50, alpha=0.7)
-axes[0, 1].scatter(min_cvar_portfolio['volatility'], min_cvar_portfolio['cvar'], 
-                  color='red', s=200, marker='s', label='Min CVaR', zorder=5)
-
-# Add colorbar
-cbar = plt.colorbar(plt.cm.ScalarMappable(cmap='viridis'), ax=axes[0, 1])
-cbar.set_label('Expected Return', rotation=270, labelpad=20)
-
-axes[0, 1].set_xlabel('Volatility')
-axes[0, 1].set_ylabel('CVaR (95% Confidence)')
-axes[0, 1].set_title('CVaR vs Volatility Trade-off', fontsize=16, fontweight='bold')
-axes[0, 1].legend()
-axes[0, 1].grid(True, alpha=0.3)
-
-# Plot 3: Portfolio weights comparison
-comparison_weights = pd.DataFrame({
-    'Mean-Variance': tangency_portfolio['weights'],
-    'CVaR Optimal': min_cvar_portfolio['weights']
-})
-
-x = np.arange(len(tickers))
-width = 0.35
-
-axes[1, 0].bar(x - width/2, comparison_weights['Mean-Variance'], width, 
-              label='Mean-Variance', alpha=0.8, color='gold')
-axes[1, 0].bar(x + width/2, comparison_weights['CVaR Optimal'], width, 
-              label='CVaR Optimal', alpha=0.8, color='red')
-
-axes[1, 0].set_xlabel('Assets')
-axes[1, 0].set_ylabel('Portfolio Weight')
-axes[1, 0].set_title('Portfolio Weights: Mean-Variance vs CVaR', fontsize=16, fontweight='bold')
-axes[1, 0].set_xticks(x)
-axes[1, 0].set_xticklabels(tickers, rotation=45)
-axes[1, 0].legend()
-axes[1, 0].grid(True, alpha=0.3)
-
-# Plot 4: Risk measures comparison
-# Calculate portfolio returns for both strategies
-mv_portfolio_returns = (returns * tangency_portfolio['weights']).sum(axis=1)
-cvar_portfolio_returns = (returns * min_cvar_portfolio['weights']).sum(axis=1)
-
-# Calculate various risk measures
-risk_measures = pd.DataFrame({
-    'Mean-Variance': [
-        mv_portfolio_returns.std() * np.sqrt(252),  # Volatility
-        -np.percentile(mv_portfolio_returns, 5) * np.sqrt(252),  # VaR
-        -mv_portfolio_returns[mv_portfolio_returns <= np.percentile(mv_portfolio_returns, 5)].mean() * np.sqrt(252),  # CVaR
-        mv_portfolio_returns.min() * np.sqrt(252)  # Maximum Loss
-    ],
-    'CVaR Optimal': [
-        cvar_portfolio_returns.std() * np.sqrt(252),  # Volatility
-        -np.percentile(cvar_portfolio_returns, 5) * np.sqrt(252),  # VaR
-        -cvar_portfolio_returns[cvar_portfolio_returns <= np.percentile(cvar_portfolio_returns, 5)].mean() * np.sqrt(252),  # CVaR
-        cvar_portfolio_returns.min() * np.sqrt(252)  # Maximum Loss
-    ]
-}, index=['Volatility', 'VaR (95%)', 'CVaR (95%)', 'Max Loss'])
-
-# Create heatmap
-im = axes[1, 1].imshow(risk_measures.values, cmap='Reds', aspect='auto')
-axes[1, 1].set_title('Risk Measures Comparison', fontsize=16, fontweight='bold')
-axes[1, 1].set_xticks(range(len(risk_measures.columns)))
-axes[1, 1].set_yticks(range(len(risk_measures.index)))
-axes[1, 1].set_xticklabels(risk_measures.columns)
-axes[1, 1].set_yticklabels(risk_measures.index)
-
-# Add values to heatmap
-for i in range(len(risk_measures.index)):
-    for j in range(len(risk_measures.columns)):
-        axes[1, 1].text(j, i, f'{risk_measures.iloc[i, j]:.3f}', 
-                       ha='center', va='center', fontsize=12, fontweight='bold')
-
-plt.tight_layout()
-plt.show()
-
-# Print detailed results
-print("\n" + "="*60)
-print("CVaR OPTIMIZATION RESULTS")
-print("="*60)
-
-print(f"\nMinimum CVaR Portfolio:")
-print(f"Expected Return: {min_cvar_portfolio['expected_return']:.4f}")
-print(f"Volatility: {min_cvar_portfolio['volatility']:.4f}")
-print(f"CVaR (95%): {min_cvar_portfolio['cvar']:.4f}")
-print(f"VaR (95%): {min_cvar_portfolio['var']:.4f}")
-print(f"Sharpe Ratio: {min_cvar_portfolio['sharpe_ratio']:.4f}")
-
-print(f"\nComparison with Mean-Variance Tangency Portfolio:")
-print(f"{'Metric':<20} {'Mean-Variance':<15} {'CVaR Optimal':<15} {'Difference':<15}")
-print("-" * 65)
-print(f"{'Expected Return':<20} {tangency_portfolio['expected_return']:<15.4f} {min_cvar_portfolio['expected_return']:<15.4f} {min_cvar_portfolio['expected_return'] - tangency_portfolio['expected_return']:<15.4f}")
-print(f"{'Volatility':<20} {tangency_portfolio['volatility']:<15.4f} {min_cvar_portfolio['volatility']:<15.4f} {min_cvar_portfolio['volatility'] - tangency_portfolio['volatility']:<15.4f}")
-print(f"{'Sharpe Ratio':<20} {tangency_portfolio['sharpe_ratio']:<15.4f} {min_cvar_portfolio['sharpe_ratio']:<15.4f} {min_cvar_portfolio['sharpe_ratio'] - tangency_portfolio['sharpe_ratio']:<15.4f}")
-
-print(f"\nTop 5 holdings in CVaR Optimal Portfolio:")
-top_cvar_holdings = min_cvar_portfolio['weights'].abs().nlargest(5)
-for asset, weight in top_cvar_holdings.items():
-    print(f"{asset}: {weight:.4f} ({weight*100:.1f}%)")
-```
-
-## Genetic Algorithm Optimization {#sec-ga-implementation}
-
-Genetic algorithms provide a powerful metaheuristic approach for portfolio optimization, particularly when dealing with complex constraints or non-convex objectives. We implement a custom genetic algorithm specifically designed for portfolio optimization.
-
-```{python}
-#| label: fig-genetic-algorithm
-#| fig-cap: "Genetic algorithm portfolio optimization and convergence analysis"
-
-from deap import base, creator, tools, algorithms
-import random
-
-class GeneticPortfolioOptimizer:
-    """
-    Genetic Algorithm for portfolio optimization with custom operators.
-    """
-    
-    def __init__(self, returns_data, risk_free_rate=0.02):
-        """
-        Initialize genetic algorithm optimizer.
-        
-        Parameters:
-        -----------
-        returns_data : pandas.DataFrame
-            Historical returns data
-        risk_free_rate : float
-            Risk-free rate for Sharpe ratio calculation
-        """
-        self.returns = returns_data
-        self.mean_returns = returns_data.mean() * 252
-        self.cov_matrix = returns_data.cov() * 252
-        self.risk_free_rate = risk_free_rate
-        self.n_assets = len(returns_data.columns)
-        
-        # Setup DEAP framework
-        self._setup_deap()
-        
-    def _setup_deap(self):
-        """Setup DEAP genetic algorithm framework."""
-        # Create fitness and individual classes
-        creator.create("FitnessMax", base.Fitness, weights=(1.0,))
-        creator.create("Individual", list, fitness=creator.FitnessMax)
-        
-        # Initialize toolbox
-        self.toolbox = base.Toolbox()
-        
-        # Attribute generator: random weights
-        self.toolbox.register("attr_weight", random.uniform, 0, 1)
-        
-        # Structure initializers
-        self.toolbox.register("individual", tools.initRepeat, creator.Individual,
-                             self.toolbox.attr_weight, n=self.n_assets)
-        self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
-        
-        # Register genetic operators
-        self.toolbox.register("evaluate", self._evaluate_individual)
-        self.toolbox.register("mate", self._crossover)
-        self.toolbox.register("mutate", self._mutate)
-        self.toolbox.register("select", tools.selTournament, tournsize=3)
-        
-    def _normalize_weights(self, individual):
-        """Normalize weights to sum to 1."""
-        total = sum(individual)
-        if total == 0:
-            return [1.0/self.n_assets] * self.n_assets
-        return [w/total for w in individual]
-    
-    def _evaluate_individual(self, individual):
-        """
-        Evaluate fitness of an individual (portfolio).
-        
-        Parameters:
-        -----------
-        individual : list
-            Portfolio weights
-            
-        Returns:
-        --------
-        tuple: Fitness value (Sharpe ratio)
-        """
-        # Normalize weights
-        weights = self._normalize_weights(individual)
-        weights = np.array(weights)
-        
-        # Calculate portfolio metrics
-        portfolio_return = np.sum(weights * self.mean_returns)
-        portfolio_variance = np.dot(weights.T, np.dot(self.cov_matrix, weights))
-        portfolio_std = np.sqrt(portfolio_variance)
-        
-        # Handle edge cases
-        if portfolio_std == 0:
-            return (-1000.0,)
-        
-        # Calculate Sharpe ratio
-        sharpe_ratio = (portfolio_return - self.risk_free_rate) / portfolio_std
-        
-        return (sharpe_ratio,)
-    
-    def _crossover(self, ind1, ind2):
-        """
-        Custom crossover operator using blend crossover (BLX-α).
-        
-        Parameters:
-        -----------
-        ind1, ind2 : list
-            Parent individuals
-            
-        Returns:
-        --------
-        tuple: Modified parent individuals
-        """
-        alpha = 0.5
-        for i in range(len(ind1)):
-            # Calculate range
-            min_val = min(ind1[i], ind2[i])
-            max_val = max(ind1[i], ind2[i])
-            range_val = max_val - min_val
-            
-            # Generate new values
-            low = min_val - alpha * range_val
-            high = max_val + alpha * range_val
-            
-            # Ensure non-negative weights
-            low = max(0, low)
-            high = max(0, high)
-            
-            # Create offspring
-            ind1[i] = random.uniform(low, high)
-            ind2[i] = random.uniform(low, high)
-            
-        return ind1, ind2
-    
-    def _mutate(self, individual):
-        """
-        Custom mutation operator using Gaussian mutation.
-        
-        Parameters:
-        -----------
-        individual : list
-            Individual to mutate
-            
-        Returns:
-        --------
-        tuple: Mutated individual
-        """
-        mutation_strength = 0.1
-        for i in range(len(individual)):
-            if random.random() < 0.2:  # Mutation probability
-                individual[i] += random.gauss(0, mutation_strength)
-                individual[i] = max(0, individual[i])  # Ensure non-negative
-                
-        return (individual,)
-    
-    def optimize(self, population_size=100, generations=50, cx_prob=0.7, mut_prob=0.2):
-        """
-        Run genetic algorithm optimization.
-        
-        Parameters:
-        -----------
-        population_size : int
-            Size of population
-        generations : int
-            Number of generations
-        cx_prob : float
-            Crossover probability
-        mut_prob : float
-            Mutation probability
-            
-        Returns:
-        --------
-        dict: Best individual and optimization statistics
-        """
-        # Initialize population
-        population = self.toolbox.population(n=population_size)
-        
-        # Statistics tracking
-        stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("avg", np.mean)
-        stats.register("min", np.min)
-        stats.register("max", np.max)
-        stats.register("std", np.std)
-        
-        # Hall of fame to track best individuals
-        hof = tools.HallOfFame(1)
-        
-        # Evolution tracking
-        self.fitness_evolution = []
-        
-        # Run algorithm
-        for gen in range(generations):
-            # Evaluate population
-            fitnesses = list(map(self.toolbox.evaluate, population))
-            for ind, fit in zip(population, fitnesses):
-                ind.fitness.values = fit
-            
-            # Update hall of fame
-            hof.update(population)
-            
-            # Record statistics
-            record = stats.compile(population)
-            self.fitness_evolution.append(record)
-            
-            if gen % 10 == 0:
-                print(f"Generation {gen}: Max Fitness = {record['max']:.4f}, Avg Fitness = {record['avg']:.4f}")
-            
-            # Selection
-            offspring = self.toolbox.select(population, len(population))
-            offspring = list(map(self.toolbox.clone, offspring))
-            
-            # Crossover and mutation
-            for child1, child2 in zip(offspring[::2], offspring[1::2]):
-                if random.random() < cx_prob:
-                    self.toolbox.mate(child1, child2)
-                    del child1.fitness.values
-                    del child2.fitness.values
-            
-            for mutant in offspring:
-                if random.random() < mut_prob:
-                    self.toolbox.mutate(mutant)
-                    del mutant.fitness.values
-            
-            # Replace population
-            population[:] = offspring
-        
-        # Get best individual
-        best_individual = hof[0]
-        best_weights = self._normalize_weights(best_individual)
-        best_weights = np.array(best_weights)
-        
-        # Calculate final portfolio metrics
-        portfolio_return = np.sum(best_weights * self.mean_returns)
-        portfolio_variance = np.dot(best_weights.T, np.dot(self.cov_matrix, best_weights))
-        portfolio_std = np.sqrt(portfolio_variance)
-        sharpe_ratio = (portfolio_return - self.risk_free_rate) / portfolio_std
-        
-        return {
-            'weights': pd.Series(best_weights, index=self.returns.columns),
-            'expected_return': portfolio_return,
-            'volatility': portfolio_std,
-            'sharpe_ratio': sharpe_ratio,
-            'fitness_evolution': self.fitness_evolution
-        }
-
-# Initialize genetic algorithm optimizer
-ga_optimizer = GeneticPortfolioOptimizer(returns)
-
-# Run optimization
-print("Running Genetic Algorithm Optimization...")
-ga_result = ga_optimizer.optimize(population_size=100, generations=100, cx_prob=0.7, mut_prob=0.2)
-
-# Create comprehensive visualization
-fig, axes = plt.subplots(2, 2, figsize=(18, 12))
-
-# Plot 1: Convergence analysis
-generations = range(len(ga_result['fitness_evolution']))
-max_fitness = [gen['max'] for gen in ga_result['fitness_evolution']]
-avg_fitness = [gen['avg'] for gen in ga_result['fitness_evolution']]
-
-axes[0, 0].plot(generations, max_fitness, 'r-', linewidth=2, label='Best Fitness')
-axes[0, 0].plot(generations, avg_fitness, 'b-', linewidth=2, label='Average Fitness')
-axes[0, 0].set_xlabel('Generation')
-axes[0, 0].set_ylabel('Fitness (Sharpe Ratio)')
-axes[0, 0].set_title('Genetic Algorithm Convergence', fontsize=16, fontweight='bold')
-axes[0, 0].legend()
-axes[0, 0].grid(True, alpha=0.3)
-
-# Plot 2: Compare all three approaches
-all_methods_weights = pd.DataFrame({
-    'Mean-Variance': tangency_portfolio['weights'],
-    'CVaR Optimal': min_cvar_portfolio['weights'],
-    'Genetic Algorithm': ga_result['weights']
-})
-
-x = np.arange(len(tickers))
-width = 0.25
-
-axes[0, 1].bar(x - width, all_methods_weights['Mean-Variance'], width, 
-              label='Mean-Variance', alpha=0.8, color='gold')
-axes[0, 1].bar(x, all_methods_weights['CVaR Optimal'], width, 
-              label='CVaR Optimal', alpha=0.8, color='red')
-axes[0, 1].bar(x + width, all_methods_weights['Genetic Algorithm'], width, 
-              label='Genetic Algorithm', alpha=0.8, color='green')
-
-axes[0, 1].set_xlabel('Assets')
-axes[0, 1].set_ylabel('Portfolio Weight')
-axes[0, 1].set_title('Portfolio Weights: All Methods Comparison', fontsize=16, fontweight='bold')
-axes[0, 1].set_xticks(x)
-axes[0, 1].set_xticklabels(tickers, rotation=45)
-axes[0, 1].legend()
-axes[0, 1].grid(True, alpha=0.3)
-
-# Plot 3: Risk-Return comparison
-methods = ['Mean-Variance', 'CVaR Optimal', 'Genetic Algorithm']
-returns_list = [tangency_portfolio['expected_return'], 
-                min_cvar_portfolio['expected_return'], 
-                ga_result['expected_return']]
-volatilities_list = [tangency_portfolio['volatility'], 
-                     min_cvar_portfolio['volatility'], 
-                     ga_result['volatility']]
-colors = ['gold', 'red', 'green']
-
-for i, (method, ret, vol, color) in enumerate(zip(methods, returns_list, volatilities_list, colors)):
-    axes[1, 0].scatter(vol, ret, s=200, c=color, label=method, alpha=0.8, edgecolors='black')
-
-axes[1, 0].set_xlabel('Volatility (Annualized)')
-axes[1, 0].set_ylabel('Expected Return (Annualized)')
-axes[1, 0].set_title('Risk-Return Profile: All Methods', fontsize=16, fontweight='bold')
-axes[1, 0].legend()
-axes[1, 0].grid(True, alpha=0.3)
-
-# Plot 4: Performance metrics comparison
-performance_metrics = pd.DataFrame({
-    'Mean-Variance': [
-        tangency_portfolio['expected_return'],
-        tangency_portfolio['volatility'],
-        tangency_portfolio['sharpe_ratio']
-    ],
-    'CVaR Optimal': [
-        min_cvar_portfolio['expected_return'],
-        min_cvar_portfolio['volatility'],
-        min_cvar_portfolio['sharpe_ratio']
-    ],
-    'Genetic Algorithm': [
-        ga_result['expected_return'],
-        ga_result['volatility'],
-        ga_result['sharpe_ratio']
-    ]
-}, index=['Expected Return', 'Volatility', 'Sharpe Ratio'])
-
-# Create heatmap
-im = axes[1, 1].imshow(performance_metrics.values, cmap='RdYlGn', aspect='auto')
-axes[1, 1].set_title('Performance Metrics Comparison', fontsize=16, fontweight='bold')
-axes[1, 1].set_xticks(range(len(performance_metrics.columns)))
-axes[1, 1].set_yticks(range(len(performance_metrics.index)))
-axes[1, 1].set_xticklabels(performance_metrics.columns, rotation=45)
-axes[1, 1].set_yticklabels(performance_metrics.index)
-
-# Add values to heatmap
-for i in range(len(performance_metrics.index)):
-    for j in range(len(performance_metrics.columns)):
-        axes[1, 1].text(j, i, f'{performance_metrics.iloc[i, j]:.4f}', 
-                       ha='center', va='center', fontsize=12, fontweight='bold')
-
-plt.tight_layout()
-plt.show()
-
-# Print detailed results
-print("\n" + "="*60)
-print("GENETIC ALGORITHM OPTIMIZATION RESULTS")
-print("="*60)
-
-print(f"\nGenetic Algorithm Portfolio:")
-print(f"Expected Return: {ga_result['expected_return']:.4f}")
-print(f"Volatility: {ga_result['volatility']:.4f}")
-print(f"Sharpe Ratio: {ga_result['sharpe_ratio']:.4f}")
-
-print(f"\nFinal Generation Statistics:")
-final_stats = ga_result['fitness_evolution'][-1]
-print(f"Best Fitness: {final_stats['max']:.4f}")
-print(f"Average Fitness: {final_stats['avg']:.4f}")
-print(f"Fitness Standard Deviation: {final_stats['std']:.4f}")
-
-print(f"\nTop 5 holdings in GA Portfolio:")
-top_ga_holdings = ga_result['weights'].abs().nlargest(5)
-for asset, weight in top_ga_holdings.items():
-    print(f"{asset}: {weight:.4f} ({weight*100:.1f}%)")
-
-# Summary comparison table
-print(f"\n" + "="*80)
-print("COMPREHENSIVE METHODS COMPARISON")
-print("="*80)
-comparison_table = pd.DataFrame({
-    'Mean-Variance': [
-        tangency_portfolio['expected_return'],
-        tangency_portfolio['volatility'],
-        tangency_portfolio['sharpe_ratio']
-    ],
-    'CVaR Optimal': [
-        min_cvar_portfolio['expected_return'],
-        min_cvar_portfolio['volatility'],
-        min_cvar_portfolio['sharpe_ratio']
-    ],
-    'Genetic Algorithm': [
-        ga_result['expected_return'],
-        ga_result['volatility'],
-        ga_result['sharpe_ratio']
-    ]
-}, index=['Expected Return', 'Volatility', 'Sharpe Ratio'])
-
-print(comparison_table.round(4))
-```
-
-## Conclusions and Practical Implications {#sec-conclusions}
-
-This comprehensive analysis of portfolio optimization techniques reveals important insights for both theoretical understanding and practical implementation:
-
-### Key Findings
-
-**Mean-Variance Optimization** remains the foundational approach, providing analytical solutions and clear mathematical interpretation. The tangency portfolio achieves the maximum Sharpe ratio under the assumption of normal returns and quadratic utility. However, its reliance on sample moments can lead to estimation error and concentrated portfolios.
-
-**Expected Shortfall Optimization** offers superior tail risk management by focusing on losses beyond the VaR threshold. Our CVaR-optimized portfolio demonstrates more conservative risk characteristics while maintaining competitive returns. The coherent properties of ES make it particularly attractive for risk management applications.
-
-**Genetic Algorithm Optimization** provides flexibility to handle complex constraints and non-convex objectives. While computationally intensive, GAs can discover solutions in complex optimization landscapes where traditional methods might fail. Our implementation shows competitive performance with the added benefit of handling arbitrary constraints.
-
-### Performance Comparison
-
-Across our technology portfolio analysis, all three methods produce portfolios with similar risk-adjusted returns, but with different risk characteristics:
-
-- **Highest Sharpe Ratio**: Mean-variance tangency portfolio
-- **Lowest Tail Risk**: CVaR-optimized portfolio  
-- **Most Flexible**: Genetic algorithm approach
-
-### Practical Recommendations
-
-1. **For Traditional Applications**: Mean-variance optimization remains effective for benchmark portfolios and strategic asset allocation
-2. **For Risk Management**: CVaR optimization should be preferred when tail risk is a primary concern
-3. **For Complex Constraints**: Genetic algorithms excel when dealing with integer constraints, cardinality restrictions, or non-standard objectives
-
-### Limitations and Future Research
-
-Our analysis focuses on a single asset class over a specific time period. Future research could extend this framework to:
-
-- Multi-asset class portfolios
-- Time-varying parameters and regime switching
-- Transaction costs and practical constraints
-- Alternative risk measures and utility functions
-- Machine learning-enhanced optimization
-
-The evolution of portfolio optimization continues, with each approach offering unique advantages depending on the specific application and market conditions.
-
-## References
-<parameter name="todos">[{"content": "Read and analyze existing portfolio optimization post structure", "status": "completed", "priority": "high", "id": "1"}, {"content": "Set up Python environment with required packages (yfinance, cvxpy, scipy, etc.)", "status": "completed", "priority": "high", "id": "2"}, {"content": "Implement Markowitz mean-variance optimization with mathematical theory", "status": "completed", "priority": "high", "id": "3"}, {"content": "Implement Expected Shortfall (CVaR) portfolio optimization", "status": "in_progress", "priority": "high", "id": "4"}, {"content": "Implement genetic algorithm for portfolio optimization", "status": "pending", "priority": "high", "id": "5"}, {"content": "Create publication-ready visualizations with proper formatting", "status": "pending", "priority": "medium", "id": "6"}, {"content": "Add comprehensive academic references and bibliography", "status": "pending", "priority": "medium", "id": "7"}, {"content": "Create professional thumbnail for the post", "status": "pending", "priority": "low", "id": "8"}, {"content": "Test Quarto rendering to ensure everything works correctly", "status": "pending", "priority": "high", "id": "9"}]
+Portfolio optimization is a fundamental concept in finance that helps investors make informed decisions about how to allocate their capital. The Mean-Variance framework developed by Markowitz provides a solid foundation for understanding the trade-off between risk and return. While more advanced methods exist, the principles of diversification and the efficient frontier remain as relevant as ever.
