@@ -40,7 +40,7 @@ When I'm not working on difficult (for me) problems, you'll find me running arou
 ::: {.gpa-badge}
 GPA: 5.99 / 6.00 
 :::
-- **Focus:** (Probabilistic) Machine Learning, Statistical Learning Theory, Computational Statistics, and Causality
+- **Focus:** (Probabilistic) Machine Learning, Statistical Learning Theory, Computational Statistics, Causality
 - **Thesis:** Mechanistic Interpretability in Text-to-Image Diffusion Models (Grade: 6.00/6.00)
 - **Semester Paper:** Extrapolation and Distributional Robustness for Climate Downscaling
 :::
@@ -48,7 +48,7 @@ GPA: 5.99 / 6.00
 ::: {.education-card}
 ### 🎓 Bachelor of Arts in Business and Economics
 ::: {.meta-info}
-🏛️ University of Zurich (UZH) | 📍 Zurich, Switzerland | 📅 Sep 2019 - Feb 2023
+🏛️ University of Zurich | 📍 Zurich, Switzerland | 📅 Sep 2019 - Feb 2023
 :::
 
 ::: {.gpa-badge}
@@ -85,7 +85,7 @@ GPA: 5.87 / 6.00 (Class Rank 1)
 :::
 
 ::: {.education-card}
-### 💼 Research Assistant (Civilian Service)
+### 💼 Biostatistics Research Assistant
 ::: {.meta-info}
 🏛️ University of Zurich (EBPI) | 📍 Zurich, Switzerland | 📅 Feb 2022 - Aug 2023
 :::
