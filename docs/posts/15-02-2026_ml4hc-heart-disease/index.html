@@ -22,7 +22,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -199,15 +219,13 @@ window.Quarto = {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
-  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">2</span> The Data</a>
-  <ul class="collapse">
-  <li><a href="#the-zero-cholesterol-problem" id="toc-the-zero-cholesterol-problem" class="nav-link" data-scroll-target="#the-zero-cholesterol-problem"><span class="header-section-number">2.1</span> The Zero Cholesterol Problem</a></li>
-  </ul></li>
-  <li><a href="#three-models-one-dataset" id="toc-three-models-one-dataset" class="nav-link" data-scroll-target="#three-models-one-dataset"><span class="header-section-number">3</span> Three Models, One Dataset</a>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">2</span> The Data</a></li>
+  <li><a href="#three-models-one-explainability-technique" id="toc-three-models-one-explainability-technique" class="nav-link" data-scroll-target="#three-models-one-explainability-technique"><span class="header-section-number">3</span> Three Models, One Explainability Technique</a>
   <ul class="collapse">
   <li><a href="#lasso-logistic-regression" id="toc-lasso-logistic-regression" class="nav-link" data-scroll-target="#lasso-logistic-regression"><span class="header-section-number">3.1</span> Lasso Logistic Regression</a></li>
-  <li><a href="#multi-layer-perceptron" id="toc-multi-layer-perceptron" class="nav-link" data-scroll-target="#multi-layer-perceptron"><span class="header-section-number">3.2</span> Multi-Layer Perceptron</a></li>
-  <li><a href="#neural-additive-models" id="toc-neural-additive-models" class="nav-link" data-scroll-target="#neural-additive-models"><span class="header-section-number">3.3</span> Neural Additive Models</a></li>
+  <li><a href="#shap-values" id="toc-shap-values" class="nav-link" data-scroll-target="#shap-values"><span class="header-section-number">3.2</span> SHAP Values</a></li>
+  <li><a href="#multi-layer-perceptron" id="toc-multi-layer-perceptron" class="nav-link" data-scroll-target="#multi-layer-perceptron"><span class="header-section-number">3.3</span> Multi-Layer Perceptron</a></li>
+  <li><a href="#neural-additive-models" id="toc-neural-additive-models" class="nav-link" data-scroll-target="#neural-additive-models"><span class="header-section-number">3.4</span> Neural Additive Models</a></li>
   </ul></li>
   <li><a href="#how-do-they-compare" id="toc-how-do-they-compare" class="nav-link" data-scroll-target="#how-do-they-compare"><span class="header-section-number">4</span> How Do They Compare?</a>
   <ul class="collapse">
@@ -233,52 +251,50 @@ window.Quarto = {
 </section>
 <section id="the-data" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="the-data"><span class="header-section-number">2</span> The Data</h2>
-<p>The train dataset consists of 734 patient records with 11 clinical features and a binary label indicating the presence of heart disease. The features are a mix of numeric measurements (age, resting blood pressure, cholesterol, maximum heart rate, and ST segment depression during exercise) and categorical variables (sex, chest pain type, fasting blood sugar, resting ECG result, exercise-induced angina, and ST slope direction).</p>
-<p>A pair plot of the numeric features already reveals some separation between the two classes:</p>
+<p>We utilize the <a href="https://www.kaggle.com/datasets/fedesoriano/heart-failure-prediction">Heart Failure Prediction Dataset</a> from Kaggle — a popular benchmark that combines several older heart disease studies into one clean table. Each of the 734 training samples is a patient described by 11 clinical features and a binary label: heart disease or not. The features cover the usual suspects you would find in a cardiology workup — age, resting blood pressure, cholesterol, maximum heart rate, ST segment depression during exercise — alongside categorical variables like sex, chest pain type, fasting blood sugar, resting ECG result, exercise-induced angina, and ST slope direction. For a detailed description of the features, please see the Kaggle dataset documentation.</p>
+<p>Even a quick pair plot of the numeric features hints at what the models will later confirm:</p>
 <p><img src="img/eda_pairplot_disease.png" width="100%"></p>
 <p>Patients with heart disease tend to be older, reach lower maximum heart rates during exercise, and show higher Oldpeak values (a measure of ST segment depression on an electrocardiogram). None of these relationships are dramatic on their own, but in combination they start painting a picture.</p>
-<section id="the-zero-cholesterol-problem" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="the-zero-cholesterol-problem"><span class="header-section-number">2.1</span> The Zero Cholesterol Problem</h3>
-<p>The most striking data quality issue was a large cluster of patients with cholesterol values of exactly zero — which is biologically impossible. These turned out to be missing values that had been filled with zeros at some earlier stage of data collection. What made this particularly tricky is that 90% of these zero-cholesterol patients had heart disease. Whether a patient’s cholesterol was missing was itself a strong signal, likely reflecting differences in clinical workflows or the severity of the patient’s condition at the time of measurement. Rather than imputing these values (which would destroy this signal), we created a separate categorical feature encoding whether the cholesterol measurement was missing, normal, borderline, or high. We also removed a single observation with a resting blood pressure of zero, which was clearly a data entry error.</p>
-<p>The distributions of the categorical features and the target variable are shown below. While several categorical features are heavily imbalanced (most patients are male, most chest pain is asymptomatic), the target variable itself is reasonably balanced, so we did not need to resort to oversampling.</p>
+<p>Looking at the categorical side, several features are heavily imbalanced (most study participants are male, most chest pain is asymptomatic), but the target variable itself is reasonably balanced — so no need for oversampling tricks.</p>
 <p><img src="img/eda_hf_class_imbalance.png" width="100%"></p>
 </section>
-</section>
-<section id="three-models-one-dataset" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="three-models-one-dataset"><span class="header-section-number">3</span> Three Models, One Dataset</h2>
+<section id="three-models-one-explainability-technique" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="three-models-one-explainability-technique"><span class="header-section-number">3</span> Three Models, One Explainability Technique</h2>
 <section id="lasso-logistic-regression" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="lasso-logistic-regression"><span class="header-section-number">3.1</span> Lasso Logistic Regression</h3>
-<p>Standard logistic regression models the probability of the positive class as a linear function of the features passed through a sigmoid:</p>
+<p>Standard logistic regression models the probability of the positive class (heart disease) as a linear function of the features passed through a sigmoid:</p>
 <p><span class="math display">\[
 P(y = 1 \mid \mathbf{x}) = \sigma(\mathbf{w}^\top \mathbf{x} + b) = \frac{1}{1 + e^{-(\mathbf{w}^\top \mathbf{x} + b)}}
 \]</span></p>
 <p>where <span class="math inline">\(\mathbf{w} \in \mathbb{R}^p\)</span> is the weight vector, <span class="math inline">\(b\)</span> is the bias, and <span class="math inline">\(\sigma\)</span> is the logistic sigmoid function. The model is trained by minimizing the negative log-likelihood (binary cross-entropy). The Lasso variant adds an <span class="math inline">\(\ell_1\)</span> penalty on the weights, giving the objective:</p>
 <p><span class="math display">\[
-\min_{\mathbf{w}, b} \; -\frac{1}{n} \sum_{i=1}^{n} \left[ y_i \log \hat{p}_i + (1 - y_i) \log(1 - \hat{p}_i) \right] + \lambda \|\mathbf{w}\|_1
+\mathcal{L}(\mathbf{w}, b) = -\frac{1}{n} \sum_{i=1}^{n} \left[ y_i \log \hat{p}_i + (1 - y_i) \log(1 - \hat{p}_i) \right] + \lambda \|\mathbf{w}\|_1
 \]</span></p>
-<p>where <span class="math inline">\(\lambda &gt; 0\)</span> controls the regularization strength. The key property of the <span class="math inline">\(\ell_1\)</span> penalty is that it encourages sparsity — it can drive coefficients all the way to exactly zero, effectively performing feature selection during training. This makes the Lasso a natural starting point for any clinical prediction task where interpretability is a hard requirement: each non-zero coefficient directly tells you the direction and magnitude of that feature’s influence on the log-odds of disease.</p>
-<p>After selecting <span class="math inline">\(\lambda\)</span> through cross-validation and standardizing all numeric features to ensure equal penalization, we obtained the coefficient plot below:</p>
-<p><img src="img/lasso_coefficients.png" width="100%"></p>
-<p>The two strongest predictors are immediately visible. A flat ST slope is the single largest positive contributor to heart disease risk, while an upsloping ST slope is the strongest protective factor. This is consistent with cardiology literature: a flat or downsloping ST segment during exercise is a well-documented marker of myocardial ischemia, while an upsloping response is considered normal <span class="citation" data-cites="Hodnesdal2011">(<a href="#ref-Hodnesdal2011" role="doc-biblioref"><strong>Hodnesdal2011?</strong></a>)</span>. Asymptomatic chest pain — which despite its name refers to a specific clinical presentation where patients experience atypical or no chest symptoms — is the third strongest predictor. This is a known red flag in cardiology, as patients who present without classic chest pain symptoms are often at higher risk because their disease goes undetected longer.</p>
-<p>To validate these findings, we also computed permutation feature importances by shuffling each feature and measuring the resulting drop in model performance:</p>
-<p><img src="img/lasso_permutation_importance.png" width="100%"></p>
-<p>Reassuringly, the features with the largest coefficients also have the highest permutation importance, confirming that the Lasso is relying on genuinely predictive signals rather than spurious correlations.</p>
+<p>where <span class="math inline">\(\lambda &gt; 0\)</span> controls the regularization strength. The key property of the <span class="math inline">\(\ell_1\)</span> penalty is that it encourages sparsity i.e.&nbsp;the possibility to drive coefficients all the way to exactly zero whilst keeping the objective convex. Realize that the <span class="math inline">\(\ell_1\)</span> penalty is only applied to the weights <span class="math inline">\(\mathbf{w}\)</span>, not the bias <span class="math inline">\(b\)</span>, to maintain translation invariance. Finally, the problem <span class="math display">\[
+\arg\min_{\mathbf{w}, b} \mathcal{L}(\mathbf{w}, b)
+\]</span> can be solved efficiently using coordinate descent or proximal gradient methods.</p>
+<p>The induced sparsity makes the Lasso a natural starting point for any clinical prediction task where interpretability is a hard requirement: each non-zero coefficient directly tells you the direction and magnitude of that feature’s influence on the log-odds of disease. Specifically, after selecting <span class="math inline">\(\lambda\)</span> through cross-validation and standardizing all numeric and dummy encoded features to ensure equal penalization, we obtained the coefficient plot below:</p>
+<p align="center">
+<img src="img/lasso_coefficients.png" width="50%">
+</p>
+<p>The two most prominent predictors are immediately visible. A flat ST slope has the largest positive coefficient in the model, while an upsloping ST slope has the largest negative coefficient, suggesting a protective association. This is consistent with cardiology literature: a flat or downsloping ST segment during exercise is a well-documented marker of myocardial ischemia, while an upsloping response is considered normal <span class="citation" data-cites="hodnesdal2013">(<a href="#ref-hodnesdal2013" role="doc-biblioref">Hodnesdal et al. 2013</a>)</span>. Asymptomatic chest pain — which despite its name refers to a specific clinical presentation where patients experience atypical or no chest symptoms — has the third largest coefficient magnitude. This is a known red flag in cardiology, as patients who present without classic chest pain symptoms are often at higher risk because their disease goes undetected longer.</p>
 </section>
-<section id="multi-layer-perceptron" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="multi-layer-perceptron"><span class="header-section-number">3.2</span> Multi-Layer Perceptron</h3>
+<section id="shap-values" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="shap-values"><span class="header-section-number">3.2</span> SHAP Values</h3>
+<p>Moving forward, we need a way to make the predictions of neural networks more explainable in a way that provides little additional overhead. Shapley additive explanations (SHAP) values (<span class="citation" data-cites="shap2017">Lundberg and Lee (<a href="#ref-shap2017" role="doc-biblioref">2017</a>)</span>) are the most well-known tool for such post-hoc explainability insights. SHAP is rooted in cooperative game theory with the idea to treat a prediction as a “game” where the features are “players” and the prediction is the “payout”, and then ask: how much did each player contribute? The Shapley value of feature <span class="math inline">\(j\)</span> for a specific prediction is defined as:</p>
+<p><span class="math display">\[
+\phi_j = \sum_{S \subseteq \{1, \dots, p\} \setminus \{j\}} \frac{|S|!\;(p - |S| - 1)!}{p!} \left[ f(S \cup \{j\}) - f(S) \right]
+\]</span></p>
+<p>where <span class="math inline">\(S\)</span> is a subset of features, <span class="math inline">\(f(S)\)</span> is the model’s expected output when only the features in <span class="math inline">\(S\)</span> are “present” (and the remaining features are marginalized out), and <span class="math inline">\(p\)</span> is the total number of features. The sum iterates over all possible subsets <span class="math inline">\(S\)</span> that exclude feature <span class="math inline">\(j\)</span>, and computes the marginal contribution of adding <span class="math inline">\(j\)</span> to each subset, weighted by the number of permutations in which that subset would arise. This yields an explainability method that is theoretically grounded, model-agnostic, and provides local explanations for individual predictions. In practice, exact computation of SHAP values is intractable for large feature sets, so various approximation methods (like Kernel SHAP or Tree SHAP) are used depending on the model type.</p>
+</section>
+<section id="multi-layer-perceptron" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="multi-layer-perceptron"><span class="header-section-number">3.3</span> Multi-Layer Perceptron</h3>
 <p>A multi-layer perceptron (MLP) is a feed-forward neural network consisting of an input layer, one or more hidden layers, and an output layer. Given an input <span class="math inline">\(\mathbf{x} \in \mathbb{R}^p\)</span>, the forward pass through an MLP with <span class="math inline">\(L\)</span> hidden layers computes:</p>
 <p><span class="math display">\[
 \mathbf{h}^{(0)} = \mathbf{x}, \qquad \mathbf{h}^{(\ell)} = \phi\!\left(\mathbf{W}^{(\ell)} \mathbf{h}^{(\ell-1)} + \mathbf{b}^{(\ell)}\right) \quad \text{for } \ell = 1, \dots, L
 \]</span></p>
 <p>where <span class="math inline">\(\mathbf{W}^{(\ell)}\)</span> and <span class="math inline">\(\mathbf{b}^{(\ell)}\)</span> are the weight matrix and bias vector of layer <span class="math inline">\(\ell\)</span>, and <span class="math inline">\(\phi\)</span> is a non-linear activation function (typically ReLU: <span class="math inline">\(\phi(z) = \max(0, z)\)</span>). For binary classification, the final layer produces a scalar output passed through a sigmoid: <span class="math inline">\(\hat{p} = \sigma(\mathbf{w}^{(L+1)\top} \mathbf{h}^{(L)} + b^{(L+1)})\)</span>.</p>
 <p>The power of MLPs lies in their expressiveness — with sufficient width and depth, they can approximate arbitrarily complex functions (the universal approximation theorem). The downside is that the learned representations are distributed across many neurons, layers, and non-linear transformations, making it essentially impossible to attribute a prediction to any single input feature by inspecting the weights alone. To crack open this black box, we turned to SHAP values.</p>
-<section id="shap-values" class="level4" data-number="3.2.1">
-<h4 data-number="3.2.1" class="anchored" data-anchor-id="shap-values"><span class="header-section-number">3.2.1</span> SHAP Values</h4>
-<p>SHAP (SHapley Additive exPlanations) is rooted in cooperative game theory. The idea is to treat a prediction as a “game” where the features are “players” and the prediction is the “payout”, and then ask: how much did each player contribute? The Shapley value of feature <span class="math inline">\(j\)</span> for a specific prediction is defined as:</p>
-<p><span class="math display">\[
-\phi_j = \sum_{S \subseteq \{1, \dots, p\} \setminus \{j\}} \frac{|S|!\;(p - |S| - 1)!}{p!} \left[ f(S \cup \{j\}) - f(S) \right]
-\]</span></p>
-<p>where <span class="math inline">\(S\)</span> is a subset of features, <span class="math inline">\(f(S)\)</span> is the model’s expected output when only the features in <span class="math inline">\(S\)</span> are “present” (and the remaining features are marginalized out), and <span class="math inline">\(p\)</span> is the total number of features. The sum iterates over all possible subsets <span class="math inline">\(S\)</span> that exclude feature <span class="math inline">\(j\)</span>, and computes the marginal contribution of adding <span class="math inline">\(j\)</span> to each subset, weighted by the number of permutations in which that subset would arise. The Shapley values satisfy a set of desirable properties — most importantly, they sum to the difference between the model’s prediction and its average prediction: <span class="math inline">\(\sum_{j=1}^{p} \phi_j = f(\mathbf{x}) - \mathbb{E}[f(\mathbf{x})]\)</span>.</p>
 <p>The waterfall plots below show SHAP explanations for two healthy patients and two patients with heart disease:</p>
 <table>
 <tbody><tr>
@@ -295,10 +311,9 @@ P(y = 1 \mid \mathbf{x}) = \sigma(\mathbf{w}^\top \mathbf{x} + b) = \frac{1}{1 +
 <p><img src="img/shap_overall.png" width="100%"></p>
 <p>Each dot is one patient’s SHAP value for a given feature, colored by whether the feature value was high (red) or low (blue). The pattern for ST Slope Upsloping is particularly clean: high feature values (red, meaning the patient <em>does</em> have an upsloping slope) cluster exclusively on the negative SHAP side, while low values (blue, meaning no upsloping slope) cluster on the positive side. This is exactly the same story the Lasso told us, just from a completely different model.</p>
 </section>
-</section>
-<section id="neural-additive-models" class="level3" data-number="3.3">
-<h3 data-number="3.3" class="anchored" data-anchor-id="neural-additive-models"><span class="header-section-number">3.3</span> Neural Additive Models</h3>
-<p>Neural Additive Models (NAMs), introduced by <span class="citation" data-cites="nam_2021">(<a href="#ref-nam_2021" role="doc-biblioref"><strong>nam_2021?</strong></a>)</span>, are an elegant attempt to get the best of both worlds. The model belongs to the family of generalized additive models (GAMs), which restrict the prediction to a sum of univariate functions:</p>
+<section id="neural-additive-models" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="neural-additive-models"><span class="header-section-number">3.4</span> Neural Additive Models</h3>
+<p>Neural Additive Models (NAMs), introduced by <span class="citation" data-cites="nam2020">Agarwal et al. (<a href="#ref-nam2020" role="doc-biblioref">2020</a>)</span>, are an elegant attempt to get the best of both worlds. The model belongs to the family of generalized additive models (GAMs), which restrict the prediction to a sum of univariate functions:</p>
 <p><span class="math display">\[
 g\!\left(\mathbb{E}[y \mid \mathbf{x}]\right) = \beta + f_1(x_1) + f_2(x_2) + \dots + f_k(x_k)
 \]</span></p>
@@ -307,7 +322,9 @@ g\!\left(\mathbb{E}[y \mid \mathbf{x}]\right) = \beta + f_1(x_1) + f_2(x_2) + \d
 P(y = 1 \mid \mathbf{x}) = \sigma\!\left(\beta + \sum_{j=1}^{k} \text{NN}_j(x_j)\right)
 \]</span></p>
 <p>where each <span class="math inline">\(\text{NN}_j\)</span> is a separate multi-layer perceptron that takes only <span class="math inline">\(x_j\)</span> as input. Because each sub-network contains non-linear activation functions, the shape functions can be arbitrarily complex — unlike the linear relationships that logistic regression is limited to. But because the overall model is additive (no interactions between features), each learned shape function can be visualized independently.</p>
-<p><img src="img/nam_architecture.png" width="60%"></p>
+<p align="center">
+<img src="img/nam_architecture.png" width="60%">
+</p>
 <p>This additive structure is the key insight. Because each feature is processed in isolation, there are no interactions between features inside the model. This means we can plot <span class="math inline">\(\text{NN}_j(x_j)\)</span> as a function of <span class="math inline">\(x_j\)</span> for every feature and see exactly how the model uses it — something that is impossible with a standard MLP where all features interact through shared hidden layers.</p>
 <p>In practice, we found NAMs to be sensitive to hyperparameter choices. Initial attempts with hand-tuned parameters produced unstable shape functions that changed substantially across random seeds. Following the original paper, we used Bayesian optimization (via Optuna) to search the hyperparameter space, and trained an ensemble of 100 NAMs with different random initializations to get stable estimates.</p>
 <p>The resulting shape functions are shown below. The thick blue line is the ensemble mean, the thin lines are individual ensemble members, and the red bars indicate data density:</p>
@@ -322,13 +339,13 @@ P(y = 1 \mid \mathbf{x}) = \sigma\!\left(\beta + \sum_{j=1}^{k} \text{NN}_j(x_j)
 <h2 data-number="4" class="anchored" data-anchor-id="how-do-they-compare"><span class="header-section-number">4</span> How Do They Compare?</h2>
 <section id="performance" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="performance"><span class="header-section-number">4.1</span> Performance</h3>
-<p>The table below summarizes the test set performance of all three models:</p>
+<p>After training a linear model, a black-box neural network, and an interpretable neural architecture on the same data, the natural question is: does the added complexity buy us anything? The short answer is no.</p>
 <p><img src="img/performance_table.png" width="100%"></p>
-<p>The differences are marginal. The Lasso achieves the highest balanced accuracy (0.826) and precision (0.851), while the NAM edges out the competition on F1 score (0.867), recall (0.891), and ROC AUC (0.894). The MLP trails slightly on most metrics. For a dataset of this size and complexity, these differences are well within the range of random variation — the models are essentially tied.</p>
+<p>The Lasso leads on balanced accuracy (0.826) and precision (0.851). The NAM narrowly edges ahead on F1 (0.867), recall (0.891), and ROC AUC (0.894). The MLP lands somewhere in between. With only 734 patients and margins this thin, these differences are well within the range of statistical noise — the three models are, for all practical purposes, tied.</p>
 </section>
 <section id="feature-importance-agreement" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="feature-importance-agreement"><span class="header-section-number">4.2</span> Feature Importance Agreement</h3>
-<p>More interesting than the performance numbers is the degree to which all three models agree on <em>what matters</em>. Across Lasso coefficients, MLP SHAP values, and NAM shape functions, the same features consistently emerge as the strongest predictors:</p>
+<p>The performance numbers are a draw, but the more compelling finding lies in what the models agree on. Despite having fundamentally different internal mechanics, all three consistently identify the same features as the strongest predictors:</p>
 <ul>
 <li><strong>ST Slope</strong> is the single most important feature in all three models. An upsloping ST segment is protective; a flat one is a risk factor. This is well-established in cardiology: a flat or downsloping ST response to exercise suggests insufficient blood flow to the heart muscle.</li>
 <li><strong>Oldpeak</strong> (ST depression during exercise) is the second or third most important feature across all models. Higher values indicate greater risk, consistent with the clinical interpretation of exercise-induced ischemia.</li>
@@ -339,15 +356,26 @@ P(y = 1 \mid \mathbf{x}) = \sigma\!\left(\beta + \sum_{j=1}^{k} \text{NN}_j(x_j)
 </section>
 <section id="reflections" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="reflections"><span class="header-section-number">5</span> Reflections</h2>
-<p>If we had to deploy one of these models in a clinical setting, we would choose the Lasso. Not because it performs better — it doesn’t, meaningfully — but because it is the easiest model for a non-technical clinician to understand, validate, and override when their clinical judgment disagrees. A doctor can look at the Lasso coefficients and immediately see which features are driving a prediction and by how much. With the MLP, that same doctor would need to understand SHAP values. With the NAM, they would need to interpret shape functions. Transparency has real value when the stakes involve patient outcomes.</p>
-<p>That said, the NAM’s shape functions revealed something the Lasso structurally cannot: non-linear relationships in the continuous features. The sharp spike in the Cholesterol shape function at zero, for example, is a finding that a linear model can only approximate with a separate binary indicator (which is what we had to create manually). The NAM discovered this pattern automatically. For exploratory analysis and hypothesis generation, NAMs are a powerful tool.</p>
-<p>One practical caveat: NAMs were noticeably more finicky to train than either the Lasso or the MLP. The learned shape functions were sensitive to hyperparameter choices, and getting stable results required both Bayesian optimization and ensembling. In a clinical deployment where reliability and reproducibility matter, this additional complexity is a genuine downside.</p>
-<p>The broader takeaway from this project is that in healthcare ML, the most important question is often not “which model has the highest AUC?” but “which model can I trust, explain, and act on?” When models across the interpretability spectrum agree on what matters, that convergence is itself a form of validation — and it is often more convincing to a clinician than any single number.</p>
+<p>If we had to deploy one of these models in a clinical setting, the Lasso would be our pick — not because it outperforms the others, but because a cardiologist can inspect a table of coefficients and immediately see what is driving a prediction. The MLP requires SHAP to be interpretable after the fact; the NAM requires understanding shape functions. When patient outcomes are on the line, the model that a clinician can scrutinize and override with the least friction is the one worth deploying.</p>
+<p>That said, the NAM proved its value as an exploratory tool. Its shape functions surfaced non-linear relationships that the Lasso is structurally unable to capture — the Cholesterol spike at zero being the clearest example. A linear model requires you to manually engineer a binary indicator for that pattern; the NAM discovers it on its own. For hypothesis generation and deeper data understanding, this is a meaningful advantage.</p>
+<p>On the practical side, NAMs were considerably more difficult to train than either the Lasso or the MLP. The shape functions were sensitive to hyperparameter choices and random initialization, and producing reliable estimates required both Bayesian hyperparameter optimization and ensembling over 100 models. In a clinical deployment where reproducibility is non-negotiable, this added complexity is a legitimate concern.</p>
+<p>The broader takeaway from this project is that the most productive question in healthcare ML is often not “which model achieves the highest AUC?” but rather “do we understand what the model has learned, and does it align with clinical knowledge?” When three architectures spanning the full interpretability spectrum independently converge on the same risk factors — and those factors match established cardiology — that convergence carries more weight than any single metric on a leaderboard.</p>
+
 
 
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-nam2020" class="csl-entry" role="listitem">
+Agarwal, Rishabh, Nicholas Frosst, Xuezhou Zhang, Rich Caruana, and Geoffrey E. Hinton. 2020. <span>“Neural Additive Models: Interpretable Machine Learning with Neural Nets.”</span> <em>CoRR</em> abs/2004.13912. <a href="https://arxiv.org/abs/2004.13912">https://arxiv.org/abs/2004.13912</a>.
+</div>
+<div id="ref-hodnesdal2013" class="csl-entry" role="listitem">
+Hodnesdal, Christian, Erik Prestgaard, Gunnar Erikssen, Knut Gjesdal, Sverre E Kjeldsen, Knut Liestol, Per Torger Skretteberg, Jan Erikssen, and Johan Bodegard. 2013. <span>“Rapidly Upsloping ST-Segment on Exercise ECG: A Marker of Reduced Coronary Heart Disease Mortality Risk.”</span> <em>European Journal of Preventive Cardiology</em> 20 (4): 541–48.
+</div>
+<div id="ref-shap2017" class="csl-entry" role="listitem">
+Lundberg, Scott, and Su-In Lee. 2017. <span>“A Unified Approach to Interpreting Model Predictions.”</span> <a href="https://arxiv.org/abs/1705.07874">https://arxiv.org/abs/1705.07874</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
