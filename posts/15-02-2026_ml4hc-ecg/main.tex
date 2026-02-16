@@ -1,0 +1,554 @@
+\input{settings}
+\usepackage{hyperref}
+\usepackage{color, colortbl}
+\definecolor{Gray}{gray}{0.9}
+\hypersetup{colorlinks=true, linkcolor=black, citecolor = black, urlcolor = black}
+\usepackage[backend=biber,style=apa,]{biblatex}
+\usepackage{biblatex}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{cleveref}
+\addbibresource{bibliography.bib}
+\usepackage{makecell}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{tablefootnote}
+\usepackage{subcaption}
+\usepackage[shortlabels]{enumitem}
+\usepackage{comment}
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows.meta, positioning}
+
+\bibliography{bibliography}
+
+
+\renewcommand\theadalign{bc}
+\renewcommand\theadgape{\Gape[4pt]}
+\renewcommand{\mc}{\makecell}
+\renewcommand{\th}{\thead}
+
+
+\setlength{\parindent}{0pt}
+
+
+
+\begin{document}
+\lhead{Machine Learning for Health Care: Project 2} 
+\rhead{Jan Schlegel \hspace{10px} 19-747-096 \\ Paul Schlossmacher \hspace{10px} 23-941-636 \\ Gianfranco Basile \hspace{10px} 23-955-545} 
+\cfoot{\thepage\ of \pageref{LastPage}}
+
+
+%%%%%%%%%%%%%% How convinced are we of our results?
+
+
+\section*{Part 1: Supervised Learning on Time Series (20 Pts)}
+\subsection*{Q1: Exploratory Data Analysis (2 Pts)}
+
+\textbf{Get familiar with the PTB dataset by examining different example time series and studying the
+distribution of labels (1 Pt)}\\ 
+The PTB dataset consists of electrocardiograms (ECGs), which measure the electrical activity of the heart from different angles. Among experts, the various different waves, segments and intervals of ECGs are discussed (\cite{oxfordmed}), however we limit ourselves to pointing out, that it is well known in the literature that specific patterns of some parts of an ECG are strongly associated with different heart diseases.\\
+
+In the PTB dataset, all patients fall into one of two cases: Healthy patients and those with a myocardial infarction. Regarding the distribution of the labels, we see in figure \ref{fig:lab_distr} that there are twice as many patients with a  myocardial infarction than healthy patients.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{plots/lable_distr.png} 
+    \caption{\textbf{Label distribution} This figure displays the distribution of healthy control and Myocardial infarction.}
+    \label{fig:lab_distr}
+\end{figure}
+
+Based on the PTB dataset's strong class imbalance, we agreed to use the SMOTE oversampling technique, as implemented in the  \texttt{imblearn} Python library by \textcite{imblearn}, for the training of all the models in part 1. The SMOTE algorithm not only addresses the problem of class imbalance but additionally serves the purpose of data augmentation due to its creation of synthetic samples, as described in (cf. \textcite{smote}). Importantly, we did not apply the SMOTE algorithm or any other augmentations to the validation and the test dataset.\\
+
+An important feature of our ECG dataset is the use of zero-padding to ensure uniformity in the length of each time series. This standardization technique allows for the analysis across all ECG recordings, as it guarantees that each series has the same duration represented in the data.
+As illustrated in figure \ref{fig:ts_patted}, both healthy and myocardial infarction time series conclude with zero-padding. Notably, the quantity of zero-padding varies substantially, hinting at a lot of variance in the duration of ECG signals before standardization.
+
+%underlying the natural diversity in the duration of ECG signals before standardization.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{plots/Padded_ts.png} 
+    \caption{\textbf{Orginal time series} This figure displays the time series for Healthy Control and Myocardial infarction.}
+    \label{fig:ts_patted}
+\end{figure}
+
+\textbf{Choose one or more appropriate metric(s) for the classification task
+(1 Pt).}\\
+The chosen metrics are, Accuracy, Balanced Accuracy, $F_1$-Score, Precision and Recall. We opted for these metrics because we are dealing with an unbalanced dataset. The reader can find a detailed explanation of these metrics in Part2 Q1.
+
+
+
+\subsection*{Q2: Classic Machine Learning Methods (5 Pts)}
+
+\textbf{(1) Choose (at least) two different classic (non-deep) ML classifiers and train them on the raw time series of the PTB dataset without adding new features. Report test set performances (1pt).}\\
+We settled for a logistic elastic net regression, a random forest classifier, and a \texttt{LightGBM}  gradient boosting model (cf. \textcite{lightgbm}). All feature values already lay between zero and one but we nevertheless had to standardize the columns for the logistic regression to ensure that the elastic net penalty was applied equally to all coefficients. \\
+
+As for hyperparametertuning, we defined the same hyperparameterspace and used the same optimization scheme for the respective models with and without engineered features. In detail, for logistic regression we made use of the \texttt{LogisticRegressionCV} function from sklearn (cf. \textcite{sklearn_api}), and for the two tree-based methods we utilized the optuna library (cf. \textcite{optuna}) and ran 500 trials of 5-fold cross-validation. \\
+
+From the top section of table \ref{table:part1_scores}, it is apparent that logistic regression is barely better than always predicting the majority class, while the random forest and the \texttt{LightGBM} classifier yield competitive results. This suggests that a linear decision boundary, such as the one learnt by logistic regression, is insufficient for classification based on the original time series.
+
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{\begin{tabular}{lcccccc}\toprule
+Model & Accuracy & Balanced Accuracy&$F_1$-Score  & Precision & Recall\\ \midrule
+Classical ML Methods:\\
+Logistic ElasticNet & 0.793 & 0.800 & 0.845 & 0.918 & 0.784 & \\
+Random Forest & 0.978 & 0.971 & 0.985 & 0.983 & 0.986 & \\
+LightGBM & 0.986 & 0.982 & 0.990 & 0.990 & 0.991 & \\
+\\
+Classical ML Methods with Feature Engineering:\\
+Logistic ElasticNet & 0.948 & 0.941 & 0.964 & 0.971 & 0.957 & \\
+Random Forest & 0.987 & 0.983 & 0.991 & 0.990 & 0.992 & \\
+LightGBM & 0.994 & 0.991 & 0.996 & 0.994 & 0.998 & \\
+\\
+Deep Learning Methods:\\
+LSTM & 0.990 & 0.990 & 0.993 & 0.995 & 0.991 \\
+Bidirectional LSTM & 0.993 &  0.990 & 0.995 & 0.994 & 0.987 \\ 
+ CNN & 0.994 & 0.992 &  0.996 & 0.995 & 0.997 \\ 
+CNN Residual Blocks &\cellcolor{Gray}0.997 & \cellcolor{Gray}0.996 & \cellcolor{Gray}0.998 & \cellcolor{Gray}0.997& \cellcolor{Gray}0.999&\\
+Transformer & 0.990 & 0.988 & 0.993 & 0.993 & 0.993 &\\
+\bottomrule
+\end{tabular}}
+\caption{\textbf{Performance of the Models.} Key performance metrics were calculated on the test set for every model under consideration and rounded to three decimal places. The cell of the best score in each column is highlighted in light grey.}
+\label{table:part1_scores}
+\end{table}
+\skip\footins=\bigskipamount
+
+
+
+
+\textbf{(2) Feature design and engineering is important for classic ML methods. Repeat (1) with additional features of your choice, try to improve the predictive performance of your method, and report test set performance (3pts) again}\\
+
+Our initial, unsuccessful attempts to improve the model showed that the time series' zero padding distorted the time series features extracted by the \texttt{EfficientFCParameters} function from the \texttt{tsfresh} library. Thus, we decided to remove the zero padding at the end of the ECG sequences and only then extract the time series features. Since these engineered features were not all on a similar scale and included some binary variables, we one-hot encoded the categorical variables and standardized the numeric features. For the logistic ElasticNet regression, we additionally standardized the one-hot encoded variables to ensure that the regularization penalty is applied equally over all feature coefficients. Moreover, note that the features were extracted independently for the train and test set. The resulting performance is reported in the middle section of table \ref{table:part1_scores}. \\
+
+It is evident, that feature engineering improved the classification abilities of all classical ML methods. The greatest improvement, around 15\%, can be observed for logistic regression. Further, the random forest and the gradient boosting model yielded metric values comparable to those of the deep learning models. \\
+
+
+\textbf{(3) Evaluate the pros and cons of the different classifiers used (1pt).}\\
+\begin{enumerate}
+    \item Logistic Regression:
+    \begin{itemize}
+        \item model and its coefficients are easy to understand and interpret
+        \item low computational burden for training and inference
+        \item performs well for linearly separable data
+        \item struggles if the true decision boundary is complex and non-linear
+        \item sensitive to outliers and noise
+    \end{itemize}
+    \item Random Forest:
+    \begin{itemize}
+        \item typically good performance even for complex decision boundaries
+        \item calculates feature importance scores that can help with model improvement and data understanding
+        \item ensemble method $\leadsto$ robust against noise and outliers
+        \item lack of interpretability when compared to a single decision tree or logistic regression
+    \end{itemize}
+    \item Gradient Boosting (\texttt{LightGBM}):
+    \begin{itemize}
+        \item frequently achieves state-of-the-art results even for complex decision boundaries
+        \item robust against noise and outliers
+        \item calculates feature importance scores that can help with model improvement and data understanding
+        \item lack of interpretability when compared to a single decision tree or logistic regression
+        \item sequential nature slows down training but efficient implementations (even on GPU) exist 
+        \item many hyperparameters that require careful tuning for optimal performance
+    \end{itemize}
+\end{enumerate}
+
+
+
+
+\subsection*{Q3: Recurrent Neural Networks (4 Pts)}
+
+\textbf{Implement an LSTM network, train it on the PTB dataset, and report test set performance (2 pts)}
+
+The choice of LSTM (Long Short-Term Memory), as proposed in \textcite{6795963}, is a natural choice when considering the time-series nature of our input.
+ The architecture of an LSTM is designed to overcome the vanishing/exploding gradient problem that can occur in traditional RNNs. The training of the LSTM however turned out to be unstable, taking around 200 epochs until convergence. The resulting test performance is detailed in table \ref{table:part1_scores}.\\
+
+\begin{comment}
+         To develop the LSTM we used the Pytorch library \textcite{Ansel_PyTorch_2_Faster_2024}. In the provided LSTM class, we choose hidden\_size 128 and num\_layers 2. The forward pass begins with the input tensor being reshaped and permuted to match the expected input structure of the LSTM layer. After passing the input into the LSTM, the obtained output captures the output features from the LSTM for each time step in the sequence. The next step consists of performing on the output obtained previously two operations:
+     \begin{itemize}
+         \item \texttt{out.mean(dim=0)}: Computes the mean of the outputs across the time dimension \texttt{(dim=0)}. This is a form of temporal pooling, which compresses the information across all time steps into a single representation.
+        \item \texttt{out.max(dim0).values}: In this way, we find the maximum value across the time dimension for each feature.
+     \end{itemize}
+    The concatenated tensor of obtained pooled features is then passed through a fully connected layer composed of a linear transformation followed by non-linear activation (ReLU) and, in the end, by a linear transformation that gives as output the logits.
+\end{comment}
+
+\textbf{Why might a bidirectional model also be useful here (1 pt)?}\\
+In our context, a bidirectional LSTM can be particularly advantageous over a unidirectional LSTM for several reason:
+\begin{enumerate}
+    \item The bidirectional LSTM is capable of learning from both past and future states.
+    Theoretically, this is important for ECG data, where the context of each segment is important for understanding the overall heart function.
+    \item Certain patterns in the ECG data can indicate heart failure; for this reason, employing a bidirectional LSTM can help to identify these patterns more effectively compared to the unidirectional LSTM.
+\end{enumerate}
+Although the above points suggest that the bidirectional LSTM should offer better performance compared to the unidirectional LSTM, the metrics calculated on the test set, showed in table \ref{table:part1_scores}, shows that this improved performance is not significant.\\
+
+\textbf{Implement and train a bidirectional model (1 pt). Report test performance.}\\
+To implement the bidirectional LSTM, we can to start from the implementation of the unidirectional LSTM and add the argument \texttt{bidirectional = True} and double the size of the hidden layer.
+ As pointed out before, the performance of the bidirectional LSTM on the test set can be found in table \ref{table:part1_scores} in correspondence to "Bidirectional LSTM". However, the reported metrics for the bidirectional LSTM are not exceptionally better than those obtained for the unidirectional LSTM.
+ 
+\subsection*{Q4: Convolutional Neural Networks (4 Pts)}
+\textbf{Discuss some of the relative advantages of RNNs and CNNs for time series tasks (1 pt).}\\
+
+The paper by \cite{hewamalage} outlines how traditionally there has been some skepticism in the field concerning neural networks in time series applications: The doubts mainly stem from the fact that - until a few years ago - neural networks used to predict quite poorly in those settings. The reasons given for this poor performance were two-fold:
+\begin{itemize}
+    \item Firstly that time series are generally so short that complex approaches like neural networks struggle to model them
+    \item Secondly that even when the time series are long, the underlying characteristics might change and thus lead again to relatively short timeframes, where the same attributes dominate as explanatory factors.
+\end{itemize}
+However, \cite{hewamalage} also point out that we have recently seen some great improvements of CNNs in time series settings. RNNs specifically have - in theory - an inherent advantage to CNNs, which is that the feedback loops of the residual blocks directly address potential temporal orders and dependencies. For example, one can use attention-weights to model seasonal trends by, e.g., giving more importance to data points that are exactly one year apart.\\
+
+\textbf{Implement and train a vanilla CNN and a CNN with residual blocks (2 Pt)}\\
+We implemented a CNN with 3 convolutional layers and a CNN with residual blocks with 4 residual blocks and trained them both for 200 epochs (with early stopping). Their performance can be seen in table \ref{table:part1_scores}.\\
+
+\textbf{Report test performance and comment on your findings, discussing why residual layers do/don’t help (1 pt).}\\
+The performance of the CNN both with and without residual layers was very good. Both models surpassed the 0.99 benchmark in every metric we considered (\ref{table:part1_scores}). Naturally, the CNN with residual layers did take a while longer to train, but it also outperformed its counterpart without the residual layers. We suspect that this might be due to the reasons we mentioned above, i.e. the feedback loops of residual blocks directly addressing temporal orders and dependencies, which is ideal for time-series applications such as ours. Having said that, we would like to emphasise that the outperformance of the CNN with residual blocks was only by a very fine margin.
+
+\subsection*{Q5: Attention and Transformers (5 Pts)}
+\textbf{Implement, train, and test a simple transformer model (2 pts).}\\
+\begin{comment}
+    Our custom transformer first passes the input sequence through a linear encoding layer which projects the single input feature into a higher-dimensional space. We then applied positional encodings, as proposed in \textcite{attention_all_you_need}, to these encoded feature sequences. These sinusoidal positional encodings convey information about the relative and absolute positions of different time points in the sequence to the model. Such positional encoding is necessary since transformer models lack recurrence or convolution. Subsequently, the encoded sequences were fed into a \texttt{TransformerEncoder} block consisting of five encoder layers each involving eight attention heads. The output of the top encoder layer is then condensed into a single vector, whereby we had the most success when combining average and max pooling as in the LSTM above. Finally, these vectors were passed into a simple MLP classifier with one hidden layer and Hardswish activation.\\
+\end{comment}
+
+We trained a transformer with five encoder layers for 100 epochs where the early stopping mechanism halted training after 44 epochs. The resulting test set performance is detailed in table \ref{table:part1_scores}.\\
+
+\textbf{What differences and advantages do transformers show over recurrent neural networks (1 pt)?}\\
+Recurrent neural networks process input in a sequential manner such that the output of each step depends on the output of the previous step. Thus, recurrent neural networks inherently capture the temporal structure of the data.  However, RNN's struggle with long-range dependencies due to this inherent recursion and the resulting vanishing and exploding gradient problems. Additionally, the sequential nature of recurrent neural networks precludes parallelization within training samples \textcite{attention_all_you_need}.\\
+
+%However, due to the inherent recursion and the resulting vanishing and exploding gradient problems, they (including LSTM's) struggle with (very) long-range dependencies.
+
+Transformers, on the other hand, process input sequences simultaneously by utilizing a self-attention mechanism that computes how the steps within a time series are related. This allows transformers to capture dependencies across the entire sequence at once. Due to this global approach to dependency modelling, transformers handle long-range dependencies more effectively than recurrent neural networks. Moreover, the non-recurrent and non-sequential nature of transformers makes them highly parallelizable which usually leads to faster training times compared to those of recurrent neural networks \parencite{attention_all_you_need}.\\
+
+\textbf{Visualize the attention map learned by your model using input layer weights. Do you gain any insight on important data points to distinguish between normal and abnormal sequences (2 pts)?}\\
+
+\begin{comment}
+    We used inheritance to modify the self-attention block and the forward function in the \texttt{TransformerEncoderLayer} class of the \texttt{PyTorch} framework by \textcite{pytorch} such that it additionally returns the attention weights in every forward pass. Additionally, since we used multiple encoder layers, we had to rewrite the forward function of the \texttt{TransformerEncoder} such that the weights of every layer were collected and returned.
+\end{comment}
+After extracting the attention weights, we (mean) aggregated them over the different attention heads and encoder layers. Finally, to receive a one-dimensional representation of the attention maps, we calculated the mean over the output weights for every step in the input sequence. The resulting attention maps are visualized in figure \ref{fig:agg_att_maps}.\\
+
+
+First, observe that the padded time steps all get assigned zero attention since we used a padding mask that relays the padding locations to the transformer. Next, we observe that for the myocardial infarction samples, the model seems to place significant attention on the QRS complex. Additionally, large attention is given whenever the initial T wave looks abnormal e.g. the inverted T wave in the last column of the second row. Similarly, for the healthy samples, the model places substantial attention on the QRS complex and sometimes also on the initial T wave. This likely indicates that the attention map highlights the absence of anomalies in the different segments in the healthy samples and the presence of clear anomalies, such as inverted T waves, in the unhealthy samples. This aligns mostly with \textcite{detecting_MI} who emphasize the importance of the T wave, Q wave, and ST segment in detecting myocardial infarctions.\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{plots/aggregated_attention_maps.png} 
+    \caption{\textbf{Aggregated Attention Maps.} This figure displays five attention maps for each class label. For each class, the observations were randomly selected ensuring their representativeness.}
+    \label{fig:agg_att_maps}
+\end{figure}
+
+
+
+
+Moreover, instead of aggregating the attention maps over the encoder layers, we could take a different approach and visualize the attention maps for every encoder layer of the transformer separately. This approach was taken to obtain the visualizations displayed in figure \ref{fig:att_maps_layer}. There it seems like the first two encoder layers tend to focus on the later parts of the ECG sequence, whereas the third layer focuses mostly on the peaks, and the last two layers appear to revolve around the earlier elements of the sequence. Finally, due to the padding mask we applied during training, all the padded elements of the input sequence again are assigned no attention. \\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{plots/attention_maps_by_layer.png} 
+    \caption{\textbf{Attention Maps by Layer.} This figure displays the attention maps stratified by the encoder layer for two randomly selected observations from each class.}
+    \label{fig:att_maps_layer}
+\end{figure}
+
+\section*{Part 2: Transfer and Representation Learning (20 Pts)}
+The \texttt{MIT-BIH} dataset is highly imbalanced, leading to our decision to utilize \texttt{SMOTE} during training for oversampling and data augmentation, as we did in part 1.
+
+\subsection*{Q1: Supervised Model for Transfer (3 Pts)}
+\textbf{Reuse your implementation for one of the deep learning architectures explored in Part 1 to train a model on the MIT-BIH dataset. Report test performance (1 Pt)}\\
+
+For this question, we decided to employ a CNN without residual blocks. The choice of this deep learning architecture was driven by the comparably low computational expenses and the stability during the training phase. The test performance can be seen in \ref{table:part1_scores}.\\
+
+\textbf{Motivate your choice of model and metrics for this arrhythmia classification task (2 Pt).}\\
+
+The choice of the CNN was given by the fact that this deep learning architecture led to the best performance, how it is possible to verify in table \ref{table:part1_scores}. Another reason why we preferred the CNN architecture is that it was the easiest model to train overall.
+
+The employed metrics are reported in table \ref{table:part2_encoder_mit_scores} in correspondence with the CNN column. In addition, in table \ref{table:recall_precision}, it is possible to find precision and recall for each class. In the next part, there will be a short justification of the reason why we used these metrics:\\
+
+\textbf{Accuracy}: it is a straightforward metric that describes how accurate the model is. The trade-off of this metric is that it does not provide an estimate of the overall model quality; in particular, it disregards class imbalance. The model may be very good at predicting the majority class but very poor at predicting the minority class.
+ To overcome the poor capability of the accuracy metric to deal with class imbalance, we employed other possible metrics such as precision, recall, and balanced accuracy.\\
+
+ %In this case, a value of 0.968 suggests the model has good prediction capability.
+
+ \textbf{Balanced Accuracy}: This metric is a performance metric used to evaluate classification models, particularly when dealing with imbalanced datasets. It is defined as the average of sensitivity and specificity.\\
+
+ \textbf{Precision}: In multi-class classification, precision corresponds to the fraction of observations correctly classified as being of a certain class over all the observations the model predicts to belong to that class. So, with this metric, we can correctly measure the model's ability to identify instances of a particular class. It is possible to notice that the precision is higher for certain classes than others.\\
+
+\textbf{Recall}: In multi-class classification, Recall corresponds to the fraction of observations correctly classified as being of a certain class over all the observations that belong to that class. So, with this metric, we can measure the model's ability to correctly identify all instances of a particular class.\\
+
+\textbf{$F_1$-score}: The F1 score is the harmonic mean of precision and recall. The use of these metrics is given by the fact that it is particularly useful in situations where the classes are imbalanced.\\
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lccccc}\toprule
+Class     & 0     & 1     & 2     & 3     & 4     \\ \midrule
+Precision & 0.793 & 0.800 & 0.845 & 0.918 & 0.784 \\ 
+Recall    & 0.978 & 0.971 & 0.985 & 0.983 & 0.986 \\ 
+$F_1$     & 0.983 & 0.709 & 0.929 & 0.709 & 0.981 \\ 
+
+\bottomrule
+\end{tabular}
+\caption{\textbf{Recall and Precision $\mathbf{F_1}$-score for the CNN.} The table reports the Precision and Recall $F_1$-score for each class.}
+\label{table:recall_precision}
+\end{table}
+
+The drawback of Precision and Recall and $F_1$-score in the context of multi-class classification is that it can become difficult to interpret these scores when there are many classes. For this reason, even though we don't have so many classes, we preferred to average these metrics.\\
+
+\textbf{Macro-average precision/recall/$F_1$-score}: The idea behind this metric is that, instead of having the scores for every class, they can be reduced into one "average" metric. In this case, we opted for a Macro-averaging precision, Macro-average recall, and Macro-averaging $F_1$-score. We employed the "Macro-average" because it gives equal weight to each class, regardless of the number of instances. These metrics are presented in table \ref{table:recall_precision}.
+
+
+\subsection*{Q2: Representation Learning Model (4 Pts)}
+\textbf{1. Pretrain an encoder using the objective of your choice on the training set of the MIT-BIH dataset. How do you monitor this pre-training step? (2 pts)}\\
+
+We implemented the setup described in subsection 2C of \textcite{infoNCE_proj_head} and placed a projection head on top of our encoder from Q1. As we were tasked with finding low-dimensional representations, the encoder returns embeddings in a 16-dimensional latent space. The projection head, a simple MLP, maps this latent space into a 32-dimensional space suitable for contrastive learning. We further followed the approach outlined in \textcite{infoNCE_proj_head} and utilized the InfoNCE loss function as introduced in \textcite{infoNCE_orig}.\\
+
+
+This \texttt{InfoNCE} loss requires the construction of samples that are similar (positive) or dissimilar (negatives) to the original sample. As displayed in figure \ref{fig:augmented_samples_repr}, for the positive sample, we implemented random noise addition, amplification, and slight stretching of the time series as part of our data augmentation strategy. Note that only one of these three augmentations was randomly applied to every positive sample. Additionally, we experimented with reversing, random permutation, and shifting of the time series. However, these latter augmentations proved to be less effective, likely due to their alteration of the natural order of the cardiac cycle. For the negative samples, we initially randomly generated four indices that did not correspond to the index of the anchor observation. Subsequently, we randomly applied either noise addition, amplification, or slight stretching to every negative sample. To ensure a high variety within the negatives, we used a large batch size of 256 during training. The pre-training process was monitored by reporting the \texttt{InfoNCE} loss after every epoch on the train as well as a small validation set. Moreover, we employed early stopping in case the validation \texttt{InfoNCE} loss did not improve for 10 consecutive epochs. Consequently, the training process was halted early after 39 epochs.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{plots/augmented_samples.png} 
+    \caption{\textbf{Samples for Contrastive Learning.} This figure displays five examples (rows) of the original sample (column 1), the corresponding augmented/positive sample (column 2) and the four associated, randomly drawn and augmented negative samples (columns 3-6).}
+    \label{fig:augmented_samples_repr}
+\end{figure}
+
+\textbf{2. Evaluation of the Pretraining: train a classic ML method from Part 1 to predict the MIT-BIH labels from the learned representations of the training set and evaluate the representation learning quality on the test set of the MIT-BIH dataset (2 pts), using the same metric(s) as in Q1. Important: summarize your results in a table and add that table to the report!}\\
+
+After extracting the embeddings for the training and the test sets using the aforementioned encoder, we fitted an untuned \texttt{LGBMClassifier} with 1'000 trees on the test embeddings. The resulting performance on the test set is detailed in table \ref{table:part2_encoder_mit_scores}.
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lccc}
+\toprule
+Metric  & Contrastive Learning \& LightGBM & CNN  \\ 
+\midrule
+Accuracy               & 0.963  & 0.968  \\
+Balanced Accuracy      & 0.899  & 0.922\\
+F1 Score (macro avg.)  & 0.849  & 0.862 \\
+Precision (macro avg.) & 0.812  & 0.818\\
+Recall (macro avg.)    & 0.899  & 0.922\\ \bottomrule
+\end{tabular}
+\caption{\textbf{Performance of the Encoder Models Evaluated on Downstream MIT BIH Classification Task.} Key performance metrics were calculated on the test set for a CNN encoder that was trained in a supervised (Q1) and a self-supervised (Q2) approach. For Q1, a simple MLP was used as a classifier, whereas in Q2, a LightGBM classifier with 1'000 boosted trees was fit.}
+\label{table:part2_encoder_mit_scores}
+\end{table}
+
+
+\subsection*{Q3: Visualising Learned Representations (4 Pts)}
+\textbf{With both encoders from Q1 and Q2, obtain representations for both the MIT-BIH and PTB datasets by feeding them through the encoder. Visualize your learned representations through a dimensionality reduction technique such as t-SNE or UMAP (2 Pt).}
+
+For visualizing the learned representation, we used the t-SNE, proposed in \textcite{van2008visualizing}. We chose to project it into a 3D space to minimize the loss of information when moving from the high-dimensional space to the lower-dimensional space.
+
+\begin{figure}[H]
+
+\begin{subfigure}{.5\textwidth}
+  \centering
+    \includegraphics[width=\linewidth]{plots/t_SNE_Q1_MIT1.png}
+  \caption{N.1, T-SNE for embeddings of Q1}
+  \label{fig:TsneQ1_1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{plots/t_SNE_Q1_MIT2.png}
+  \caption{N.2, T-SNE for embeddings of Q1}
+  \label{fig:TsneQ1_2}
+\end{subfigure}
+
+\caption{The plot on the left and on the right show the t-SNE visualization for the embeddings obtained in Q1 with two different angulations for the test of the MIT\_BIH dataset.}
+\label{fig:T_SNE_Q1}
+
+\end{figure}
+
+As illustrated in figure \ref{fig:T_SNE_Q1}, the embeddings derived from the MIT BIH dataset using the encoder in Q1 exhibit distinct clustering in the 3D space. Conversely, figure \ref{fig:T_SNE_Q2} displays the embeddings for Q2 in the same 3D space, where the differentiation is not as pronounced. Despite the subtler distinctions, variations among the data points are still discernible
+
+\begin{figure}[H]
+
+\begin{subfigure}{.5\textwidth}
+  \centering
+    \includegraphics[width=\linewidth]{plots/t_SNE_Q2_MIT1.png}
+  \caption{N.1, T-SNE for embeddings of Q2}
+  \label{fig:TsneQ2_1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{plots/t_SNE_Q2_MIT2.png}
+  \caption{N.2, T-SNE for embeddings of Q2}
+  \label{fig:TsneQ2_2}
+\end{subfigure}
+
+\caption{The plot on the left and on the right show the t-SNE visualization for the embeddings obtained in Q2 with two different angulations for the test of the MIT\_BIH dataset.}
+\label{fig:T_SNE_Q2}
+
+\end{figure}
+With the PTB dataset, figure \ref{fig:T_SNE_Q1_ptb} reveals that the t-SNE visualization across three dimensions of the embeddings generated using the encoder from Q1 does not highlight any significant differences between the embeddings of class 1 and class 2. In contrast, figure \ref{fig:T_SNE_Q2_ptb} shows that the 3D representation of the embeddings from the encoder in Q2 exhibits a higher y-axis value for the embeddings of class 0 compared to those of class 1.
+
+\begin{figure}[H]
+
+\begin{subfigure}{.5\textwidth}
+  \centering
+    \includegraphics[width=\linewidth]{plots/TSNE_Q1_PTB1.png}
+  \caption{N.1, T-SNE for embeddings of Q1}
+  \label{fig:TsneQ1_1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{plots/TSNE_Q1_PTB2.png}
+  \caption{N.2, T-SNE for embeddings of Q1}
+  \label{fig:TsneQ1_2}
+\end{subfigure}
+
+\caption{The plot on the left and on the right shows the t-SNE visualization for the embeddings obtained in Q1 with two different angulations for the test of the PTB dataset.}
+\label{fig:T_SNE_Q1_ptb}
+
+\end{figure}
+
+
+\begin{figure}[H]
+
+\begin{subfigure}{.5\textwidth}
+  \centering
+    \includegraphics[width=\linewidth]{plots/TSNE_Q2_PTB1.png}
+  \caption{N.1, T-SNE for embeddings of Q2}
+  \label{fig:TsneQ2_1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{plots/TSNE_Q2_PTB2.png}
+  \caption{N.2, T-SNE for embeddings of Q2}
+  \label{fig:TsneQ2_2}
+\end{subfigure}
+
+\caption{The plot on the left and on the right show the t-SNE visualization for the embeddings obtained in Q2 with two different angulations for the test of the PTB dataset.}
+\label{fig:T_SNE_Q2_ptb}
+
+\end{figure}
+
+
+
+\textbf{Are data points with different labels distributed identically? (1 pt).}\\
+
+Looking at the t-SNE figure in \ref{fig:T_SNE_Q1} and in figure \ref{fig:T_SNE_Q2}, it is possible to observe distinct clusters. This suggests that the observations within each cluster are more similar to each other than to those in other clusters, based on the high-dimensional structure of the data. However, t-SNE is a non-linear dimensionality reduction technique that is particularly sensitive to local structure and does not preserve distances or global structure. This means that while t-SNE can be very effective for visualizing high-dimensional data in a way that shows clustering, it does not necessarily imply that the original observations are from different distributions.
+
+To evaluate quantitatively, we employed a method that depends on two main concepts: Radial Basis Function (RBF) and Maximum Mean Discrepancy (MMD). Using RBF to transform the data and MMD to compare the distributions, we can provide a quantitative assessment to complement the visual insights from t-SNE plots. This combined approach ensures a more comprehensive understanding of the data's structure and the relationships between different clusters.
+
+\begin{comment}
+    
+
+Some details about MMD can be found in \textcite{JMLR:v13:gretton12a}.
+Briefly, RBF is a function that measures similarity, defined by the Gaussian function, which compares the distance between data points in a transformed space. The most common type of RBF is the Gaussian RBF, which calculates similarity based on the Euclidean distance between points, allowing for effective handling of high-dimensional data.
+
+MMD is a statistical test for the difference between two probability distributions, useful for comparing high-dimensional distributions. It quantifies the discrepancy between distributions by comparing their means in a reproducing kernel Hilbert space (RKHS). This method is particularly powerful because it does not assume any specific parametric form of the distributions, making it flexible and robust for statistical testing in machine learning applications.
+
+\end{comment}
+
+
+
+Another approach proposed in \textcite{D3EW00829K} is to calculate the first principal component and then, using this component, perform the Kolmogorov–Smirnov (KS) test. The KS test evaluates whether the two vectors of observation with different labels come from the same distribution. For a matter of space, we didn't display the p-value, but for each combination of classes, the p-value is close to zero, meaning that in the space of the first PCA, the two observations coming from two different labels have a different distribution. In table \ref{table:MMD_mit}, you can find the results of the MMD metrics for the embeddings obtained with the encoder in Q1 and Q2. 
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccccc}\toprule
+Combination of class & MMD-Q1 & MMD-Q2 & p-value KS test Q1 & p-value KS test Q2  \\ \midrule
+Class 0 and 1 & 1.2795 & 0.2408 & $<$ 1e-16 & $<$ 1e-16 \\
+Class 0 and 2 & 2.3792 & 0.7618 & $<$ 1e-16 & $<$ 1e-16\\
+Class 0 and 3 & 2.6134 & 0.3725 & $<$ 1e-16 & $<$ 1e-16\\
+Class 0 and 4 & 3.3850 & 1.1862 & $<$ 1e-16 & $<$ 1e-16\\
+Class 1 and 2 & 2.5304 & 0.5600 & $<$ 1e-16 & $<$ 1e-16\\
+Class 1 and 3 & 3.2303 & 0.8864 & $<$ 1e-16 & $<$ 1e-16\\
+Class 1 and 4 & 3.7900 & 1.1395 & $<$ 1e-16 & $<$ 1e-16\\
+Class 2 and 3 & 2.8612 & 1.0146 & $<$ 1e-16 & $<$ 1e-16\\
+Class 2 and 4 & 3.6725 & 0.4640 & $<$ 1e-16 & $<$ 1e-16\\ 
+Class 3 and 4 & 4.7374 & 1.5962 & $<$ 1e-16 & $<$ 1e-16\\ 
+\bottomrule
+\end{tabular}
+\caption{MMD and PCA-KS values obtained for MMD and PCA-KS for both embeddings obtained the encoder of Q1 and Q2}
+\label{table:MMD_mit}
+\end{table}
+\skip\footins=\bigskipamount
+
+Because Maximum Mean Discrepancy (MMD) is just a number and doesn't have an upper or lower bound, it's only possible to compare these numbers relative to each other. Regarding MMD, the embeddings obtained with the encoder in Q2 and Q1 for classes 0 and 1 are the closest, while those for classes 3 and 4 are the furthest apart. The MMD of the embeddings for classes 3 and 4 obtained with the encoder in Q1 is the largest compared to all the other classes.\\
+
+\textbf{Are the two datasets distributed identically? (1 pt). Provide quantitative metrics to assess this.}
+
+For this question, we used the KS test applied to the first principal component. The p-value of the KS test done on the first principal component for the embeddings obtained using the encored created in both Q1 and Q2 on MITBIH and the PTB is equal to 1.88024468e-53 and 6.74628213e-33, respectively. This means that different distributions generate the first principal component for the two datasets. This is a strong sign that the original data are generated from two different distributions.
+
+
+\subsection*{Q4: Finetuning Strategies (9 Pts)}
+\textbf{1. Classic ML method: Similar to Q3, obtain representations for the PTB dataset by feeding the dataset through the pre-trained encoder. Use a classic ML method from Part 1 to train and test for the PTB task using these representations. (1 pt)}\\
+
+Our choice for the classic ML method was2 gradient boosting via the \texttt{LGBMClassifier} function. We used SMOTE on the training data for the same reasons as before. After obtaining our embeddings by applying the encoder to the data, we also standardized them (both the training and the testing embeddings). The classical ML methods were quite competitive for both encoders. Exact results can be observed in table \ref{table:part2_finetuning_scores}, however we did observe, that the Representation Learning Encoder from Part2/Q2 performed considerably better than the encoder from the supervised model for transfer learning.\\
+
+
+\textbf{2. MLP output layers: Add output layer(s) for the PTB binary class to your encoder model. Implement the following finetuning strategies (3 pts):}
+\begin{enumerate}[(A)]
+    \item \textbf{A. Train the output layer(s) only on the PTB dataset, freezing the encoder.}
+    \item \textbf{B. Train the entire model on the PTB dataset (encoder + output layers).}
+    \item \textbf{First, train the output layers, then unfreeze and train the entire joint model in two separate stages}
+\end{enumerate}
+\textbf{In all cases, report performance on the PTB test dataset using the same metric(s) as in Part 1 and summarize the metrics in a single table. Comment on potential differences in performance over Part 1 results (1 pt). }\\
+% my bet is on LightGBM
+We implemented the above, by first pre-training the encoders on the MIT-BIH dataset and then applying the respective steps described in (A), (B) and (C) above with a simple MLP. Again, the performance can be seen in table \ref{table:part2_finetuning_scores}. Amongst all metrics, the combination of the representation learning encoder together with Strategy B - i.e. all layers being trained at the same time - performed best. We do see that also for the other two strategies the representation learning encoder seems to perform considerably better. In that sense we have a similarity with the Classical ML methods, where we notice the same pattern.\\
+
+
+Across part 1 and 2 our models have performed very well. Therefore, when comparing the scores in table \ref{table:part1_scores} and \ref{table:part2_finetuning_scores}, we can - with the exception of the Logistic Lasso - only observe differences in the 2nd decimal place. Having taken this into account, we still consider it noteworthy how much better the LightGBM Gradient Boosting worked on all metrics in part 1 compared to part 2. This is however not enough evidence for making any statements about the effectiveness of the Encoder strategy in our ECG application. Finally, we would also like to point out that the performances of our encoder-based models could very likely have been improved by working with a higher dimensional latent space. In the end we decided to make it a 16-dimensional space, to comply with the task of creating "low-dimensional representations". We suspect that a higher-dimensional space would have yielded better performances, however at the cost of higher complexity and computational workload.
+
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{\begin{tabular}{lcccccc}\toprule
+Model & Accuracy & Balanced Accuracy&$F_1$-Score  & Precision & Recall\\ \midrule
+Classical ML Methods:\\
+Supervised Encoder \& LGBM  & 0.920 & 0.911 & 0.944 & 0.957 & 0.931 & \\
+Representation Learning Encoder \& LGBM & 0.956 & 0.950 & 0.969 & 0.975 & 0.963 \\
+\\
+MLP Output Layers:\\
+Transfer Learning Encoder \& Strategy A  & 0.915 & 0.915 & 0.939 & 0.885 & 0.915 & \\
+Transfer Learning Encoder \& Strategy B & 0.989 & 0.985 & 0.992 & 0.987 & 0.985 & \\
+Transfer Learning Encoder \& Strategy C & 0.979 & 0.976 & 0.989 & 0.973 & 0.975 & \\
+\\
+Representation Learning Encoder \& Strategy A  & 0.958 & 0.957 & 0.971 & 0.941 & 0.957 & \\
+Representation Learning Encoder \& Strategy B & \cellcolor{Gray}0.996 & \cellcolor{Gray}0.994 & \cellcolor{Gray}0.997 & \cellcolor{Gray}0.996 & \cellcolor{Gray}0.994 & \\
+Representation Learning Encoder \& Strategy C & 0.992 & 0.990 & 0.995 & 0.991 & 0.990 & \\
+\bottomrule
+\end{tabular}}
+\caption{\textbf{Performance of the Models.} Key performance metrics were calculated on the test set for every model under consideration and rounded to three decimal places. The cell of the best score in each column is highlighted in light grey. Closer descriptions of the respective strategies can be found in the accompanying text for Q4.}
+\label{table:part2_finetuning_scores}
+\end{table}
+\skip\footins=\bigskipamount
+
+\textbf{Which of the above fine-tuning strategies performs best and why? (2 pts).}\\
+The combination of representation learning for the encoder and strategy B performed best on all metrics as we can see in table \ref{table:part2_finetuning_scores}. In principle, strategy B performing best, is not surprising, since it is the only case among the three strategies, where the "encoder" gets trained on the PTB dataset only. As to, why the representation learning strategy seemed to perform better than the supervised learning encoder, we refer to the next question.
+\\
+
+\textbf{Which of the two pre-training strategies considered (transfer learning vs. representation learning) performs best and why? (2 pts)}\\
+We see in table\ref{table:part2_finetuning_scores} that the representation learning pre-training strategy outperforms the transfer learning strategy. One potential reason for bad performance of transfer learning mentioned by \cite{Zhao} are domain mismatches. Even though the PTB and MIT-BIH datasets do cover similar topics, differences between the two datasets might be one reason, why transfer learning performed comparatively worse. Another possible reason is given by \cite{Fedorov}, who flag the danger of transfer learning models learning from irrelevant features and therefore performing badly in subsequent tasks.
+
+\section*{Part 3: General Questions (7 Pts)}
+\subsection*{Q1: There are many machine learning settings where classic methods are still competitive with deep learning architectures. Have you observed this in this project? Why is this (not) the case? (2 pts)}
+%Note: reference paper that says traditional ML methods outperform neural networks on tabular data. feature engineering -> data becomes tabular; yields similar performance as NN that consider underlying temporal structure
+
+% Probably not much better since time series is relatively simple, i.e. featuredim = 1 and not multivariate time series
+One notices in table \ref{table:part1_scores} that the scores obtained for the classical ML methods with feature engineering and deep learning methods are very similar. The reason may be that ECG signals have distinct waveforms that follow a natural order. This underlying structure might be simple enough that complex deep learning models do not provide a significant advantage over simpler tree-based models.\\
+
+The same goes for the results in part 2, which we see in table \ref{table:part2_finetuning_scores}. Again, the classic ML methods were still quite competitive. As outlined before, we suspect that this is due to the underlying structure of the data being relatively simple.
+%univariate
+
+\subsection*{Q2: When modeling time series using deep learning architectures, when might you want a causal/unidirectional architecture? Give an example of a task. (1 pt).}
+
+In general, causal architectures are crucial for the model to be valid and applicable in settings where not the whole sequence is available during both training and prediction. A bidirectional model could cause data leakage, in the form of look-ahead bias, by utilizing future information unavailable in real-time applications. A possible application for unidirectional models is real-time forecasting of stock prices using historical data. Bidirectional architectures, on the other hand, are useful when the context before and after the data point is available at test time and improves understanding. This is typically the case in e.g. translation tasks, and audio or video processing.
+
+\subsection*{Q3: Can you think of an attention-related bottleneck regarding very (very) long time series? Conceptually, which deep methods from above are more suitable for such long time series? (2 pt).}
+
+
+As mentioned in \textcite{attention_all_you_need}, the complexity per self-attention layer is $\mathcal{O}(n^2 \cdot d)$, where $n$ denotes the sequence length and d is the representation dimension. Thus, contrary to recurrent layers ($\mathcal{O}(n\cdot d^2)$ per layer) and convolutional layers with kernel size $k$ ($\mathcal{O}(k\cdot n\cdot d^2)$ per layer), the computational complexity of self-attention layers is quadratic in the sequence length which is computationally intractable for very long time series \parencite{attention_all_you_need}. Moreover, as mentioned in \textcite{longformer}, the memory requirements for self-attention also grow quadratically with the sequence length which is not the case for recurrent and convolutional layers. Consequently, instead of transformers, one could use the recurrent neural networks or convolutional neural networks from above. Both of these approaches tackle the problem of quadratic complexity in sequence length.
+
+
+\subsection*{Q4: What are some challenges in using self-supervised representation learning? What difficulties have you observed in your approach? Can you think of additional ones? (2 pt)}
+As mentioned in \textcite{SSRL_challenges}, the pretraining costs for self-supervised representation learning (SSRL) tasks often are tremendous. This coincides with our experience from part 2, where the training of our contrastive model took considerably longer than all the other networks since it required six separate forward passes for every batch. Moreover, \textcite{SSRL_challenges} highlight that SSRL typically benefits from huge and curated datasets, and large models. Such datasets might not be available for all domains and not all institutions might have the computational resources that are necessary for training enormous neural networks. Furthermore, \textcite{SSRL_challenges} point out that transferability to downstream tasks is not necessarily ensured. In addition, for the contrastive learning approach that we employed, we not only had to (heuristically) tune the hyperparameters of the encoder but additionally had to experiment with different augmentation strategies for the positive and negative samples until we found a working combination. This greatly complicated the error diagnosis during training. Finally, we particularly struggled with creating negative samples that are non-trivial but not indistinguishable from the positive and original sample.
+
+
+%overfitting to the original tasks such that the embeddings are not useful for downstream tasks
+
+
+
+
+
+
+
+\printbibliography
+
+
+\end{document}

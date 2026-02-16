@@ -1,0 +1,192 @@
+---
+title: "Predicting Heart Disease: When Simple Models Rival Deep Learning"
+abstract: "We compare three models for predicting heart disease from clinical data — Lasso logistic regression, a multi-layer perceptron, and a neural additive model — and find that they all land within two percentage points of each other on balanced accuracy. The more interesting story is what they reveal about the data: all three consistently identify the same handful of clinical features as the strongest predictors, and the most interpretable models achieve this without sacrificing performance."
+categories:
+  - Python
+  - Data Science
+  - Machine Learning
+  - Deep Learning
+  - Healthcare
+author: "Jan Schlegel"
+date: "2026-02-14"
+image: "image.jpg"
+bibliography: references.bib
+format:
+  html:
+    code-fold: true
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    fig-width: 5
+    fig-height: 3.5
+    fig-dpi: 150
+---
+
+![](image.jpg)
+
+## Introduction
+
+Cardiovascular diseases remain by far the leading cause of death worldwide, and a lot of clinical decision-making still depends on a physician's intuition and experience. The question we set out to answer in a course project for ETH's *Machine Learning for Healthcare* class was straightforward: given a handful of routine clinical measurements, can we reliably predict whether a patient has heart disease? And more importantly, can we do so in a way that a cardiologist could actually scrutinize and trust?
+
+We train three models that sit at very different points on the interpretability spectrum: a Lasso logistic regression (fully transparent), a multi-layer perceptron (a black box that needs post-hoc explanation), and a neural additive model (a recent architecture designed to combine neural network flexibility with additive model interpretability). 
+
+## The Data
+
+The train dataset consists of 734 patient records with 11 clinical features and a binary label indicating the presence of heart disease. The features are a mix of numeric measurements (age, resting blood pressure, cholesterol, maximum heart rate, and ST segment depression during exercise) and categorical variables (sex, chest pain type, fasting blood sugar, resting ECG result, exercise-induced angina, and ST slope direction).
+
+A pair plot of the numeric features already reveals some separation between the two classes:
+
+<img src="img/eda_pairplot_disease.png" width="100%">
+
+Patients with heart disease tend to be older, reach lower maximum heart rates during exercise, and show higher Oldpeak values (a measure of ST segment depression on an electrocardiogram). None of these relationships are dramatic on their own, but in combination they start painting a picture.
+
+### The Zero Cholesterol Problem
+
+The most striking data quality issue was a large cluster of patients with cholesterol values of exactly zero — which is biologically impossible. These turned out to be missing values that had been filled with zeros at some earlier stage of data collection. What made this particularly tricky is that 90% of these zero-cholesterol patients had heart disease. Whether a patient's cholesterol was missing was itself a strong signal, likely reflecting differences in clinical workflows or the severity of the patient's condition at the time of measurement. Rather than imputing these values (which would destroy this signal), we created a separate categorical feature encoding whether the cholesterol measurement was missing, normal, borderline, or high. We also removed a single observation with a resting blood pressure of zero, which was clearly a data entry error.
+
+The distributions of the categorical features and the target variable are shown below. While several categorical features are heavily imbalanced (most patients are male, most chest pain is asymptomatic), the target variable itself is reasonably balanced, so we did not need to resort to oversampling.
+
+<img src="img/eda_hf_class_imbalance.png" width="100%">
+
+## Three Models, One Dataset
+
+### Lasso Logistic Regression
+
+Standard logistic regression models the probability of the positive class as a linear function of the features passed through a sigmoid:
+
+$$
+P(y = 1 \mid \mathbf{x}) = \sigma(\mathbf{w}^\top \mathbf{x} + b) = \frac{1}{1 + e^{-(\mathbf{w}^\top \mathbf{x} + b)}}
+$$
+
+where $\mathbf{w} \in \mathbb{R}^p$ is the weight vector, $b$ is the bias, and $\sigma$ is the logistic sigmoid function. The model is trained by minimizing the negative log-likelihood (binary cross-entropy). The Lasso variant adds an $\ell_1$ penalty on the weights, giving the objective:
+
+$$
+\min_{\mathbf{w}, b} \; -\frac{1}{n} \sum_{i=1}^{n} \left[ y_i \log \hat{p}_i + (1 - y_i) \log(1 - \hat{p}_i) \right] + \lambda \|\mathbf{w}\|_1
+$$
+
+where $\lambda > 0$ controls the regularization strength. The key property of the $\ell_1$ penalty is that it encourages sparsity — it can drive coefficients all the way to exactly zero, effectively performing feature selection during training. This makes the Lasso a natural starting point for any clinical prediction task where interpretability is a hard requirement: each non-zero coefficient directly tells you the direction and magnitude of that feature's influence on the log-odds of disease.
+
+After selecting $\lambda$ through cross-validation and standardizing all numeric features to ensure equal penalization, we obtained the coefficient plot below:
+
+<img src="img/lasso_coefficients.png" width="100%">
+
+The two strongest predictors are immediately visible. A flat ST slope is the single largest positive contributor to heart disease risk, while an upsloping ST slope is the strongest protective factor. This is consistent with cardiology literature: a flat or downsloping ST segment during exercise is a well-documented marker of myocardial ischemia, while an upsloping response is considered normal [@Hodnesdal2011]. Asymptomatic chest pain — which despite its name refers to a specific clinical presentation where patients experience atypical or no chest symptoms — is the third strongest predictor. This is a known red flag in cardiology, as patients who present without classic chest pain symptoms are often at higher risk because their disease goes undetected longer.
+
+To validate these findings, we also computed permutation feature importances by shuffling each feature and measuring the resulting drop in model performance:
+
+<img src="img/lasso_permutation_importance.png" width="100%">
+
+Reassuringly, the features with the largest coefficients also have the highest permutation importance, confirming that the Lasso is relying on genuinely predictive signals rather than spurious correlations.
+
+
+### Multi-Layer Perceptron
+
+A multi-layer perceptron (MLP) is a feed-forward neural network consisting of an input layer, one or more hidden layers, and an output layer. Given an input $\mathbf{x} \in \mathbb{R}^p$, the forward pass through an MLP with $L$ hidden layers computes:
+
+$$
+\mathbf{h}^{(0)} = \mathbf{x}, \qquad \mathbf{h}^{(\ell)} = \phi\!\left(\mathbf{W}^{(\ell)} \mathbf{h}^{(\ell-1)} + \mathbf{b}^{(\ell)}\right) \quad \text{for } \ell = 1, \dots, L
+$$
+
+where $\mathbf{W}^{(\ell)}$ and $\mathbf{b}^{(\ell)}$ are the weight matrix and bias vector of layer $\ell$, and $\phi$ is a non-linear activation function (typically ReLU: $\phi(z) = \max(0, z)$). For binary classification, the final layer produces a scalar output passed through a sigmoid: $\hat{p} = \sigma(\mathbf{w}^{(L+1)\top} \mathbf{h}^{(L)} + b^{(L+1)})$.
+
+The power of MLPs lies in their expressiveness — with sufficient width and depth, they can approximate arbitrarily complex functions (the universal approximation theorem). The downside is that the learned representations are distributed across many neurons, layers, and non-linear transformations, making it essentially impossible to attribute a prediction to any single input feature by inspecting the weights alone. To crack open this black box, we turned to SHAP values.
+
+#### SHAP Values
+
+SHAP (SHapley Additive exPlanations) is rooted in cooperative game theory. The idea is to treat a prediction as a "game" where the features are "players" and the prediction is the "payout", and then ask: how much did each player contribute? The Shapley value of feature $j$ for a specific prediction is defined as:
+
+$$
+\phi_j = \sum_{S \subseteq \{1, \dots, p\} \setminus \{j\}} \frac{|S|!\;(p - |S| - 1)!}{p!} \left[ f(S \cup \{j\}) - f(S) \right]
+$$
+
+where $S$ is a subset of features, $f(S)$ is the model's expected output when only the features in $S$ are "present" (and the remaining features are marginalized out), and $p$ is the total number of features. The sum iterates over all possible subsets $S$ that exclude feature $j$, and computes the marginal contribution of adding $j$ to each subset, weighted by the number of permutations in which that subset would arise. The Shapley values satisfy a set of desirable properties — most importantly, they sum to the difference between the model's prediction and its average prediction: $\sum_{j=1}^{p} \phi_j = f(\mathbf{x}) - \mathbb{E}[f(\mathbf{x})]$.
+
+The waterfall plots below show SHAP explanations for two healthy patients and two patients with heart disease:
+
+<table>
+<tr>
+<td style="width:50%; padding:4px;">
+<img src="img/shap0.png" width="100%">
+<em>Two healthy patients: ST Slope Upsloping is the dominant protective factor</em>
+</td>
+<td style="width:50%; padding:4px;">
+<img src="img/shap1.png" width="100%">
+<em>Two diseased patients: Old Peak and Cholesterol drive risk upward</em>
+</td>
+</tr>
+</table>
+
+For the healthy patients, having an upsloping ST slope was the strongest factor pushing the prediction toward "no disease". For the diseased patients, high Oldpeak values and low cholesterol readings (likely the zero-imputed missing values) were the biggest risk drivers. The cholesterol finding might seem paradoxical at first — shouldn't *high* cholesterol be bad? — but recall that the zero values were overwhelmingly associated with heart disease. The model is picking up on the missing-data signal, not on low cholesterol being protective.
+
+The overall SHAP beeswarm plot across all test patients gives a broader view:
+
+<img src="img/shap_overall.png" width="100%">
+
+Each dot is one patient's SHAP value for a given feature, colored by whether the feature value was high (red) or low (blue). The pattern for ST Slope Upsloping is particularly clean: high feature values (red, meaning the patient *does* have an upsloping slope) cluster exclusively on the negative SHAP side, while low values (blue, meaning no upsloping slope) cluster on the positive side. This is exactly the same story the Lasso told us, just from a completely different model.
+
+
+### Neural Additive Models
+
+Neural Additive Models (NAMs), introduced by @nam_2021, are an elegant attempt to get the best of both worlds. The model belongs to the family of generalized additive models (GAMs), which restrict the prediction to a sum of univariate functions:
+
+$$
+g\!\left(\mathbb{E}[y \mid \mathbf{x}]\right) = \beta + f_1(x_1) + f_2(x_2) + \dots + f_k(x_k)
+$$
+
+where $g$ is a link function (the logit for binary classification), $\beta$ is a bias term, and each $f_j$ is a *shape function* that depends on a single feature. Classical GAMs typically use splines for the $f_j$'s. The key innovation of NAMs is to parameterize each shape function as its own small neural network:
+
+$$
+P(y = 1 \mid \mathbf{x}) = \sigma\!\left(\beta + \sum_{j=1}^{k} \text{NN}_j(x_j)\right)
+$$
+
+where each $\text{NN}_j$ is a separate multi-layer perceptron that takes only $x_j$ as input. Because each sub-network contains non-linear activation functions, the shape functions can be arbitrarily complex — unlike the linear relationships that logistic regression is limited to. But because the overall model is additive (no interactions between features), each learned shape function can be visualized independently.
+
+<img src="img/nam_architecture.png" width="60%">
+
+This additive structure is the key insight. Because each feature is processed in isolation, there are no interactions between features inside the model. This means we can plot $\text{NN}_j(x_j)$ as a function of $x_j$ for every feature and see exactly how the model uses it — something that is impossible with a standard MLP where all features interact through shared hidden layers.
+
+In practice, we found NAMs to be sensitive to hyperparameter choices. Initial attempts with hand-tuned parameters produced unstable shape functions that changed substantially across random seeds. Following the original paper, we used Bayesian optimization (via Optuna) to search the hyperparameter space, and trained an ensemble of 100 NAMs with different random initializations to get stable estimates.
+
+The resulting shape functions are shown below. The thick blue line is the ensemble mean, the thin lines are individual ensemble members, and the red bars indicate data density:
+
+<img src="img/nam_shapes.png" width="100%">
+
+These plots are where NAMs really shine. For the continuous features, we can read off the non-linear relationships directly. The Cholesterol shape function shows a sharp spike at zero (confirming the missing-data signal), followed by a relatively flat region for normal values and a slight uptick at very high values. Oldpeak shows a roughly monotonic increase — greater ST depression means higher risk. For the binary features, the shape functions collapse to simple step functions since there are only two possible inputs.
+
+We also computed SHAP values for the NAM to compare with the MLP:
+
+<img src="img/nam_shap_beeswarm.png" width="100%">
+
+An interesting difference emerges when comparing this to the MLP's SHAP plot. Because each feature is modeled by its own sub-network in the NAM, the SHAP values for a given feature depend only on that feature's value — not on the values of other features. This is why the SHAP dots for binary features appear as two clean vertical lines (one per category), while in the MLP's SHAP plot the same features show much more spread. The NAM's additive structure constrains the explanations to be simpler and more consistent.
+
+
+## How Do They Compare?
+
+### Performance
+
+The table below summarizes the test set performance of all three models:
+
+<img src="img/performance_table.png" width="100%">
+
+The differences are marginal. The Lasso achieves the highest balanced accuracy (0.826) and precision (0.851), while the NAM edges out the competition on F1 score (0.867), recall (0.891), and ROC AUC (0.894). The MLP trails slightly on most metrics. For a dataset of this size and complexity, these differences are well within the range of random variation — the models are essentially tied.
+
+### Feature Importance Agreement
+
+More interesting than the performance numbers is the degree to which all three models agree on *what matters*. Across Lasso coefficients, MLP SHAP values, and NAM shape functions, the same features consistently emerge as the strongest predictors:
+
+- **ST Slope** is the single most important feature in all three models. An upsloping ST segment is protective; a flat one is a risk factor. This is well-established in cardiology: a flat or downsloping ST response to exercise suggests insufficient blood flow to the heart muscle.
+- **Oldpeak** (ST depression during exercise) is the second or third most important feature across all models. Higher values indicate greater risk, consistent with the clinical interpretation of exercise-induced ischemia.
+- **Chest Pain Type: Asymptomatic** is a strong positive predictor of heart disease in all three models. This reflects the clinical reality that patients with atypical presentations are often diagnosed later and with more advanced disease.
+
+This level of agreement across fundamentally different model families is reassuring. It suggests that these features are genuinely predictive of heart disease in this population, not artifacts of any particular modeling choice.
+
+
+## Reflections
+
+If we had to deploy one of these models in a clinical setting, we would choose the Lasso. Not because it performs better — it doesn't, meaningfully — but because it is the easiest model for a non-technical clinician to understand, validate, and override when their clinical judgment disagrees. A doctor can look at the Lasso coefficients and immediately see which features are driving a prediction and by how much. With the MLP, that same doctor would need to understand SHAP values. With the NAM, they would need to interpret shape functions. Transparency has real value when the stakes involve patient outcomes.
+
+That said, the NAM's shape functions revealed something the Lasso structurally cannot: non-linear relationships in the continuous features. The sharp spike in the Cholesterol shape function at zero, for example, is a finding that a linear model can only approximate with a separate binary indicator (which is what we had to create manually). The NAM discovered this pattern automatically. For exploratory analysis and hypothesis generation, NAMs are a powerful tool.
+
+One practical caveat: NAMs were noticeably more finicky to train than either the Lasso or the MLP. The learned shape functions were sensitive to hyperparameter choices, and getting stable results required both Bayesian optimization and ensembling. In a clinical deployment where reliability and reproducibility matter, this additional complexity is a genuine downside.
+
+The broader takeaway from this project is that in healthcare ML, the most important question is often not "which model has the highest AUC?" but "which model can I trust, explain, and act on?" When models across the interpretability spectrum agree on what matters, that convergence is itself a form of validation — and it is often more convincing to a clinician than any single number.
