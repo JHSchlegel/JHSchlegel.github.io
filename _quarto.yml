@@ -9,6 +9,7 @@ execute:
 
 website:
   title: "Jan Schlegel"
+  favicon: logo.png
   navbar:
     pinned: true
     right:
