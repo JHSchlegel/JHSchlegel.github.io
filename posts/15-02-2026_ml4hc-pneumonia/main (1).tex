@@ -1,0 +1,563 @@
+\input{settings}
+\usepackage{hyperref}
+\usepackage{color, colortbl}
+\definecolor{Gray}{gray}{0.9}
+\hypersetup{colorlinks=true, linkcolor=black, citecolor = black, urlcolor = black}
+\usepackage[backend=biber,style=apa,]{biblatex}
+\usepackage{biblatex}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{cleveref}
+\addbibresource{bibliography.bib}
+\usepackage{makecell}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{tablefootnote}
+\usepackage{subcaption}
+
+
+\bibliography{bibliography}
+
+
+\renewcommand\theadalign{bc}
+\renewcommand\theadgape{\Gape[4pt]}
+\renewcommand{\mc}{\makecell}
+\renewcommand{\th}{\thead}
+
+
+\setlength{\parindent}{0pt}
+
+
+
+\begin{document}
+\lhead{Machine Learning for Health Care: Project 1} 
+\rhead{Jan Schlegel \hspace{10px} 19-747-096 \\ Paul Schlossmacher \hspace{10px} 23-941-636 \\ Gianfranco Basile \hspace{10px} 23-955-545} 
+\cfoot{\thepage\ of \pageref{LastPage}}
+
+
+%%%%%%%%%%%%%% How convinced are we of our results?
+
+
+\section*{Part 1: Heart Disease Prediction Dataset}
+
+\subsubsection*{Q1: Exploratory Data Analysis (EDA)}
+
+\textbf{Get familiar with the dataset by exploring the different features, their distribution, and the labels
+(1 Pt)}\\
+
+The heart failure data set consists of 734 (training) observations and 12 columns including our binary target variable \texttt{Heart Disease}. More precisely, we are dealing with the following columns, five of which are numeric:
+\begin{itemize}
+    \item \texttt{Age}: age of the patient in years
+    \item \texttt{Sex}: sex of the patient (M/F)
+    \item \texttt{Chest Pain Type}: whether chest pain is of type asymptomatic, atypical angina, typical angina or non-anginal pain
+    \item \texttt{Resting Blood Pressure}: resting blood pressure (mmHg) of the patient
+    \item \texttt{Cholesterol}: cholesterol level (mm/dl) of the patient
+    \item \texttt{Fasting Blood Sugar}: fasting blood sugar of the patient
+    \item \texttt{Resting ECG}: resting electrocardiogram result of the patient
+    \item \texttt{Maximum Heart Rate}: maximum heart rate (BPM) of the patient
+    \item \texttt{Exercise-Induced Angina}: whether patient has exercise-induced angina or not
+    \item \texttt{Oldpeak}: depression of ST segment during exercise versus at rest in electrocardiogram
+    \item \texttt{ST Slope}: slope direction (up/ flat/ down) of the ST segment in electrocardiogram
+    \item \texttt{Heart Disease}: whether a patient has a heart disease or not; response variable
+\end{itemize}
+For more information about the individual features, we refer to \textcite{hd_data}.\\
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{plots/eda_pairplot_disease.png}
+    \caption{\textbf{Pair Plot of Numeric Features}. This figure displays the pair plot of all numeric features colored by the \texttt{Heart Disease} response.}
+    \label{fig:eda_pairplot_disease}
+\end{figure}
+
+
+\textbf{Missing or nonsensical data, unusual feature distribution,
+outliers, or class imbalance, and describe how to handle them (1 Pt).}\\
+As shown in Figure \ref{fig:eda_pairplot_disease}, patients with heart diseases tend to ceteris paribus be older, and have lower \texttt{Max Heart Rate} and higher \texttt{Oldpeak} values. Moreover, we can see in Figure \ref{fig:eda_pairplot_disease} that the distribution of \texttt{Cholesterol} and \texttt{Oldpeak} variable are both zero-inflated. It is conceivable for the \texttt{Oldpeak} values to be zero, but not for the cholesterol level. Thus, we assume that the zero values in the \texttt{Cholesterol} variable are zero-imputed values. Moreover, 90\% of those zero imputed observations had heart diseases. Thus, we will in the following assume that the zero cholesterol values are not missing at random and will create an additional categorical column to indicate whether the cholesterol level was imputed or not. Furthermore, we note that one observation has a \texttt{Resting Blood Pressure} of zero which is impossible. As it is only a single observation, we will exclude it from further analysis. Finally, the distributions of the categorical variables as well as the response variable are visualized in Figure \ref{fig:eda_class_imbalance}. We can see that whilst all categorical variables are strongly imbalanced, the \texttt{Heart Disease} response is relatively balanced. Thus, due to the balanced nature of the target variable we decided against implementing any oversampling strategy.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{plots/eda_hf_class_imbalance.pdf}
+    \caption{\textbf{Distributions of Categorical Features.} This figure displays the count plots of all categorical features and the binary response variable for the training data.}
+    \label{fig:eda_class_imbalance}
+\end{figure}
+
+\textbf{Explain how you preprocess the dataset for the remaining tasks of part 1
+(1 Pt).}\\
+
+Based on our findings discoveries in the EDA agreed upon the following preprocessing steps:
+\begin{enumerate}
+    \item Remove observation 366 from the training data i.e. the zero \texttt{Resting Blood Pressure}. We will not remove any other statistical outliers, as they might represent rare conditions that could increase interpretability of our models.
+    \item Create an additional categorical feature column for the cholesterol level with entries "imputed", "normal", "borderline" and "high". This allows us to indicate whether the \texttt{Cholesterol} variable was imputed or not and to individually analyze the contributions of commonly used cholesterol categories to the heart disease class.
+    \item Transform the feature columns:
+    \begin{itemize}
+        \item Categorical columns: The categorical variables have to be transformed into a numeric scale. We decided to use one-hot encoding for the categorical variables to make it as straightforward as possible to interpret the effect of each category on the target variable. Moreover, the small influx of columns should not be a problem since logistic lasso regression uses $\ell_1$ regularization and neural networks also tend to perform well in presence of multicollinearity.
+
+        \item Numeric columns: By standardizing all numeric features we will bring them all on a similar scale without changing the marginal distributions of the features.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{Q2: Logistic Lasso Regression}\\
+
+\textbf{Describe which preprocessing steps are crucial (1 Pt)}\\
+For this task, we performed preprocessing steps to enable proper functionality of the Lasso. This preprocessing involved standardizing the training covariates, ensuring that all covariates are penalized equally. We also went through the same pre-processing steps that were already described in Q1. \\
+
+\textbf{Fit a Lasso regression model with l1 regularization (1 Pt)}\\
+For model fit, we chose the parameter lambda through cross-validation. The chosen lambda corresponds to the value of $\lambda = 2.78$.\\
+
+\textbf{Provide performance metrics such as f1-score or balanced accuracy (1 Pt)}\\
+
+A value of 0.826 for Balanced Accuracy indicates that the model's performance is quite high in terms of correctly classifying both the positive and negative classes.\\
+
+A value of 0.866 for the $F_1$-score indicates a high level of precision and recall in the model's predictions, indicating a balance between correctly identifying true positives and minimizing false positives and false negatives.\\
+
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{\begin{tabular}{lcccccc}\toprule
+Model & Balanced Accuracy&$F_1$-Score  & Precision & Recall & ROC AUC\\ \midrule
+Logistic Lasso & \cellcolor{Gray} 0.826 &  0.866 & \cellcolor{Gray} 0.851  & 0.882 & 0.826 \\ 
+Multi Layer Perceptron & 0.806 & 0.847 & 0.839 & 0.855 & 0.891 \\ 
+Neural Additive Model & 0.824 & \cellcolor{Gray} 0.867 &  0.845 & \cellcolor{Gray} 0.891 & \cellcolor{Gray} 0.894 \\ \bottomrule
+\end{tabular}}
+\caption{\textbf{Performance of the Models.} Key performance metrics calculated on the test set for a logistic lasso regression, a multi layer perceptron and a neural additive model. The cell of the best score in each column is highlighted in light grey.}
+\label{table:scores}
+\end{table}
+\skip\footins=\bigskipamount
+
+\textbf{Visualize the importance of the different features and argue how they contribute to the model's output. (1 Pt)}\\
+We utilized sklearn's API \cite{sklearn_api} for the Permutation feature importance technique to evaluate the impact of different features on the model's output. In Figure \ref{fig:Par_val}, the negative contribution (-1.017822) of "ST Slope: Upsloping" suggests an approximately 64\% decrease in heart failure odds when the patient presents this feature. Conversely, "ST Slope: Flat" exhibits a positive contribution (1.147343).\\
+Furthermore, Figure \ref{fig:Perm_imp_lasso} demonstrates that both variables have a positive value of the permutation importance mean, indicating that shuffling their values reduces the model's performance. This emphasizes their significance in ensuring accurate predictions.
+%(Addition: For illustrative purposes, "ST Slope: Upsloping" is chosen as an example).
+
+\begin{figure}[htbp]
+
+\begin{subfigure}{.40\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{plots/lasso_coefficients.png}
+  \caption{Coefficients of the Lasso model}
+  \label{fig:Par_val}
+\end{subfigure}%
+\begin{subfigure}{.60\textwidth}
+    \centering
+  \includegraphics[width=\linewidth]{plots/lasso_permutation_importance.png}
+  \caption{Permutation importance mean and standard deviation}
+  \label{fig:Perm_imp_lasso}
+\end{subfigure}
+
+\caption{Plot (a) displays the values of the coefficients along with their corresponding names. Plot (b) shows the mean and standard deviation of the permutation importance obtained with 30 repetitions.}
+\label{fig:side_by_side_plots}
+
+\end{figure}
+
+\textbf{A researcher is interested in the important variables
+and their influence on the label. They have fitted the Logistic Lasso Regression to determine the
+important variables. Then, they train a Logistic Regression solely on these variables and use
+this model to make conclusions. Elaborate why this would be a good or bad idea (1 Pt).}\\
+This approach may not be considered reliable if we fit Logistic Lasso Regression on the same dataset to determine important variables and subsequently fit Logistic Regression on the same dataset using the selected variables. Such a process could lead to "double dipping," where the same data is used both for feature selection and model training. In this case inference would be invalid. However, by splitting the dataset into two parts and performing feature selection on one part and model fitting on the other, this approach becomes sound.
+
+
+% Müsstemer a dere Stell no öpis über de Train-Test-Split sege?
+
+\subsubsection*{Q3: Multi-Layer Perceptrons}
+
+\textbf{Implement a simple MLP, train it on the dataset, and report test set performance ( f1-score or balanced accuracy) (2 Pt).}\\
+
+We implemented a MLP, whose performance can be seen in Table \ref{table:scores}. Regarding $F_1$-Score and Balanced Accuracy its scores are not far off from the scores of the \textit{Logistic Lasso} and the \textit{Neural Additive Model}, however the MLP does perform the worst out of the three in those two metrics.
+\\
+
+\textbf{Visualize SHAP explanations of the outputs of two positive and negative samples and feature importances of the overall model (2 Pt).}\\
+
+We observe in Figure \ref{fig:fig131} that \texttt{ST Slope: Upsloping} being negative was the biggest factor for the MLP's decision to predict the patients to be healthy.\\
+In Figure \ref{fig:fig132} we can observe the SHAP values for two diseased patients. Here it seems like both Old Peak and Cholesterol were very important, with lower Cholesterol values seemingly increasing the risk of heart disease. This might look paradoxical at first, since traditionally high cholesterol is associated with heart disease. However, we should remember that we saw in the Exploratory Data Analysis, that we had a lot of 0-values for Cholesterol, which probably were pre-imputed missing values. This is why we also created the feature level "Cholesterol Level: Imputed". Because of these circumstances we should probably not draw too many conclusions from our observations for the Cholesterol feature.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{plots/shap0.png}
+    \caption{\textbf{SHAP Negative Sample:} This figure displays SHAP values of high and low input feature values of 2 healthy patients for the Multi-Layered-Perceptron}
+    \label{fig:fig131}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/shap1.png}
+  \caption{\textbf{SHAP Positive Sample:} This figure displays SHAP values of high and low input feature values of 2 diseased patients for the Multi-Layered-Perceptron}
+  \label{fig:fig132}
+\end{figure}
+
+Finally, we can also see the feature importances of the overall model in Figure \ref{fig:fig133}. Here we can see for example very nicely for the ST Slope: Upsloping: Low feature values (i.e. blue points) are exclusively associated with positive SHAP values while high feature values (i.e. red points) are associated with negative SHAP values. Thus, we can draw the conclusion that having an upsloping ST slope (red points) negatively contributes to heart disease, while having a non-upsloping ST slope positively contributes to heart disease. 
+Note that most Feature values in the Shapley figures we have seen are either bright red or bright blue, because the features are binary in these cases.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/shap_overall.png}
+  \caption{SHAP Overall}
+  \label{fig:fig133}
+\end{figure}
+
+
+
+\textbf{Are feature importances consistent across different
+predictions and compared to overall importance values (1 Pt)}\\
+
+We can see this in Figure \ref{fig:fig133}. As we are observing a lot of different patients, it is natural for feature importances not to be the exact same for every single one. However we do definitely see some very heavy clustering for some of the features. For "ST Slope: Upsloping" we see a very strong clustering around the 0.3-0.5 region of the SHAP values. A similar clustering can be observed both in the negative and positive regions of the "Chest Pain: Type Asymptomatic" feature. Since this is still a heterogenous dataset we do of course also see some data points such as "Maximum Heart Rate", where the importances are spread around quite widely.\\
+Also, we can observe that some features are a lot more important than others. Towards the end of Figure \ref{fig:fig133} we see that some SHAP values barely differ from 0 at all.
+
+\subsection*{Q5: Neural Additive Model (NAM)}
+\textbf{Read the paper about NAMs, implement the
+model, and train it on the dataset (3 Pt). Like Q2-3, provide performance metrics on the test set.}\\
+After implementing the neural additive model as described in \textcite{nam_2021}, we realized after some initial heuristic hyperparameter tuning attempts that the model and its visualizations of the feature contributions were relatively sensitive to the choice of hyperparameters. Consequently, we decided, in accordance with \textcite{nam_2021}, to tune the hyperparameters using Bayesian optimization. To be precise, we utilized the Optuna package (cf. \textcite{optuna}) and its Tree-structured Parzen Estimator (TPE) sampler to search a hyperparameter space similar to the one mentioned in appendix A.6 of \textcite{nam_2021}. When using these hyperparameters, we were able to achieve very similar results on the test set across all performance metrics as the logistic lasso regression model, as is shown in Table \ref{table:scores}. \\
+
+\textbf{Utilize the interpretability of NAMs to visualize the feature importances (2 Pt).}\\
+The great advantage of the NAM's unique approach of modelling each feature with a separate neural network is that for every feature we can visualize the learnt shape functions independently. These individual shape functions are displayed in Figure \ref{Figure:nam_shapes}. Note that since we consider a binary classification problem negative logits of the individual feature networks, ceteris paribus, decrease probability and positive logits increase probabilities of the positive class. Interestingly, the learnt shape functions for the one-hot-encoded variables are step functions meaning that for binary inputs also the output can only be one of two values. Moreover, the learnt shape functions seem to be in line with our observations from the EDA. For example, the shape functions reveal that the zero \texttt{Cholesterol} values, strong deviations from 0 in the \texttt{Old Peak}, \texttt{Sex: Male} as well as \texttt{Chest Pain: Type Asymptomatic} all increase the probability of the heart disease class.
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{plots/nam_shapes.png} 
+\caption{\textbf{Learnt Shape Functions of the Neural Additive Model.} This plot was inspired by a similar plot in \textcite{nam_2021} and displays the shape functions for each feature. The visualized shape functions were learned from an ensemble of 100 equally parametrized NAMs whose weights were initialized using differing random seeds. The thick blue line are the mean shape functions of the ensemble whilst the thin blue lines are the shape functions of the individual constituents of the ensemble. The red color bars indicate the normalized data density for each feature.} 
+\label{Figure:nam_shapes}
+\end{figure}\\
+
+
+Additionally, the feature importances, as determined by the SHAP values, are visualized in Figure \ref{fig:nam_shap}. When comparing this plot to the MLP SHAP feature importance plot from Figure \ref{fig:fig133}, it is apparent that whilst the most important features are more or less the same, there are less points in the plot. Moreover, the pattern of the points seems to coincide with the distribution of the individual features i.e. for binary variables there are only two entries where the height of the line indicates the frequency and for the continuous variables the points are more spread out with some occasional clusters in what could be e.g. the zero \texttt{Cholesterol} values. This is most likely due to each feature being modelled by an individual neural network and hence the output of a particular feature network is not influenced by the other features or the other feature networks respectively.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/nam_shap_beeswarm.png}
+    \caption{\textbf{NAM Feature Importances According to SHAP.} This figure displays SHAP values of high and low input feature values for the neural additive model.}
+    \label{fig:nam_shap}
+
+\end{figure}\\
+
+
+\textbf{Conceptually, how does the model compare to Logistic Regression and MLPs (1 Pt)?} \\
+Contrary to logistic regression and MLPs, the NAM does not fit a single model to the data but instead fits a separate fully connected neural network to each feature. The outputs of these feature networks then get aggregated and finally mapped into a probability space. Due to the incorporation of non-linear activation functions in the individual feature networks, the NAM is capable of learning arbitrarily complex shape functions \parencite{nam_2021}. This is in contrast to logistic regression, which can only learn linear decision boundaries, and MLPs, which can learn non-linear decision boundaries but do not provide feature-wise interpretability.\\
+
+\textbf{Why are NAMs more interpretable than MLPs despite being based on non-linear neural networks (1 Pt)?}\\
+Similar to traditional (generalized) additive models, the additive nature of  NAMs allows us to isolate and visualize the effect of each feature on the logits. For MLPs however, the influence of a single feature on the prediction is distributed across many different neurons, layers and non-linear activation functions. This makes it difficult to decipher the contribution of each input feature to the final prediction.
+
+
+
+
+\section*{Part 2: Pneumonia Prediction Dataset}
+
+\subsubsection*{Q1: Exploratory Data Analysis}
+
+\textbf{Explore the label distribution and qualitatively describe the data
+by plotting some examples for both labels. (1 Pt)}\\
+In the dataset, there are three labels: "Normal," "Bacterial Pneumonia," and "Viral Pneumonia." For the exploratory data analysis (EDA), we will consider both options (i.e., three labels and two labels). Figure \ref{fig:Lab_distr3} and Figure \ref{fig:Lab_distr2} illustrate that a total of 74.29\% of all images are labeled as “Pneumonia,” and 25.71\% of all images are labeled as “Normal.” Among the Pneumonia labels, approximately two-thirds are classified as Bacterial Pneumonia, while only one-third are categorized as Viral Pneumonia.
+
+
+
+\begin{figure}[H]
+
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{plots/label_distr_three.png}
+  \caption{Distribution of labels in training data \\
+  (3 labels)}
+  \label{fig:Lab_distr3}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{plots/lable_distr_two.png}
+  \caption{Distribution of labels in training data \\ (2 labels)}
+  \label{fig:Lab_distr2}
+\end{subfigure}
+
+\caption{The plot on the left shows the distribution of the three label categories, the plot on the right shows the distribution of the two label categories}
+\label{fig:side_by_side_plot1}
+
+\end{figure}
+
+\textbf{Do you see visual differences between healthy
+and disease samples? (1 Pt)}\\
+
+As for differences between images of different classes, we can see that the images of the "Normal" class are generally more clear and less blurry with less white areas than the images of the Pneumonia class. Also, it is easier to distinguish the heart from the lungs in the "Normal" class images.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/img_sample.png}
+  \caption{Sample of health and disease samples}
+  \label{fig:sample}
+\end{figure}
+
+
+\textbf{Describe one potential source of bias that could influence model
+performance. (1 Pt)}\\
+
+We can see that most of the images have a small R somewhere. Moreover, manual visual inspection of a selection of images revealed that some of the x-ray images belonging to the Pneumonia class have the label 'A-P' in the top left corner. Thus, we need to remove these labels in our preprocessing. Additionally, we have to address the general overrepresentation of the Pneumonia class (as highlighted in Figure \ref{fig:side_by_side_plot1}) e.g. by reweighting the loss function.
+
+\textbf{How do you preprocess the data for your further analysis? (1 Pt)}\\
+\begin{enumerate}
+    \item \textbf{Resizing}: The images have different sizes. When loading the images, we will scale them all to (256, 256). Note that (256, 256) is arbitrary but is often chosen in image classification tasks involving CNNs.
+    \item \textbf{Center Crop}: Crop the images to (224, 224) to remove labels that may be present in the corners of some images.
+    \item \textbf{Random Rotation}: Rotate the images by a maximum of 10 degrees to enhance the model's robustness to different orientations of the X-ray images.
+    \item \textbf{Random Horizontal Flip}: Flip the images horizontally to improve the model's robustness to different orientations of the X-ray images.
+    \item \textbf{Random Grayscale}: Make the model more resilient against different color scales in the X-ray images (and to make arrows less visible, which are sometimes present, as seen in the example images on \href{https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia/data}{Kaggle}).
+    \item \textbf{Convert To Tensor}: Finally, convert the images to tensors, which automatically scales all pixel values between 0 and 1.
+\end{enumerate}
+
+The result of the preprocessing step can be visualized in Figure \ref{fig:prep_sample}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/Preprocessed_img.png}
+  \caption{Preprocessed images using}
+  \label{fig:prep_sample}
+\end{figure}
+
+
+
+\subsubsection*{Q2: CNN Classifier (3 Pts)}
+
+\textbf{First design a CNN classifier for the dataset (2 Pt)}\\
+The implemented model is a  Convolutional Neural Network (CNN) architecture based on the ResNet-50 pre-trained model. The original fully connected layer of ResNet-50 is replaced with custom layers for binary classification. These layers include linear, ReLU activation, and dropout layers. The final linear layer outputs two values for binary classification to adapt it for the Integrated method. During the forward pass, input images are processed through the customized ResNet-50.
+
+\\
+\textbf{Report its performance on a test set (1 Pt)}\\
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Metric} & \textbf{CNN} & \textbf{CNN Permuted Labels}\\
+\midrule
+Accuracy & 0.87 & 0.60\\
+Balanced Accuracy & 0.83  & 0.52\\
+Recall & 0.99 & 0.84\\
+Precision & 0.83 & 0.63\\
+F1 Score & 0.91 & 0.72\\
+\bottomrule
+\end{tabular}
+\label{tab:performance_cnn}
+\caption{\textbf{Performance Metrics of the CNNs on the Test Set.} Hereby CNN denotes the CNN as described in part 2 that was trained on the original, unpermuted labels whilst CNN Permuted Labels corresponds to the CNN of the data randomization tests from part 3 that was trained on the permuted labels.}
+\end{table}
+
+\subsubsection*{Q3: Integrated Gradients}
+
+\textbf{Implement the integrated gradients method and
+visualize attribution maps of five healthy and five disease test samples (2 Pts)}\\
+After implementing the Integrated Gradient with the help of the \texttt{CAPTUM} package and applying it to our CNN, we can construct some nice plots, which visualize which sections contribute to the prediction. In Figure \ref{fig:int_grad0}, we can see this applied to an example of healthy patients (i.e., label=0). 
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/img0_int_grad.png}
+  \caption{Original image and attribution map recovered using integrated gradient for six different healthy patients}
+  \label{fig:int_grad0}
+\end{figure}
+
+In Figure \ref{fig:int_grad1} we see the same for diseased patients (label=1). In the next section we will analyse the differences in the highlighted regions:
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{plots/img1_int_grad.png}
+  \caption{Original image and recovered using integrated gradient for six different pneumonia patients}
+  \label{fig:int_grad1}
+\end{figure}
+
+\textbf{Do the maps highlight sensible regions (1 Pt)?}\\
+In Figure \ref{fig:int_grad0}, which considers healthy patients, it is possible to notice that the model attributes more relevance to pixels corresponding to the lungs, indicating that these regions are considered important for the classification of healthy cases. This makes intuitive sense, because this means that there are no anomalies found around the lungs. \\
+
+On the contrary, in Figure \ref{fig:int_grad1}, the model gives importance to a wider area, suggesting that for classifying pneumonia cases, the model does not seem to agree with specific regions within the chest. Again, this makes intuitive sense, because pneumonia can be found in many different areas of the chest.\\
+\\
+It should be noted, that all the Figures we show for this section were selected randomly to avoid any biases. Thus, while our interpretation does not align perfectly with every image, we are confident in the trend we observed in the images shown.
+
+
+\textbf{Are attributions consistent across samples? (1 Pt)}\\
+Yes, as mentioned in the previous answer, it is possible to notice that in Figure \ref{fig:int_grad0}, in all the images, the higher attribution is given to the center part of the images where the lungs and the spine are present, while in Figure \ref{fig:int_grad1} the integrated gradient method seems to attribute importance to a broader area or pixels.
+However, the fact that the model doesn't have outstanding performance may result in unstable attribution for X-ray images corresponding to healthy and unhealthy patients. This is seen in Figure \ref{fig:int_grad0}, where the image positioned in the first row, first column, doesn't stress the lungs and the spines as the other images in the same plot
+and also, in Figure \ref{fig:int_grad1}, the attribution mask in the third column,  second row, is quite different compared to the images in the same plot.\\
+
+\textbf{Does the choice of baseline input image have a big effect (1 Pt) on the attribution maps?}\\
+As is possible to notice in Figure \ref{fig:baseline_int_grad}, when changing the baseline in the integrated gradient method, the model appears to assign relevance to different pixel areas for the classification of healthy and pneumonia patients. This behavior suggests the model focuses on different areas then before when classifying the patient as healthy or unhealthy. Therefore a change in baseline definitely has a big effect on the attribution maps.
+
+\begin{figure}[H]
+
+\begin{subfigure}{.5\textwidth}
+  \centering
+    \includegraphics[width=\linewidth]{plots/bs0_int_grad_1.png}
+  \caption{Attribution maps for baseline equal 0}
+  \label{fig:bas0_int}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{plots/bs1_int_grad_1.png}
+  \caption{Attribution maps for baseline equal 1}
+  \label{fig:bas1_int}
+\end{subfigure}
+
+\caption{The plot on the left shows the attribution in case we use zero as baseline, the plot on the right shows the attribution in case we use one as baseline}
+\label{fig:baseline_int_grad}
+
+\end{figure}
+
+\subsubsection*{Q4: Grad-CAM}
+
+\textbf{Like in Q3, implement the method and visualize attribution maps of five healthy and five disease test samples (2 Pt}\\
+
+After implementing the Grad-CAM with the help of the \texttt{CAPTUM} package and applying it to the last convolutional layer of the CNN, we can construct some nice plots, which visualize which sections contribute to the prediction. In Figure \ref{fig:fig241}, we can see this applied to an example of healthy patients (i.e., label=0). 
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=\linewidth]{plots/GradCAM_True0.png}
+	\caption{\textbf{Grad-CAM Healthy Test Sample:} The heatmap shows which regions were highlighted as important for healthy patients}
+	\label{fig:fig241}
+\end{figure}
+
+In Figure \ref{fig:fig242} we see the same for diseased patients (label=1). In the next section we will analyse the differences in the highlighted regions:
+
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=\linewidth]{plots/GradCAM_True1.png}
+	\caption{\textbf{Grad-CAM Healthy Test Sample:} The heatmap shows which regions were highlighted as important for diseased patients.}
+	\label{fig:fig242}
+\end{figure}
+
+\textbf{Do the maps highlight sensible regions (1 Pt)?}\\
+To understand which regions would be sensible to highlight, we consider the paper by \textcite{SeeralaKrishnan2021}. There, they note that for diseased patients, the highlighted regions should be located "within the chest cavity away from the shadow produced by the heart by the X-ray." This is primarily the case in our figure \ref{fig:fig242}. We can also see clearly, that regions, where a slight shadow - i.e. the pneuomnia - is visible get highlighted especially strong.\\
+
+It is intuitively more difficult for healthy patients to understand which regions the model should focus on to reach its conclusion. However, we can see that the model seems to focus on areas within the chest cavity - mainly the bottom areas. This is different to the paper by \textcite{SeeralaKrishnan2021} we mentioned before, where the GradCAM for healthy patients mainly highlighted regions outside of the chest. However this difference could be because we used different underlying neural networks.
+\\
+
+\textbf{Are attributions consistent across samples? (1 Pt)}\\
+
+The attributions are relatively consistent across the samples. For diseased patients, we can see the clear pattern described above. For healthy patients we found one outlier in the 2nd row and 1st column of \ref{fig:fig241}.
+\\
+Note again - as for the Integrated Gradients - that the images shown in our figures were chosen randomly and thus our interpretations might not match perfectly with each image.
+\\
+
+\textbf{Compare your findings with Q3. (1 Pt)}\\
+
+Our findings are broadly similar to the ones in the Integrated Gradients model in Q3. In fact, for the GradCAM, we noted before that the lower regions inside the chest cavity tend to get highlighted quite consistently for healthy patients. For integrated graduates, the spine and the lungs seem to be consistently highlighted. So, while not the same areas get highlighted by the two models in the healthy case, we can observe that a seemingly unimportant area gets highlighted by both for healthy patients.
+
+For diseased patients, we get more similarities: The key observation for the Integrated Gradients was that a bigger area of the chest was considered for diseased patients. The same is definitely true for GradCAM as can be observed in Figures \ref{fig:fig241} and \ref{fig:fig242}.
+
+
+
+\subsubsection*{Q5: Data Randomization Test}
+
+\textbf{Read the paper and retrain your CNN on random training labels (1 Pt)}\\
+
+We used the same CNN architecture as described in Part 2 trained in on the Pneumonia dataset with the same train, validation, and test split but with permuted train labels. Moreover, we left all transformations to the images as they were in Part 2. Finally, the validation set was not used for model selection but was only there to ensure that the model is trained on the same images as in Part 2. Instead of using the validation set for determining and saving the model with the lowest validation loss, we trained the CNN for a fixed 200 epochs (without enforcing early stopping) and saved only the model of the final epoch. The model was then evaluated on the test set with the performance metrics being shown in Table \ref{tab:performance_cnn}. Most notably, we can see that the balanced accuracy of this model is close to 50\% as was to be expected.
+
+\textbf{Perform the Data randomization Test for both Integrated Gradients and Grad-CAM (1 Pt). Do they pass or fail? Elaborate and visualize your findings (1 Pt)!}\\
+
+\textbf{Integrated Gradients:}\\
+Looking at Figure \ref{fig:int_grad0_perm} and \ref{fig:int_grad1_perm}, the two attributions maps for healthy and unhealthy patients look similar, meaning that the models, trained taking into consideration the permuted label, don't differentiate between the X-ray for healthy and unhealthy patients, so it assigns the label randomly. In addition, if we compare Figure \ref{fig:int_grad1} and \ref{fig:int_grad1_perm} it is clear that the attribution is given differently, in fact for the attribution recovered using the permuted label, it is possible to notice a quite nice definition of lungs and spine, while for the attribution map obtained using the unpermuted label this net definition is not possible.
+\\
+Because of these differences the Integrated Gradients pass the Data Randomization test.
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=\linewidth]{plots/img0_int_grad_perm.png}
+	\caption{Original image and attribution map recovered using Integrated Gradient for six different healthy patients obtained using the permuted label}
+	\label{fig:int_grad0_perm}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=\linewidth]{plots/img1_int_grad_perm.png}
+	\caption{Original image and attribution map recovered using Integrated Gradient for six different pneumonia patients obtained using the permuted label}
+	\label{fig:int_grad1_perm}
+\end{figure}
+
+
+\textbf{GradCAM:}\\
+We consider the same images as before to observe how GradCAM performs under randomized training labels. The predictions and GradCAM attributions for these images for a model, where the training labels had been permuted beforehand, can be seen in Figure \ref{fig:fig251} for truly healthy patients and Figure \ref{fig:fig251} for truly diseased patients.
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=\linewidth]{plots/GradCAM_True0_Perm.png}
+	\caption{\textbf{Grad-CAM Healthy Test Sample - Permuted Labels} The heatmap shows which regions were highlighted as important for healthy patients in the model that was trained on permuted labels}
+	\label{fig:fig251}
+\end{figure}
+
+
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=\linewidth]{plots/GradCAM_True1_Perm.png}
+	\caption{\textbf{Grad-CAM Healthy Test Sample - Permuted Labels:} The heatmap shows which regions were highlighted as important for diseased patients in the model that was trained on permuted labels}
+	\label{fig:fig252}
+\end{figure}
+
+We can see a definite change to the attributions maps from the non-permuted model for healthy and diseased patients. What is most striking is that far smaller regions get highlighted as being important: One outlier is the image of the 1st row and 2nd column of \ref{fig:fig251}: However here this might be explained by the fact that this is the only healthy patient in the sample shown, who was correctly predicted to be healthy as well after the permutation.\\
+
+In summary, we can conclude that the GradCAM and Integrated Gradient saliency maps pass the Data Randomization test because of a significant change in the attribution maps.
+
+
+
+\section*{Part 3a: General Questions - Task 1}
+\textbf{Q1: How consistent were the different interpretable/explainable methods? Did they find similar patterns?  (2 Pts)} \\
+
+Yes, we had very strong similarities between all the methods. For all of Lasso, MLP SHAP and NAM SHAP the following are important:
+
+\begin{itemize}
+    \item ST Slope, where it being flat increases the risk of heart disease and it being upsloping decreases the risk.
+    \item Old Peak was particularly important for both MLP SHAP and NAM SHAP and also to a slightly lesser extent for the Lasso. Here a higher peak increased the risk.
+    \item Chest Pain: Type Asymptomatic being True greatly increased the risk of disease in all 3 models.
+\end{itemize}
+
+\textbf{Q2: Given the “interpretable” or “explainable” results of one of the models, how would you convince a doctor to trust them? Pick one example per part of the project.  (2 Pts)}\\
+
+We would choose the Lasso as the model to convince a doctor with. It has an $F_1$-Score of 87\% and is very close to the performances of the other models. Also it is a model that a lot of doctors will probably be already familiar with, which definitely would help, because this means that they could easily adapt the model themselves if they wanted to. Another selling point is $L_1$-regularization, which generally is one of the big advantages of the Lasso, even though we don't see it occuring in our specific case because of the structure of the data. Finally, the Lasso is very transparent. We can clearly see without having to resort to extra methods which coefficients have the biggest impact.
+
+\textbf{Q3: Elaborate whether the feature importances from the interpretability/ explainability methods intuitively make sense to find the respective disease.  (2 Pts)}\\
+
+We consider again the features mentioned above:
+
+\begin{itemize}
+    \item ST Slope: An upsloping slope being associated with reduced heart disease also gets confirmed in the literature, for example in \cite{Hodnesdal}.
+    \item OldPeak: The interpretation of this was a bit more complicated, since it was not immediately clear to us from the documentation what exactly this data point refers to. After consulting the literature, we understand it to be the depression in the ST segment of an ECG as a numerical value. We observe in our data that an increase in this number leads to an increased risk of heart disease. This conforms with the findings of \cite{Short}.
+    \item Chest Pain: The prevalence of this feature increasing the risk of heart disease is of course very intuitive.
+\end{itemize}
+
+\textbf{Q4: If you had to deploy one of the methods in practice, which one would you choose and why?  (2 Pts)}\\
+
+As when trying to convince the doctor, we would still go for the Lasso, for the same reasons: The performance is very good, it is easy to implement even for non-experts and the interpretation is very straightforward. Also - even though it does not apply here - $L_1$-regularization is another benefit of the Lasso.
+\\
+Another reason is that we saw for example that the NAM's results were very sensitive to changes in the hyperparameters.
+
+\section*{Part 3b: General Questions - Task 2}
+\textbf{Q1: How consistent were the different interpretable/explainable methods? Did they find similar patterns?  (2 Pts)} \\
+
+While we did see some discrepancies in the interpreatable methods for both Integrated Gradients and GradCAM, because we chose our images randomly, we could generally observe the following trend for both methods:
+\\
+For pneumonia patients we can see in  Figure \ref{fig:fig242} and Figure \ref{fig:int_grad1} that the attribution maps highlight a broader area of the chest. On the contrary, for healthy patients in \ref{fig:fig241} and Figure \ref{fig:int_grad0}, the attribution is given to a smaller area of pixels.
+\\
+In that sense the two models did find similar patterns.
+
+
+% GradCAM also has a quite nice interpretation because of the fact that the %model cannot identify smaller areas in the chest because of some other %white spots in the chest that correspond to the infection.
+
+\textbf{Q2: Given the “interpretable” or “explainable” results of one of the models, how would you convince a doctor to trust them? Pick one example per part of the project.  (2 Pts)}\\
+
+Since we focused mainly on constructing the CNN to facilitate interpretation, performance suffered a bit; in fact, the accuracy correspondeds to 87\%, which would not be ideal for convincing a dcotor.
+
+However, if we have to pick one of the two implemented "explainable" methods, we would choose the GradCAM.
+We opted for the GradCAM method because, contrary to the Integrated gradient, this method consistently highlights the pixels where the infection is potentially present. In our opinion this is what would be the most important for a doctor looking for a new method.
+
+\textbf{Q3: Elaborate whether the feature importances from the interpretability/ explainability methods intuitively make sense to find the respective disease.  (2 Pts)}\\
+
+As mentioned in the respective sections for Integrated Gradients, we did see that bigger areas got highlighted for diseased patients than for healthy ones. This makes intuitive sense as also described above.
+\\
+The same goes for the GradCAM, where the attribution maps highlighted bigger sections for diseased patients. Also we saw that the GradCAM highlighted the areas in the lung that looked like the pneumonia, which is exactly what one would expect
+
+\textbf{Q4: If you had to deploy one of the methods in practice, which one would you choose and why?  (2 Pts)}\\
+
+If we had to deploy one of the methods in practice, we would use the GradCAM because, as mentioned before, because it consistently highlights sensible regions where the infection may be present.
+
+\printbibliography
+
+
+
+\end{document}
+
+
+
+
