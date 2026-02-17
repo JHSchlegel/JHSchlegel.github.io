@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.43">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jan Schlegel">
+<meta name="dcterms.date" content="2026-02-16">
+
+<title>Jan Schlegel – Detecting Heart Attacks from ECGs: Classical ML, Deep Learning, and Representation Learning</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../logo.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="color-scheme" content="dark light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Jan Schlegel</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JHSchlegel"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Detecting Heart Attacks from ECGs: Classical ML, Deep Learning, and Representation Learning</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Python</div>
+                <div class="quarto-category">Data Science</div>
+                <div class="quarto-category">Machine Learning</div>
+                <div class="quarto-category">Deep Learning</div>
+                <div class="quarto-category">Healthcare</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jan Schlegel </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">February 16, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="block-title">Abstract</div>
+      We classify electrocardiogram recordings as healthy or indicative of myocardial infarction using a progression of increasingly powerful methods. Starting from logistic regression and gradient boosting on raw signals, we show that feature engineering closes much of the gap to deep learning. We then train LSTMs, CNNs, and a transformer, and use attention maps to visualize which parts of the ECG signal drive predictions. Finally, we explore whether contrastive representation learning can produce embeddings that transfer across datasets and outperform supervised pretraining.
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">2</span> The Data</a></li>
+  <li><a href="#classical-machine-learning" id="toc-classical-machine-learning" class="nav-link" data-scroll-target="#classical-machine-learning"><span class="header-section-number">3</span> Classical Machine Learning</a>
+  <ul class="collapse">
+  <li><a href="#elastic-net-logistic-regression" id="toc-elastic-net-logistic-regression" class="nav-link" data-scroll-target="#elastic-net-logistic-regression"><span class="header-section-number">3.1</span> Elastic Net Logistic Regression</a></li>
+  <li><a href="#random-forests" id="toc-random-forests" class="nav-link" data-scroll-target="#random-forests"><span class="header-section-number">3.2</span> Random Forests</a></li>
+  <li><a href="#gradient-boosting" id="toc-gradient-boosting" class="nav-link" data-scroll-target="#gradient-boosting"><span class="header-section-number">3.3</span> Gradient Boosting</a></li>
+  <li><a href="#feature-engineering-closes-the-gap" id="toc-feature-engineering-closes-the-gap" class="nav-link" data-scroll-target="#feature-engineering-closes-the-gap"><span class="header-section-number">3.4</span> Feature Engineering Closes the Gap</a></li>
+  </ul></li>
+  <li><a href="#deep-learning" id="toc-deep-learning" class="nav-link" data-scroll-target="#deep-learning"><span class="header-section-number">4</span> Deep Learning</a>
+  <ul class="collapse">
+  <li><a href="#lstms" id="toc-lstms" class="nav-link" data-scroll-target="#lstms"><span class="header-section-number">4.1</span> LSTMs</a></li>
+  <li><a href="#convolutional-neural-networks" id="toc-convolutional-neural-networks" class="nav-link" data-scroll-target="#convolutional-neural-networks"><span class="header-section-number">4.2</span> Convolutional Neural Networks</a></li>
+  <li><a href="#transformers" id="toc-transformers" class="nav-link" data-scroll-target="#transformers"><span class="header-section-number">4.3</span> Transformers</a></li>
+  <li><a href="#what-the-transformer-sees" id="toc-what-the-transformer-sees" class="nav-link" data-scroll-target="#what-the-transformer-sees"><span class="header-section-number">4.4</span> What the Transformer Sees</a></li>
+  </ul></li>
+  <li><a href="#representation-learning-and-transfer" id="toc-representation-learning-and-transfer" class="nav-link" data-scroll-target="#representation-learning-and-transfer"><span class="header-section-number">5</span> Representation Learning and Transfer</a>
+  <ul class="collapse">
+  <li><a href="#the-setup" id="toc-the-setup" class="nav-link" data-scroll-target="#the-setup"><span class="header-section-number">5.1</span> The Setup</a></li>
+  <li><a href="#contrastive-learning-with-infonce" id="toc-contrastive-learning-with-infonce" class="nav-link" data-scroll-target="#contrastive-learning-with-infonce"><span class="header-section-number">5.2</span> Contrastive Learning with InfoNCE</a></li>
+  <li><a href="#finetuning-strategies" id="toc-finetuning-strategies" class="nav-link" data-scroll-target="#finetuning-strategies"><span class="header-section-number">5.3</span> Finetuning Strategies</a></li>
+  </ul></li>
+  <li><a href="#reflections" id="toc-reflections" class="nav-link" data-scroll-target="#reflections"><span class="header-section-number">6</span> Reflections</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p><img src="image.jpg" class="img-fluid"></p>
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>An electrocardiogram (ECG) records the electrical impulses that coordinate every heartbeat. Cardiologists have relied on these waveforms for over a century, learning to spot the subtle deflections that distinguish a healthy heart from one that has suffered a myocardial infarction. The question we explore in this post is whether machine learning can do the same, and if so, which family of models is best suited for the task.</p>
+<p>The project uses two publicly available ECG datasets. The first, PTB, contains binary-labeled recordings (healthy vs.&nbsp;myocardial infarction) and serves as the primary benchmark for comparing supervised classifiers. The second, MIT-BIH, contains five arrhythmia classes and is used to study transfer learning and learned representations. We train a wide range of models, from logistic regression all the way to transformers, and ask three questions along the way. Can classical methods compete with deep learning on raw ECG signals? What happens when we add hand-crafted features? And can self-supervised pretraining on one dataset help us classify another?</p>
+</section>
+<section id="the-data" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="the-data"><span class="header-section-number">2</span> The Data</h2>
+<p>The PTB dataset consists of single-lead ECG recordings, each represented as a univariate time series. Every patient is labeled as either healthy or having suffered a myocardial infarction. The label distribution is noticeably skewed: patients with myocardial infarction outnumber healthy controls by roughly two to one.</p>
+<p><img src="img/lable_distr.png" width="80%"></p>
+<p>This imbalance matters because a classifier that always predicts the majority class already achieves roughly 72% accuracy without learning anything meaningful. To counter this, we apply SMOTE (Synthetic Minority Oversampling Technique, <span class="citation" data-cites="chawla2002smote">Chawla et al. (<a href="#ref-chawla2002smote" role="doc-biblioref">2002</a>)</span>) to the training set. SMOTE generates synthetic minority-class examples by interpolating between existing ones, which both balances the class distribution and acts as a form of data augmentation. We never apply it to the validation or test data.</p>
+<p>Another characteristic of the dataset is that all recordings are zero-padded to a uniform length. The amount of padding varies considerably across patients, reflecting natural differences in recording duration.</p>
+<p><img src="img/Padded_ts.png" width="100%"></p>
+<p>Even from these raw traces, certain visual differences stand out. The healthy recordings tend to exhibit clean, well-defined waveform components, while some of the myocardial infarction recordings display broader, more irregular morphologies.</p>
+</section>
+<section id="classical-machine-learning" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="classical-machine-learning"><span class="header-section-number">3</span> Classical Machine Learning</h2>
+<section id="elastic-net-logistic-regression" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="elastic-net-logistic-regression"><span class="header-section-number">3.1</span> Elastic Net Logistic Regression</h3>
+<p>Logistic regression models the probability of myocardial infarction as a linear function of the input passed through a sigmoid:</p>
+<p><span class="math display">\[
+P(y = 1 \mid \mathbf{x}) = \sigma(\mathbf{w}^\top \mathbf{x} + b) = \frac{1}{1 + e^{-(\mathbf{w}^\top \mathbf{x} + b)}}
+\]</span></p>
+<p>The elastic net variant combines <span class="math inline">\(\ell_1\)</span> and <span class="math inline">\(\ell_2\)</span> penalties, giving the objective:</p>
+<p><span class="math display">\[
+\mathcal{L}(\mathbf{w}, b) = -\frac{1}{n} \sum_{i=1}^{n} \left[ y_i \log \hat{p}_i + (1 - y_i) \log(1 - \hat{p}_i) \right] + \lambda \left( \alpha \|\mathbf{w}\|_1 + (1 - \alpha) \|\mathbf{w}\|_2^2 \right)
+\]</span></p>
+<p>where <span class="math inline">\(\lambda\)</span> controls overall regularization strength and <span class="math inline">\(\alpha \in [0, 1]\)</span> balances the two penalty terms. The <span class="math inline">\(\ell_1\)</span> component encourages sparsity (driving irrelevant coefficients to exactly zero), while the <span class="math inline">\(\ell_2\)</span> component stabilizes the solution when features are correlated. Applied to the raw time series, where each of the roughly 180 time steps is treated as an independent feature, the model achieves a balanced accuracy of just 0.800. This is barely above the majority-class baseline, and for good reason: a linear decision boundary cannot capture the temporal structure that makes ECG interpretation possible.</p>
+</section>
+<section id="random-forests" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="random-forests"><span class="header-section-number">3.2</span> Random Forests</h3>
+<p>A random forest constructs an ensemble of <span class="math inline">\(B\)</span> decision trees, each trained on a bootstrap sample of the data with a random subset of features considered at each split. The final prediction is the majority vote:</p>
+<p><span class="math display">\[
+\hat{y} = \text{mode}\left\{ \hat{y}_1, \hat{y}_2, \dots, \hat{y}_B \right\}
+\]</span></p>
+<p>Each individual tree partitions the feature space through a sequence of axis-aligned splits that greedily maximize a purity criterion (typically the Gini impurity). Because each tree is trained on a different bootstrap sample and a different feature subset, the ensemble decorrelates the individual predictions and reduces variance. On the raw ECG time series, the random forest already reaches a balanced accuracy of 0.971, demonstrating that non-linear splits at specific time steps can capture waveform structure that a linear model entirely misses.</p>
+</section>
+<section id="gradient-boosting" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="gradient-boosting"><span class="header-section-number">3.3</span> Gradient Boosting</h3>
+<p>Gradient boosting <span class="citation" data-cites="ke2017lightgbm">(<a href="#ref-ke2017lightgbm" role="doc-biblioref">Ke et al. 2017</a>)</span> takes a fundamentally different approach to ensembling. Instead of training trees independently in parallel, it builds them sequentially, where each new tree fits the residual errors of the current ensemble:</p>
+<p><span class="math display">\[
+F_m(\mathbf{x}) = F_{m-1}(\mathbf{x}) + \eta \cdot h_m(\mathbf{x})
+\]</span></p>
+<p>Here <span class="math inline">\(F_{m-1}\)</span> is the ensemble after <span class="math inline">\(m-1\)</span> iterations, <span class="math inline">\(h_m\)</span> is a new shallow tree fitted to the negative gradient of the loss with respect to the current predictions, and <span class="math inline">\(\eta\)</span> is a learning rate that controls the contribution of each tree. This additive correction scheme means the model progressively focuses on the examples that are hardest to classify, typically reaching stronger predictive performance than a random forest of equivalent size. On the raw time series, LightGBM achieves a balanced accuracy of 0.982.</p>
+</section>
+<section id="feature-engineering-closes-the-gap" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="feature-engineering-closes-the-gap"><span class="header-section-number">3.4</span> Feature Engineering Closes the Gap</h3>
+<p>The zero padding at the end of each recording distorts any features computed over the full time series. Once we strip the padding and extract a rich set of time-domain statistics (autocorrelations, entropy measures, distributional summaries, and more), the picture changes dramatically. Logistic regression jumps from 0.800 to 0.941 in balanced accuracy. The tree-based models also improve, with LightGBM reaching 0.991. The message is clear: for classical methods, the representation matters more than the model. Compress the temporal structure of the ECG into the right set of features and even a linear classifier becomes competitive.</p>
+<p><img src="img/performance_table.png" width="100%"></p>
+</section>
+</section>
+<section id="deep-learning" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="deep-learning"><span class="header-section-number">4</span> Deep Learning</h2>
+<section id="lstms" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="lstms"><span class="header-section-number">4.1</span> LSTMs</h3>
+<p>Long Short-Term Memory networks <span class="citation" data-cites="hochreiter1997lstm">(<a href="#ref-hochreiter1997lstm" role="doc-biblioref">Hochreiter and Schmidhuber 1997</a>)</span> are designed for sequential data. At each time step <span class="math inline">\(t\)</span>, the LSTM updates a hidden state <span class="math inline">\(\mathbf{h}_t\)</span> and a cell state <span class="math inline">\(\mathbf{c}_t\)</span> through a system of gates:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{f}_t &amp;= \sigma(\mathbf{W}_f [\mathbf{h}_{t-1}, x_t] + \mathbf{b}_f) \\
+\mathbf{i}_t &amp;= \sigma(\mathbf{W}_i [\mathbf{h}_{t-1}, x_t] + \mathbf{b}_i) \\
+\tilde{\mathbf{c}}_t &amp;= \tanh(\mathbf{W}_c [\mathbf{h}_{t-1}, x_t] + \mathbf{b}_c) \\
+\mathbf{c}_t &amp;= \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \tilde{\mathbf{c}}_t \\
+\mathbf{o}_t &amp;= \sigma(\mathbf{W}_o [\mathbf{h}_{t-1}, x_t] + \mathbf{b}_o) \\
+\mathbf{h}_t &amp;= \mathbf{o}_t \odot \tanh(\mathbf{c}_t)
+\end{aligned}
+\]</span></p>
+<p>The forget gate <span class="math inline">\(\mathbf{f}_t\)</span> controls which information to discard from the cell state, the input gate <span class="math inline">\(\mathbf{i}_t\)</span> controls which new information to store, and the output gate <span class="math inline">\(\mathbf{o}_t\)</span> determines what to expose as the hidden state. This gating mechanism addresses the vanishing gradient problem that plagues vanilla RNNs, allowing the network to learn dependencies across longer stretches of the ECG.</p>
+<p>A bidirectional LSTM processes the signal in both directions simultaneously and concatenates the forward and backward hidden states. For ECG classification, where the full recording is available at inference time, a bidirectional model can in principle capture context that a unidirectional pass would miss. In practice, both variants achieve balanced accuracies of 0.990 on the PTB dataset, with the bidirectional model offering no statistically meaningful improvement. This is likely because the diagnostic patterns in these recordings are sufficiently localized that forward context alone is enough.</p>
+</section>
+<section id="convolutional-neural-networks" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="convolutional-neural-networks"><span class="header-section-number">4.2</span> Convolutional Neural Networks</h3>
+<p>A 1D CNN slides learned filters across the recording and detects local patterns regardless of their absolute position in the sequence. For an input signal <span class="math inline">\(\mathbf{x} \in \mathbb{R}^T\)</span> and a filter <span class="math inline">\(\mathbf{k} \in \mathbb{R}^K\)</span>, the convolution at position <span class="math inline">\(t\)</span> is:</p>
+<p><span class="math display">\[
+(\mathbf{x} * \mathbf{k})_t = \sum_{i=0}^{K-1} k_i \cdot x_{t+i}
+\]</span></p>
+<p>Stacking multiple convolutional layers with non-linear activations builds a hierarchy of increasingly abstract features: the early layers detect local waveform characteristics (slopes, peaks, inflection points) while the deeper layers combine these into higher-level diagnostic patterns. A key advantage over LSTMs is that all positions are processed in parallel, making CNNs considerably faster to train.</p>
+<p>Adding residual connections <span class="citation" data-cites="he2016resnet">(<a href="#ref-he2016resnet" role="doc-biblioref">He et al. 2016</a>)</span> allows gradients to bypass convolutional blocks via identity shortcuts:</p>
+<p><span class="math display">\[
+\mathbf{y} = \mathcal{F}(\mathbf{x}, \{W_i\}) + \mathbf{x}
+\]</span></p>
+<p>where <span class="math inline">\(\mathcal{F}\)</span> represents the stacked convolutional layers within a block. This formulation lets the network learn corrections on top of the identity mapping rather than learning the full transformation from scratch, which stabilizes training and enables deeper architectures. On the PTB dataset, the CNN with residual blocks achieves 0.997 accuracy and 0.996 balanced accuracy, the highest scores among all supervised models. Even the vanilla CNN without skip connections reaches 0.992, confirming that convolutional architectures are well suited for detecting the localized waveform anomalies that characterize myocardial infarction.</p>
+</section>
+<section id="transformers" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="transformers"><span class="header-section-number">4.3</span> Transformers</h3>
+<p>The transformer <span class="citation" data-cites="vaswani2017attention">(<a href="#ref-vaswani2017attention" role="doc-biblioref">Vaswani et al. 2017</a>)</span> replaces recurrence and convolution with self-attention. For an input sequence <span class="math inline">\(\mathbf{X} \in \mathbb{R}^{T \times d}\)</span>, the scaled dot-product attention is:</p>
+<p><span class="math display">\[
+\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\!\left(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d_k}}\right) \mathbf{V}
+\]</span></p>
+<p>where <span class="math inline">\(\mathbf{Q} = \mathbf{X}\mathbf{W}^Q\)</span>, <span class="math inline">\(\mathbf{K} = \mathbf{X}\mathbf{W}^K\)</span>, and <span class="math inline">\(\mathbf{V} = \mathbf{X}\mathbf{W}^V\)</span> are linear projections of the input into query, key, and value spaces. The attention weights <span class="math inline">\(\text{softmax}(\mathbf{Q}\mathbf{K}^\top / \sqrt{d_k})\)</span> form a <span class="math inline">\(T \times T\)</span> matrix that encodes how much each time step attends to every other time step. Multi-head attention runs <span class="math inline">\(h\)</span> parallel attention computations with different projection matrices and concatenates the results, allowing the model to jointly attend to information from different representation subspaces.</p>
+<p>Since the self-attention mechanism is permutation-invariant, the model has no inherent notion of order. Sinusoidal positional encodings are added to the input embeddings to inject information about the absolute and relative positions of time steps.</p>
+<p>A critical consideration is computational cost. The self-attention matrix is <span class="math inline">\(T \times T\)</span>, making both computation and memory <span class="math inline">\(\mathcal{O}(T^2)\)</span> in the sequence length. Recurrent networks scale linearly in <span class="math inline">\(T\)</span> and convolutional networks scale as <span class="math inline">\(\mathcal{O}(K \cdot T)\)</span> where <span class="math inline">\(K\)</span> is the kernel size. For the short ECG recordings in our datasets the quadratic cost is acceptable, but it becomes a bottleneck for very long time series.</p>
+<p>On the PTB dataset the transformer reaches 0.990 accuracy and 0.988 balanced accuracy. It does not surpass the residual CNN, but it offers something the CNN cannot: interpretable attention weights.</p>
+</section>
+<section id="what-the-transformer-sees" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="what-the-transformer-sees"><span class="header-section-number">4.4</span> What the Transformer Sees</h3>
+<p>By extracting and aggregating the attention weights across heads and layers, we can visualize which parts of the ECG the model focuses on when making its prediction. The figure below overlays the aggregated attention (blue heatmap) on the ECG signal (red) for several healthy and myocardial infarction samples.</p>
+<p><img src="img/aggregated_attention_maps.png" width="100%"></p>
+<p>For the myocardial infarction samples, the model places substantial attention on the QRS complex and on regions where the T wave appears abnormal (for instance, inverted T waves). For the healthy samples, attention concentrates on the same waveform components but reflects their normality rather than flagging anomalies. The zero-padded time steps receive no attention, confirming that the padding mask works as intended.</p>
+<p>Stratifying by encoder layer reveals that earlier layers attend to broader regions of the signal while deeper layers focus more narrowly on specific peaks and segments.</p>
+<p><img src="img/attention_maps_by_layer.png" width="100%"></p>
+<p>These patterns align with cardiology. The QRS complex, the T wave, and the ST segment are precisely the waveform components that clinicians examine when diagnosing a myocardial infarction <span class="citation" data-cites="thygesen2018mi">(<a href="#ref-thygesen2018mi" role="doc-biblioref">Thygesen et al. 2018</a>)</span>. The transformer learns to attend to the same regions without any explicit clinical guidance.</p>
+</section>
+</section>
+<section id="representation-learning-and-transfer" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="representation-learning-and-transfer"><span class="header-section-number">5</span> Representation Learning and Transfer</h2>
+<section id="the-setup" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="the-setup"><span class="header-section-number">5.1</span> The Setup</h3>
+<p>All the models above are trained and evaluated on the same PTB dataset. But in clinical practice, labeled ECG data for a specific condition may be scarce. A natural strategy is to pretrain a model on a larger, readily available dataset and then adapt it to the target task. We use the MIT-BIH arrhythmia dataset (five classes) as the source domain and PTB (binary) as the target.</p>
+<p>The idea is to train an encoder that maps each ECG recording into a compact, 16-dimensional embedding. A lightweight downstream classifier then operates on these embeddings for the PTB task. The question is how to pretrain the encoder: with labels (supervised transfer learning) or without them (self-supervised representation learning).</p>
+</section>
+<section id="contrastive-learning-with-infonce" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="contrastive-learning-with-infonce"><span class="header-section-number">5.2</span> Contrastive Learning with InfoNCE</h3>
+<p>In the self-supervised approach, we pretrain the encoder using the InfoNCE loss <span class="citation" data-cites="oord2018infonce">(<a href="#ref-oord2018infonce" role="doc-biblioref">Oord, Li, and Vinyals 2018</a>)</span>. The objective pushes the encoder to produce similar embeddings for different augmented views of the same recording and dissimilar embeddings for different recordings. For an anchor embedding <span class="math inline">\(\mathbf{z}\)</span>, a positive embedding <span class="math inline">\(\mathbf{z}^+\)</span> (augmented version of the same recording), and <span class="math inline">\(N\)</span> negative embeddings <span class="math inline">\(\{\mathbf{z}_i^-\}\)</span>, the loss is:</p>
+<p><span class="math display">\[
+\mathcal{L}_{\text{InfoNCE}} = -\log \frac{\exp(\text{sim}(\mathbf{z}, \mathbf{z}^+) / \tau)}{\exp(\text{sim}(\mathbf{z}, \mathbf{z}^+) / \tau) + \sum_{i=1}^{N} \exp(\text{sim}(\mathbf{z}, \mathbf{z}_i^-) / \tau)}
+\]</span></p>
+<p>where <span class="math inline">\(\text{sim}(\cdot, \cdot)\)</span> denotes cosine similarity and <span class="math inline">\(\tau\)</span> is a temperature parameter. Following <span class="citation" data-cites="chen2020simclr">Chen et al. (<a href="#ref-chen2020simclr" role="doc-biblioref">2020</a>)</span>, a small projection head (an MLP) sits on top of the encoder and maps the 16-dimensional embeddings into a 32-dimensional space where the contrastive loss is computed. After pretraining, the projection head is discarded and only the encoder is kept.</p>
+<p>The augmentation strategy is critical to the quality of the learned representations. For each anchor recording, we create a positive sample by applying one of three random transformations: adding Gaussian noise, scaling the amplitude, or slightly stretching the time axis. These augmentations preserve the clinical semantics of the signal while introducing enough variation to force the encoder to learn robust features. Augmentations that destroy the temporal order of the cardiac cycle (reversing, random permutation) proved harmful.</p>
+<p><img src="img/augmented_samples.png" width="100%"></p>
+<p>The figure above shows several examples. The original signal is in blue, the positive (augmented) sample in green, and four negative samples (randomly drawn from other recordings) in red.</p>
+</section>
+<section id="finetuning-strategies" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="finetuning-strategies"><span class="header-section-number">5.3</span> Finetuning Strategies</h3>
+<p>Given a pretrained encoder, there are three natural ways to adapt it to the PTB target task. Strategy A freezes the encoder entirely and trains only a new classification head on top. Strategy B unfreezes the full model and trains encoder and classifier jointly end-to-end. Strategy C starts frozen (as in A) and then unfreezes for a second training stage (as in B).</p>
+<p><img src="img/downstream_performance_table.png" width="100%"></p>
+<p>Full finetuning (Strategy B) consistently performs best, because it allows the encoder weights to adapt to the specific characteristics of the PTB dataset rather than relying solely on what was learned from MIT-BIH. The frozen encoder (Strategy A) performs worst since its representations were never exposed to PTB data. Strategy C sits in between.</p>
+<p>The more interesting result is that the contrastive encoder outperforms the supervised one across all three finetuning strategies. The supervised encoder is trained with MIT-BIH class labels, which biases its representations toward the five-class arrhythmia task. The contrastive encoder, by contrast, learns general-purpose signal structure that transfers more gracefully to a different classification problem on a different dataset. The best configuration overall, the contrastive encoder with full finetuning, achieves 0.996 accuracy and 0.994 balanced accuracy on PTB.</p>
+</section>
+</section>
+<section id="reflections" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="reflections"><span class="header-section-number">6</span> Reflections</h2>
+<p>The most striking finding is how competitive classical tree-based methods are once they receive well-engineered features. A LightGBM model trained on extracted time-series statistics matches or exceeds most deep learning architectures. For univariate ECG signals with relatively clear diagnostic markers, the bottleneck is often the input representation rather than the model.</p>
+<p>Deep learning earns its keep in two ways. First, it removes the need for manual feature engineering by learning directly from the raw signal. Second, architectures like the transformer provide attention-based interpretability that can surface clinically meaningful patterns without any domain-specific preprocessing. The fact that our transformer independently learns to focus on the QRS complex and T wave abnormalities is reassuring from a clinical trustworthiness perspective.</p>
+<p>The contrastive learning results point to a promising direction for label-scarce settings. By learning general ECG representations without supervision, we obtain an encoder that transfers more effectively than one trained with task-specific labels. The practical challenge is that contrastive pretraining requires careful augmentation design and is considerably more expensive to train.</p>
+<p>Across the board, the margins between top-performing models are thin. The residual CNN, the contrastive encoder with full finetuning, and LightGBM with engineered features all cluster above 0.99 on most metrics. In this regime, the choice of model matters less than the quality of data preprocessing and the degree to which the practitioner understands what the model has actually learned.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-chawla2002smote" class="csl-entry" role="listitem">
+Chawla, Nitesh V., Kevin W. Bowyer, Lawrence O. Hall, and W. Philip Kegelmeyer. 2002. <span>“SMOTE: Synthetic Minority over-Sampling Technique.”</span> <em>Journal of Artificial Intelligence Research</em> 16: 321–57.
+</div>
+<div id="ref-chen2020simclr" class="csl-entry" role="listitem">
+Chen, Ting, Simon Kornblith, Mohammad Norouzi, and Geoffrey Hinton. 2020. <span>“A Simple Framework for Contrastive Learning of Visual Representations.”</span> In <em>Proceedings of the 37th International Conference on Machine Learning</em>, 1597–607.
+</div>
+<div id="ref-he2016resnet" class="csl-entry" role="listitem">
+He, Kaiming, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016. <span>“Deep Residual Learning for Image Recognition.”</span> <em>Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition</em>, 770–78.
+</div>
+<div id="ref-hochreiter1997lstm" class="csl-entry" role="listitem">
+Hochreiter, Sepp, and Jürgen Schmidhuber. 1997. <span>“Long Short-Term Memory.”</span> <em>Neural Computation</em> 9 (8): 1735–80.
+</div>
+<div id="ref-ke2017lightgbm" class="csl-entry" role="listitem">
+Ke, Guolin, Qi Meng, Thomas Finley, Taifeng Wang, Wei Chen, Weidong Ma, Qiwei Ye, and Tie-Yan Liu. 2017. <span>“LightGBM: A Highly Efficient Gradient Boosting Decision Tree.”</span> <em>Advances in Neural Information Processing Systems</em> 30.
+</div>
+<div id="ref-oord2018infonce" class="csl-entry" role="listitem">
+Oord, Aäron van den, Yazhe Li, and Oriol Vinyals. 2018. <span>“Representation Learning with Contrastive Predictive Coding.”</span> In <em>arXiv Preprint arXiv:1807.03748</em>.
+</div>
+<div id="ref-thygesen2018mi" class="csl-entry" role="listitem">
+Thygesen, Kristian, Joseph S. Alpert, Allan S. Jaffe, et al. 2018. <span>“Fourth Universal Definition of Myocardial Infarction.”</span> <em>Circulation</em> 138 (20): e618–51.
+</div>
+<div id="ref-vaswani2017attention" class="csl-entry" role="listitem">
+Vaswani, Ashish, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. <span>“Attention Is All You Need.”</span> In <em>Advances in Neural Information Processing Systems</em>. Vol. 30.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
