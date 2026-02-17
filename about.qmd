@@ -24,7 +24,7 @@ about:
 ::: {.custom-left}
 Hi there! I'm Jan, a statistician and product manager based in Zurich. I recently completed my Master's in Statistics at ETH Zurich, specializing in probabilistic AI, high-dimensional statistics, and causality. My work focuses on understanding and improving how machine learning systems make decisions—from interpreting generative models to building robust methods for high-stakes applications like climate forecasting and reinsurance.
 
-When I'm not working on difficult (for me) problems, you'll find me running in the gym, swimming, building PCs, or getting lost (intentionally) in GeoGuessr.
+When I'm not working on difficult (for me) problems, you'll find me running, in the gym, swimming, building PCs, or getting lost (intentionally) in GeoGuessr.
 :::
 
 ## Education
@@ -71,7 +71,6 @@ GPA: 5.87 / 6.00 (Class Rank 1)
 🏛️ Swiss Re | 📍 Zurich, Switzerland | 📅 Feb 2026 - Present
 :::
 - Drive robust portfolio optimization initiatives across multiple product lines
-- Apply causal machine learning techniques to enhance risk assessment and decision-making processes
 - Transitioned to full-time role following successful quantitative internship
 :::
 
