@@ -143,9 +143,7 @@ $$
 
 where each $\text{NN}_j$ is a separate multi-layer perceptron that takes only $x_j$ as input. Because each sub-network contains non-linear activation functions, the shape functions can be arbitrarily complex — unlike the linear relationships that logistic regression is limited to. But because the overall model is additive (no interactions between features), each learned shape function can be visualized independently.
 
-<p align="center">
-<img src="img/nam_architecture.png" width="60%">
-</p>
+![NAM architecture. Source: @nam2020, Figure 1.](img/nam_architecture.png){width=60% fig-align="center"}
 
 This additive structure is the key insight. Because each feature is processed in isolation, there are no interactions between features inside the model. This means we can plot $\text{NN}_j(x_j)$ as a function of $x_j$ for every feature and see exactly how the model uses it — something that is impossible with a standard MLP where all features interact through shared hidden layers.
 
