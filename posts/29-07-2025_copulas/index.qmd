@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "A Visual Introduction to Copulas"
 abstract: "This post offers a concise and intuitive introduction to copula theory, explaining what copulas are, why they are useful, and how they are applied in finance. We'll skip the heavy math and focus on the core ideas."
 categories:

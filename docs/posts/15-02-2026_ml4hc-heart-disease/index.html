@@ -322,9 +322,12 @@ g\!\left(\mathbb{E}[y \mid \mathbf{x}]\right) = \beta + f_1(x_1) + f_2(x_2) + \d
 P(y = 1 \mid \mathbf{x}) = \sigma\!\left(\beta + \sum_{j=1}^{k} \text{NN}_j(x_j)\right)
 \]</span></p>
 <p>where each <span class="math inline">\(\text{NN}_j\)</span> is a separate multi-layer perceptron that takes only <span class="math inline">\(x_j\)</span> as input. Because each sub-network contains non-linear activation functions, the shape functions can be arbitrarily complex — unlike the linear relationships that logistic regression is limited to. But because the overall model is additive (no interactions between features), each learned shape function can be visualized independently.</p>
-<p align="center">
-<img src="img/nam_architecture.png" width="60%">
-</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/nam_architecture.png" class="img-fluid figure-img" style="width:60.0%"></p>
+<figcaption>NAM architecture. Source: <span class="citation" data-cites="nam2020">Agarwal et al. (<a href="#ref-nam2020" role="doc-biblioref">2020</a>)</span>, Figure 1.</figcaption>
+</figure>
+</div>
 <p>This additive structure is the key insight. Because each feature is processed in isolation, there are no interactions between features inside the model. This means we can plot <span class="math inline">\(\text{NN}_j(x_j)\)</span> as a function of <span class="math inline">\(x_j\)</span> for every feature and see exactly how the model uses it — something that is impossible with a standard MLP where all features interact through shared hidden layers.</p>
 <p>In practice, we found NAMs to be sensitive to hyperparameter choices. Initial attempts with hand-tuned parameters produced unstable shape functions that changed substantially across random seeds. Following the original paper, we used Bayesian optimization (via Optuna) to search the hyperparameter space, and trained an ensemble of 100 NAMs with different random initializations to get stable estimates.</p>
 <p>The resulting shape functions are shown below. The thick blue line is the ensemble mean, the thin lines are individual ensemble members, and the red bars indicate data density:</p>

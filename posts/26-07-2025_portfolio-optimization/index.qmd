@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "A Guide to Portfolio Optimization"
 abstract: "This post provides a practical introduction to portfolio optimization, focusing on the foundational Mean-Variance framework by Harry Markowitz. We'll explore the concepts of risk, return, the efficient frontier, and show how to implement it in Python."
 categories:
