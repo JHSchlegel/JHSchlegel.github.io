@@ -2,9 +2,10 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/17-02-2026_ml4hc-pneumonia/index.html",
+      "/posts/16-02-2026_ml4hc-ecg/index.html",
       "/posts/15-02-2026_ml4hc-heart-disease/index.html",
       "/posts/14-02-2026_soccer-analytics/index.html",
-      "/posts/23-11-2025_covariance-shrinkage/index.html",
       "/posts/07-02-2025_portfolio-var/index.html"
     ]
   }

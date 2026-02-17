@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "Covariance Shrinkage: From Linear Shrinkage to Random Matrix Theory"
 abstract: "In high-dimensional regimes where the number of variables $N$ is comparable to the sample size $T$, the sample covariance matrix is known to be an ill-conditioned and noisy estimator of the population covariance. This post provides a rigorous mathematical treatment of covariance shrinkage, exploring the bias-variance tradeoff inherent in linear shrinkage estimators (Ledoit-Wolf). We further ground these methods in Random Matrix Theory, specifically the Marchenko-Pastur law, to characterize the asymptotic behavior of eigenvalues. Finally, we introduce and implement Nonlinear Shrinkage (Ledoit-Wolf 2020), which applies a non-linear transformation to the sample eigenvalues based on the estimation of the Stieltjes transform. Simulation studies demonstrate the efficacy of these methods in recovering true spectral properties."
 categories:
