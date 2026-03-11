@@ -32,13 +32,13 @@ When I'm not working on difficult (for me) problems, you'll find me running, in 
 ::: {.timeline-container}
 
 ::: {.education-card}
-### 🎓 Master of Science (M.Sc. ETH) in Statistics
+### Master of Science (M.Sc. ETH) in Statistics
 ::: {.meta-info}
-🏛️ ETH Zurich | 📍 Zurich, Switzerland | 📅 Sep 2023 - Sep 2025
+<i class="ri-building-line"></i> ETH Zurich <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Sep 2023 – Sep 2025
 :::
 
 ::: {.gpa-badge}
-GPA: 5.99 / 6.00 
+GPA: 5.99 / 6.00
 :::
 - **Focus:** (Probabilistic) Machine Learning, Statistical Learning Theory, Computational Statistics, Causality
 - **Thesis:** Mechanistic Interpretability in Text-to-Image Diffusion Models (Grade: 6.00/6.00)
@@ -46,16 +46,16 @@ GPA: 5.99 / 6.00
 :::
 
 ::: {.education-card}
-### 🎓 Bachelor of Arts in Business and Economics
+### Bachelor of Arts in Business and Economics
 ::: {.meta-info}
-🏛️ University of Zurich | 📍 Zurich, Switzerland | 📅 Sep 2019 - Feb 2023
+<i class="ri-building-line"></i> University of Zurich <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Sep 2019 – Feb 2023
 :::
 
 ::: {.gpa-badge}
 GPA: 5.87 / 6.00 (Class Rank 1)
 :::
 - **Major:** Banking and Finance; **Minor:** Statistics
-- **Thesis**: Portfolio Value at Risk Forecasting with Copula-GARCH Models (Grade: 6.00/6.00)
+- **Thesis:** Portfolio Value at Risk Forecasting with Copula-GARCH Models (Grade: 6.00/6.00)
 - Completed 215 ECTS (vs. standard 180) with a strong focus on quantitative finance, statistics, and computing
 :::
 
@@ -66,45 +66,45 @@ GPA: 5.87 / 6.00 (Class Rank 1)
 ::: {.timeline-container}
 
 ::: {.education-card}
-### 💼 Product Manager
+### Product Manager
 ::: {.meta-info}
-🏛️ Swiss Re | 📍 Zurich, Switzerland | 📅 Feb 2026 - Present
+<i class="ri-building-line"></i> Swiss Re <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Feb 2026 – Present
 :::
 - Drive robust portfolio optimization initiatives across multiple product lines
 - Transitioned to full-time role following successful quantitative internship
 :::
 
 ::: {.education-card}
-### 💼 Quantitative Intern
+### Quantitative Intern
 ::: {.meta-info}
-🏛️ Swiss Re | 📍 Zurich, Switzerland | 📅 Oct 2025 - Jan 2026
+<i class="ri-building-line"></i> Swiss Re <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Oct 2025 – Jan 2026
 :::
 - Developed robust high-dimensional covariance estimation methods applicable to multiple reinsurance contexts
 - Designed robust portfolio optimization techniques tailored to reinsurance, providing actionable steering insights
 :::
 
 ::: {.education-card}
-### 💼 Biostatistics Research Assistant
+### Biostatistics Research Assistant
 ::: {.meta-info}
-🏛️ University of Zurich (EBPI) | 📍 Zurich, Switzerland | 📅 Feb 2022 - Aug 2023
+<i class="ri-building-line"></i> University of Zurich (EBPI) <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Feb 2022 – Aug 2023
 :::
 - Contributed to data and code management and reproducible statistical workflows for a COVID-19 cohort study published in *Nature Communications*
 - Applied statistical modelling techniques to complex longitudinal datasets and presented the results to principal investigators and the research team
 :::
 
 ::: {.education-card}
-### 💼 Accountant (Military Service)
+### Accountant (Military Service)
 ::: {.meta-info}
-🏛️ Swiss Armed Forces | 📍 Kloten, Switzerland | 📅 Jul 2021 - Nov 2021
+<i class="ri-building-line"></i> Swiss Armed Forces <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Kloten, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Jul 2021 – Nov 2021
 :::
 - Successfully balanced full-time university studies with mandatory military service obligations
 - Managed the complete accounting for a 150-person military unit
 :::
 
 ::: {.education-card}
-### 💼 Teaching Assistant Mathematics
+### Teaching Assistant Mathematics
 ::: {.meta-info}
-🏛️ University of Zurich | 📍 Zurich, Switzerland | 📅 Sep 2020 - Jul 2021
+<i class="ri-building-line"></i> University of Zurich <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Sep 2020 – Jul 2021
 :::
 - Led twice-weekly tutorials covering Analysis and Linear Algebra for groups of up to 30 students
 :::
