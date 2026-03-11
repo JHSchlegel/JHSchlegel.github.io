@@ -1,5 +1,4 @@
 ---
-draft: true
 title: "A Visual Introduction to Copulas"
 abstract: "This post offers a concise and intuitive introduction to copula theory, explaining what copulas are, why they are useful, and how they are applied in finance. We'll skip the heavy math and focus on the core ideas."
 categories:
@@ -19,22 +18,24 @@ fig-height: 6
 fig-dpi: 150
 fig-format: png
 jupyter: python3
+bibliography: references.bib
 ---
 
-![Copulas provide a powerful framework for modeling complex dependence structures while separating marginal distributions from their joint behavior](img/copula_theory_thumbnail.png)
+![](img/copula_theory_thumbnail.png)
 
 ```{python}
 #| echo: false
 #| output: false
 
-import sys
-import os
-sys.path.append('/home/janhsc/Documents/projects/JHSchlegel.github.io/.venv/lib/python3.10/site-packages')
+# import sys
+# import os
+# sys.path.append('/home/janhsc/Documents/projects/JHSchlegel.github.io/.venv/lib/python3.10/site-packages')
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotnine as pn
 from scipy import stats
 from scipy.optimize import minimize, minimize_scalar
 from scipy.special import gamma, digamma, polygamma
@@ -56,212 +57,459 @@ plt.rcParams['xtick.labelsize'] = 10
 plt.rcParams['ytick.labelsize'] = 10
 plt.rcParams['legend.fontsize'] = 10
 plt.rcParams['figure.constrained_layout.use'] = False
+
+
+from plotnine import theme, element_text, element_rect, element_line, element_blank, theme_set
+from plotnine.scales import scale_color_manual, scale_fill_manual
+
+
+# ---------------------------------------------------------------------------
+# Colour palette — 10 perceptually distinct, print-safe, colour-blind-aware
+# hues drawn from Nature / Cell / Science conventions
+# ---------------------------------------------------------------------------
+
+ACADEMIC_COLORS = {
+    # primary accents (vivid but not garish)
+    "cobalt":       "#2166AC",   # deep blue — default series 1
+    "vermillion":   "#D6604D",   # warm red — series 2
+    "teal":         "#35978F",   # muted teal — series 3
+    "amber":        "#F4A736",   # golden amber — series 4
+    "plum":         "#762A83",   # deep purple — series 5
+
+    # secondary accents (lighter for fills / paired bars)
+    "sky":          "#74ADD1",   # light blue
+    "salmon":       "#F4A582",   # soft coral
+    "mint":         "#80CDC1",   # pale teal
+    "wheat":        "#FDD49E",   # pale amber
+    "lavender":     "#C2A5CF",   # soft purple
+
+    # neutrals (text / grid)
+    "ink":          "#1A1A2E",   # near-black for axes / text
+    "smoke":        "#F5F5F5",   # panel background
+    "stone":        "#CCCCCC",   # gridlines
+}
+
+# Ordered sequence for discrete scales (primary first, then alternating secondary)
+_COLOR_SEQUENCE = [
+    ACADEMIC_COLORS["cobalt"],
+    ACADEMIC_COLORS["vermillion"],
+    ACADEMIC_COLORS["teal"],
+    ACADEMIC_COLORS["amber"],
+    ACADEMIC_COLORS["plum"],
+    ACADEMIC_COLORS["sky"],
+    ACADEMIC_COLORS["salmon"],
+    ACADEMIC_COLORS["mint"],
+    ACADEMIC_COLORS["wheat"],
+    ACADEMIC_COLORS["lavender"],
+]
+
+
+# ---------------------------------------------------------------------------
+# Convenience scale factories
+# ---------------------------------------------------------------------------
+
+def academic_scale_color(**kwargs):
+    """Discrete colour scale using the academic palette."""
+    return scale_color_manual(values=_COLOR_SEQUENCE, **kwargs)
+
+
+def academic_scale_fill(**kwargs):
+    """Discrete fill scale using the academic palette."""
+    return scale_fill_manual(values=_COLOR_SEQUENCE, **kwargs)
+
+
+# ---------------------------------------------------------------------------
+# theme_academic
+# ---------------------------------------------------------------------------
+
+def theme_academic(
+    base_size: float = 9.0,
+    base_family: str = "Liberation Sans",
+    grid: str = "xy",          # "x", "y", "xy", or "" for none
+    border: bool = True,
+):
+    """
+    A clean, Nature-grade plotnine theme.
+
+    Parameters
+    ----------
+    base_size   : Base font size in pt. Nature single-column uses ~7–8 pt;
+                  9 pt works well for drafts and blog posts.
+    base_family : Font family. 'Arial' matches Nature; swap for 'Helvetica'
+                  or 'Source Sans Pro' as desired.
+    grid        : Which gridlines to show. 'xy' (default), 'x', 'y', or '' (none).
+    border      : Draw a complete axis border (box). Default True.
+    """
+    _ink   = ACADEMIC_COLORS["ink"]
+    _stone = ACADEMIC_COLORS["stone"]
+    _smoke = ACADEMIC_COLORS["smoke"]
+
+    half  = base_size * 0.5
+    small = base_size * 0.85
+
+    show_x_grid = "x" in grid
+    show_y_grid = "y" in grid
+    gridline = element_line(color=_stone, size=0.35, linetype="solid") if True else element_blank()
+
+    t = theme(
+        # ── Canvas ──────────────────────────────────────────────────────────
+        figure_size        = (3.5, 2.8),          # Nature 1-column width
+        plot_background    = element_rect(fill="white", color="none"),
+        panel_background   = element_rect(fill="white", color="none"),
+
+        # ── Border / spines ─────────────────────────────────────────────────
+        panel_border       = (
+            element_rect(color=_ink, fill="none", size=0.6)
+            if border else element_blank()
+        ),
+        axis_line          = (
+            element_blank()                        # border already draws it
+            if border
+            else element_line(color=_ink, size=0.6)
+        ),
+
+        # ── Gridlines ────────────────────────────────────────────────────────
+        panel_grid_major_x = gridline if show_x_grid else element_blank(),
+        panel_grid_major_y = gridline if show_y_grid else element_blank(),
+        panel_grid_minor_x = element_blank(),
+        panel_grid_minor_y = element_blank(),
+
+        # ── Ticks ────────────────────────────────────────────────────────────
+        axis_ticks         = element_line(color=_ink, size=0.5),
+        axis_ticks_length  = 0.15,                # cm — short, Nature-style
+
+        # ── Axis text & titles ───────────────────────────────────────────────
+        axis_text          = element_text(
+            family=base_family, size=small, color=_ink,
+            margin={"t": 2, "r": 2, "b": 2, "l": 2}
+        ),
+        axis_text_x        = element_text(family=base_family, size=small, color=_ink),
+        axis_text_y        = element_text(family=base_family, size=small, color=_ink),
+        axis_title         = element_text(
+            family=base_family, size=base_size, color=_ink,
+            margin={"t": 4, "r": 4, "b": 4, "l": 4}
+        ),
+        axis_title_x       = element_text(family=base_family, size=base_size, color=_ink,
+                                          margin={"t": 6}),
+        axis_title_y       = element_text(family=base_family, size=base_size, color=_ink,
+                                          margin={"r": 6}),
+
+        # ── Plot title & subtitle ─────────────────────────────────────────────
+        plot_title         = element_text(
+            family=base_family, size=base_size + 1,
+            color=_ink, face="bold",
+            margin={"b": 4}
+        ),
+        plot_subtitle      = element_text(
+            family=base_family, size=small, color="#555555",
+            margin={"b": 6}
+        ),
+        plot_caption       = element_text(
+            family=base_family, size=base_size * 0.78, color="#888888",
+            ha="left", margin={"t": 6}
+        ),
+
+        # ── Legend ────────────────────────────────────────────────────────────
+        legend_background  = element_rect(fill="white", color="none"),
+        legend_key         = element_rect(fill="white", color="none"),
+        legend_text        = element_text(family=base_family, size=small, color=_ink),
+        legend_title       = element_text(
+            family=base_family, size=small, color=_ink, face="bold"
+        ),
+        legend_key_size    = 0.45,                # cm — compact keys
+        legend_entry_spacing= 2,
+
+        # ── Facet strip ───────────────────────────────────────────────────────
+        strip_background   = element_rect(fill=_smoke, color=_stone, size=0.4),
+        strip_text         = element_text(
+            family=base_family, size=small, color=_ink, face="bold",
+            margin={"t": 3, "b": 3, "l": 4, "r": 4}
+        ),
+
+        # ── Margins ───────────────────────────────────────────────────────────
+        plot_margin        = 0.05,
+    )
+    return t
 ```
 
 ## What are Copulas?
 
-Have you ever tried to model the relationship between two or more variables, but found that they don't follow a nice, clean multivariate normal distribution? Real-world data, especially in finance, is often messy. Variables can have different distributions (some normal, some skewed, some with fat tails), and their dependence can be more complicated than simple linear correlation.
+Have you ever tried to model the relationship between two or more variables, but found that they don't follow a nice, clean multivariate normal distribution? Real-world data, especially in finance or insurance, is often messy. Variables can have different distributions (some normal, some skewed, some with fat tails), and their dependence can be more complicated than simple linear correlation.
 
 This is where copulas come in. The word "copula" means "link" or "tie," and that's exactly what they do: they **link** marginal distributions of variables together to form a multivariate distribution. The key idea is to separate the dependence structure from the marginal distributions. This means you can model the distribution of each variable on its own, and then use a copula to describe how they move together.
 
 This separation is incredibly powerful. It allows us to model complex dependencies, like the tendency of assets to crash together in a financial crisis (tail dependence), without being constrained by assumptions like normality.
 
-## Sklar's Theorem: The Core Idea
 
-The magic behind copulas is formalized by Sklar's Theorem. In simple terms, the theorem states that any multivariate distribution can be broken down into two parts:
+## Sklar's Theorem
 
-1.  The individual marginal distributions of each variable.
-2.  A copula function that describes the dependence structure between them.
+Before we can state the theorem, we need a precise definition of what a copula actually is.
 
-For a two-variable case, if you have a joint distribution $F(x_1, x_2)$ with marginals $F_1(x_1)$ and $F_2(x_2)$, Sklar's theorem says:
+::: {.callout-note}
+### Definition (Copula)
+A **bivariate copula** is a function $C: [0,1]^2 \to [0,1]$ that satisfies:
 
-$$ F(x_1, x_2) = C(F_1(x_1), F_2(x_2)) $$
+1. **Grounded**: $C(u, 0) = C(0, v) = 0$ for all $u, v \in [0,1]$.
+2. **Standard uniform margins**: $C(u, 1) = u$ and $C(1, v) = v$ for all $u, v \in [0,1]$.
+3. **2-increasing**: For every rectangle $[u_1, u_2] \times [v_1, v_2] \subseteq [0,1]^2$,
+$$
+C(u_2, v_2) - C(u_2, v_1) - C(u_1, v_2) + C(u_1, v_1) \;\geq\; 0.
+$$
+:::
 
-Here, $C$ is the copula. It's a function that takes the marginal probabilities (which are between 0 and 1) and combines them to give the joint probability.
+In plain terms, a copula is simply a joint CDF on $[0,1]^2$ whose marginals are both $\mathrm{Uniform}(0,1)$. The 2-increasing condition ensures that the probability assigned to any axis-aligned rectangle is non-negative — i.e., $C$ is a valid distribution function.
 
-The plot below illustrates this. We start with two variables that have a certain dependence (a Gaussian copula). We can then apply different marginal distributions (Normal, t-distribution, Exponential) to them, and the underlying dependence structure is preserved.
+Three special copulas serve as reference points. The **Fréchet–Hoeffding bounds** define the extreme cases of dependence [@nelsen2006]:
+
+$$
+W(u, v) = \max(u + v - 1,\, 0) \;\leq\; C(u, v) \;\leq\; \min(u, v) = M(u, v),
+$$
+
+where $W$ represents perfect negative dependence (countermonotonicity) and $M$ perfect positive dependence (comonotonicity). Between the two extremes lies the **independence copula** $\Pi(u, v) = uv$. With this machinery in place, we are ready for the central result of copula theory.
+
+::: {.callout-tip icon="false"}
+### Theorem (Sklar, 1959) [@sklar1959]
+
+Let $F$ be a bivariate joint CDF with marginal CDFs $F_X$ and $F_Y$. Then there exists a copula $C: [0,1]^2 \to [0,1]$ such that
+
+$$
+F(x, y) \;=\; C\!\bigl(F_X(x),\; F_Y(y)\bigr), \qquad \forall\,(x, y) \in \mathbb{R}^2.
+$$ {#eq-sklar}
+
+If $F_X$ and $F_Y$ are **continuous**, then $C$ is **unique** and is given explicitly by
+
+$$
+C(u, v) \;=\; F\!\bigl(F_X^{-1}(u),\; F_Y^{-1}(v)\bigr).
+$$
+
+Conversely, for any copula $C$ and any CDFs $F_X, F_Y$, the function $F(x,y) = C(F_X(x), F_Y(y))$ is a valid bivariate CDF with marginals $F_X$ and $F_Y$.
+:::
+
+Sklar's theorem has two profound consequences. First, *every* bivariate distribution — however exotic its marginals or dependence — admits a copula representation. Copulas are not a restricted model class; they provide an exact characterisation of all joint distributions. Second, continuity of the marginals pins down the copula uniquely, making the dependence structure an intrinsic property of the distribution rather than an artefact of parameterisation.
+
+### The Probability Integral Transform
+
+The bridge between the original variables and the unit square is the **Probability Integral Transform (PIT)**. If $X$ is a continuous random variable with CDF $F_X$, then
+
+$$
+U \;=\; F_X(X) \;\sim\; \mathrm{Uniform}(0, 1).
+$$
+
+The proof is immediate: $\mathbb{P}(U \leq u) = \mathbb{P}(F_X(X) \leq u) = \mathbb{P}(X \leq F_X^{-1}(u)) = u$. The PIT *standardises* any continuous random variable onto $[0,1]$, removing its marginal distribution while preserving its rank structure.
+
+Applied to a bivariate pair $(X, Y)$, the PIT yields pseudo-observations
+
+$$
+U = F_X(X), \qquad V = F_Y(Y),
+$$
+
+both of which are $\mathrm{Uniform}(0,1)$ by construction. Their joint distribution is the copula:
+
+$$
+\mathbb{P}(U \leq u,\; V \leq v)
+= \mathbb{P}\!\bigl(F_X(X) \leq u,\; F_Y(Y) \leq v\bigr)
+= F\!\bigl(F_X^{-1}(u),\; F_Y^{-1}(v)\bigr)
+= C(u, v).
+$$
+
+@fig-sklar illustrates this for a bivariate distribution with Log-Normal and Gamma marginals coupled by a Gaussian copula with $\rho = 0.72$. The left panel shows the original joint distribution in the natural observation scale; the right panel shows what remains after the PIT — the copula structure, freed from the marginal shapes.
 
 ```{python}
-#| label: fig-motivation
-#| fig-cap: "The same dependence structure (copula) can be combined with different marginal distributions."
-#| fig-width: 12
-#| fig-height: 8
+#| label: fig-sklar
+#| fig-cap: "**Sklar's Theorem in action.** Both panels show 2,000 draws from a distribution with Log-Normal and Gamma marginals linked by a Gaussian copula ($\\rho = 0.72$). Filled density contours and scattered points (coloured to match each space) reveal the distributional shape. (*Left*) Original joint distribution $F(x,y)$ in the natural observation scale. (*Right*) After applying the PIT, both variables become uniform and the copula $C(u,v)$ is exposed — the same dependence structure, stripped of marginal effects."
+#| layout-ncol: 2
+#| fig-subcap:
+#|   - "Joint distribution $F(x,\\,y)$ — original space"
+#|   - "Gaussian copula $C(u,\\,v)$,\\  $\\rho = 0.72$ — copula space"
+#| fig-width: 4.5
+#| fig-height: 4.3
 
 np.random.seed(42)
-n = 1000
+_n   = 2000
+_rho = 0.72
+_Z   = np.random.multivariate_normal([0, 0], [[1, _rho], [_rho, 1]], _n)
+_U   = stats.norm.cdf(_Z[:, 0])
+_V   = stats.norm.cdf(_Z[:, 1])
+_X   = stats.lognorm.ppf(_U, s=0.7, scale=np.exp(0.3))
+_Y   = stats.gamma.ppf(_V, a=2.5, scale=1.5)
 
-# Generate data with different marginal distributions but same dependence
-rho = 0.7
-Z = np.random.multivariate_normal([0, 0], [[1, rho], [rho, 1]], n)
+df_xy = pd.DataFrame({'x': _X, 'y': _Y})
+df_uv = pd.DataFrame({'u': _U, 'v': _V})
 
-# Transform to different margins while preserving dependence
-X1 = stats.norm.cdf(Z[:, 0])  # Uniform margins
-X2 = stats.norm.cdf(Z[:, 1])
+_th_scatter = (
+    theme_academic(base_size=9)
+    + pn.theme(legend_position='none', figure_size=(4.5, 4.3))
+)
 
-# Apply different marginal transformations
-Y1 = stats.norm.ppf(X1)  # Normal margins (original)
-Y2_normal = stats.norm.ppf(X2)
-Y2_t = stats.t.ppf(X2, df=3)  # t-distribution margins
-Y2_exp = stats.expon.ppf(X2)  # Exponential margins
+p_joint = (
+    pn.ggplot(df_xy, pn.aes('x', 'y'))
+    + pn.stat_density_2d(
+        pn.aes(fill=pn.after_stat('level')),
+        geom='polygon', alpha=0.55
+    )
+    + pn.geom_point(alpha=0.15, size=0.65, color=ACADEMIC_COLORS['cobalt'])
+    + pn.scale_fill_gradient(
+        low='#EEF4FB', high=ACADEMIC_COLORS['cobalt']
+    )
+    + pn.labs(
+        x='$x$ \u2014 Log-Normal margin',
+        y='$y$ \u2014 Gamma margin'
+    )
+    + _th_scatter
+)
 
-fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+p_cop = (
+    pn.ggplot(df_uv, pn.aes('u', 'v'))
+    + pn.stat_density_2d(
+        pn.aes(fill=pn.after_stat('level')),
+        geom='polygon', alpha=0.55
+    )
+    + pn.geom_point(alpha=0.15, size=0.65, color=ACADEMIC_COLORS['teal'])
+    + pn.scale_fill_gradient(
+        low='#EBF7F5', high=ACADEMIC_COLORS['teal']
+    )
+    + pn.coord_cartesian(xlim=(0, 1), ylim=(0, 1))
+    + pn.scale_x_continuous(breaks=[0, 0.25, 0.5, 0.75, 1.0],
+                             labels=['0', '0.25', '0.50', '0.75', '1'])
+    + pn.scale_y_continuous(breaks=[0, 0.25, 0.5, 0.75, 1.0],
+                             labels=['0', '0.25', '0.50', '0.75', '1'])
+    + pn.labs(
+        x='$u = F_X(X)$ \u2014 Uniform margin',
+        y='$v = F_Y(Y)$ \u2014 Uniform margin'
+    )
+    + _th_scatter
+)
 
-# Original data (bivariate normal)
-axes[0, 0].scatter(Y1, Y2_normal, alpha=0.6, s=20)
-axes[0, 0].set_title('Bivariate Normal')
-axes[0, 0].set_xlabel('X₁ ~ N(0,1)')
-axes[0, 0].set_ylabel('X₂ ~ N(0,1)')
-
-# Same copula, different margins
-axes[0, 1].scatter(Y1, Y2_t, alpha=0.6, s=20, color='orange')
-axes[0, 1].set_title('Normal-t Margins')
-axes[0, 1].set_xlabel('X₁ ~ N(0,1)')
-axes[0, 1].set_ylabel('X₂ ~ t(3)')
-
-axes[1, 0].scatter(Y1, Y2_exp, alpha=0.6, s=20, color='green')
-axes[1, 0].set_title('Normal-Exponential Margins')
-axes[1, 0].set_xlabel('X₁ ~ N(0,1)')
-axes[1, 0].set_ylabel('X₂ ~ Exp(1)')
-
-# Copula data (uniform margins)
-axes[1, 1].scatter(X1, X2, alpha=0.6, s=20, color='red')
-axes[1, 1].set_title('Underlying Copula (Dependence Structure)')
-axes[1, 1].set_xlabel('U₁ ~ U(0,1)')
-axes[1, 1].set_ylabel('U₂ ~ U(0,1)')
-
-plt.tight_layout()
-plt.show()
+from IPython.display import display
+display(p_joint)
+display(p_cop)
 ```
 
-## Common Copula Families
-
-There are many different families of copulas, each capturing a different type of dependence. Here are a few common ones.
-
-### Archimedean Copulas
-
-These are constructed from a function called a generator. They are popular because they are easy to construct and can model a wide range of dependence patterns.
-
-*   **Clayton Copula:** Good for modeling lower tail dependence. Think of a financial crisis where different stocks crash together.
-*   **Gumbel Copula:** Good for modeling upper tail dependence. This could be useful for modeling assets that experience simultaneous extreme positive returns.
-*   **Frank Copula:** Models symmetric dependence, but without tail dependence.
-
-The plot below shows how these three copulas capture different dependence structures.
+@fig-sklar-marginals shows the two marginal CDFs that mediate the transformation. The dashed vermillion curve in each panel is the CDF scaled to the PDF axis for visual comparison; it is this curve that is applied pointwise to each observation to produce the pseudo-observations $(U_i, V_i)$.
 
 ```{python}
-#| label: fig-archimedean-families
-#| fig-cap: "Comparison of major Archimedean copula families."
-#| fig-width: 15
-#| fig-height: 5
+#| label: fig-sklar-marginals
+#| fig-cap: "**Marginal distributions and their CDFs.** The CDF (dashed vermillion) is scaled to match the PDF axis for direct visual comparison. Applying these CDFs to each observation — $U_i = F_X(X_i)$, $V_i = F_Y(Y_i)$ — yields pseudo-observations that are marginally uniform, isolating the copula."
+#| layout-ncol: 2
+#| fig-subcap:
+#|   - "$X \\sim \\mathrm{LogNormal}(\\mu\\!=\\!0.3,\\,\\sigma\\!=\\!0.7)$"
+#|   - "$Y \\sim \\mathrm{Gamma}(\\alpha\\!=\\!2.5,\\,\\beta\\!=\\!1.5)$"
+#| fig-width: 4.5
+#| fig-height: 3.0
 
-# Create evaluation grid
-u = np.linspace(0.01, 0.99, 100)
-U1, U2 = np.meshgrid(u, u)
+_th_marg = (
+    theme_academic(base_size=9)
+    + pn.theme(legend_position='none', figure_size=(4.5, 3.0))
+)
 
-# Define Clayton copula for comparison
-theta_clayton = 2
-C_clayton = np.maximum((U1**(-theta_clayton) + U2**(-theta_clayton) - 1)**(-1/theta_clayton), 0)
+# ── Marginal X : LogNormal ─────────────────────────────────────────────────
+_lnorm = stats.lognorm(s=0.7, scale=np.exp(0.3))
+_xv    = np.linspace(_lnorm.ppf(1e-3), _lnorm.ppf(0.999), 350)
+_pdx   = _lnorm.pdf(_xv)
+_cdx   = _lnorm.cdf(_xv)
+_scale_x = _pdx.max()
 
-# Define Gumbel copula
-theta_gumbel = 2
-C_gumbel = np.exp(-((-np.log(U1))**theta_gumbel + (-np.log(U2))**theta_gumbel)**(1/theta_gumbel))
+df_mx = pd.DataFrame({
+    'x':     np.r_[_xv, _xv],
+    'y':     np.r_[_pdx, _cdx * _scale_x],
+    'curve': ['PDF'] * len(_xv) + ['CDF'] * len(_xv),
+})
 
-# Define Frank copula
-theta_frank = 5
-C_frank = -1/theta_frank * np.log(1 + (np.exp(-theta_frank * U1) - 1) * (np.exp(-theta_frank * U2) - 1) / (np.exp(-theta_frank) - 1))
+_ann_x_pdf = _xv[np.argmax(_pdx)] * 0.52
+_ann_x_cdf = _xv[int(len(_xv) * 0.72)]
 
-fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-levels = np.linspace(0, 1, 20)
+p_mx = (
+    pn.ggplot(df_mx)
+    + pn.geom_area(
+        df_mx[df_mx.curve == 'PDF'], pn.aes('x', 'y'),
+        fill=ACADEMIC_COLORS['cobalt'], alpha=0.18
+    )
+    + pn.geom_line(
+        df_mx[df_mx.curve == 'PDF'], pn.aes('x', 'y'),
+        color=ACADEMIC_COLORS['cobalt'], size=1.35
+    )
+    + pn.geom_line(
+        df_mx[df_mx.curve == 'CDF'], pn.aes('x', 'y'),
+        color=ACADEMIC_COLORS['vermillion'], size=1.2, linetype='dashed'
+    )
+    + pn.annotate('text', x=_ann_x_pdf, y=_scale_x * 0.88,
+                  label='$f_X(x)$', color=ACADEMIC_COLORS['cobalt'], size=8.5)
+    + pn.annotate('text', x=_ann_x_cdf, y=_scale_x * 0.88,
+                  label='$F_X(x)$', color=ACADEMIC_COLORS['vermillion'], size=8.5)
+    + pn.labs(x='$x$', y='Density')
+    + _th_marg
+)
 
-# Clayton
-im1 = axes[0].contourf(U1, U2, C_clayton, levels=levels, cmap='viridis')
-axes[0].set_title(f'Clayton Copula (θ={theta_clayton})\n(Lower Tail Dependence)')
-axes[0].set_xlabel('$u_1$')
-axes[0].set_ylabel('$u_2$')
-fig.colorbar(im1, ax=axes[0])
+# ── Marginal Y : Gamma ─────────────────────────────────────────────────────
+_gam  = stats.gamma(a=2.5, scale=1.5)
+_yv   = np.linspace(_gam.ppf(1e-3), _gam.ppf(0.999), 350)
+_pdy  = _gam.pdf(_yv)
+_cdy  = _gam.cdf(_yv)
+_scale_y = _pdy.max()
 
-# Gumbel
-im2 = axes[1].contourf(U1, U2, C_gumbel, levels=levels, cmap='viridis')
-axes[1].set_title(f'Gumbel Copula (θ={theta_gumbel})\n(Upper Tail Dependence)')
-axes[1].set_xlabel('$u_1$')
-axes[1].set_ylabel('$u_2$')
-fig.colorbar(im2, ax=axes[1])
+df_my = pd.DataFrame({
+    'x':     np.r_[_yv, _yv],
+    'y':     np.r_[_pdy, _cdy * _scale_y],
+    'curve': ['PDF'] * len(_yv) + ['CDF'] * len(_yv),
+})
 
-# Frank
-im3 = axes[2].contourf(U1, U2, C_frank, levels=levels, cmap='viridis')
-axes[2].set_title(f'Frank Copula (θ={theta_frank})\n(Symmetric Dependence)')
-axes[2].set_xlabel('$u_1$')
-axes[2].set_ylabel('$u_2$')
-fig.colorbar(im3, ax=axes[2])
+_ann_y_pdf = _yv[np.argmax(_pdy)] * 0.48
+_ann_y_cdf = _yv[int(len(_yv) * 0.75)]
 
-plt.tight_layout()
-plt.show()
+p_my = (
+    pn.ggplot(df_my)
+    + pn.geom_area(
+        df_my[df_my.curve == 'PDF'], pn.aes('x', 'y'),
+        fill=ACADEMIC_COLORS['teal'], alpha=0.18
+    )
+    + pn.geom_line(
+        df_my[df_my.curve == 'PDF'], pn.aes('x', 'y'),
+        color=ACADEMIC_COLORS['teal'], size=1.35
+    )
+    + pn.geom_line(
+        df_my[df_my.curve == 'CDF'], pn.aes('x', 'y'),
+        color=ACADEMIC_COLORS['vermillion'], size=1.2, linetype='dashed'
+    )
+    + pn.annotate('text', x=_ann_y_pdf, y=_scale_y * 0.88,
+                  label='$f_Y(y)$', color=ACADEMIC_COLORS['teal'], size=8.5)
+    + pn.annotate('text', x=_ann_y_cdf, y=_scale_y * 0.88,
+                  label='$F_Y(y)$', color=ACADEMIC_COLORS['vermillion'], size=8.5)
+    + pn.labs(x='$y$', y='Density')
+    + _th_marg
+)
+
+display(p_mx)
+display(p_my)
 ```
 
-### Elliptical Copulas
+### Copula Density and Likelihood Decomposition
 
-These are derived from elliptical distributions like the Normal and Student's t distributions.
+When $F_X$ and $F_Y$ admit densities $f_X$ and $f_Y$, differentiating @eq-sklar with respect to $x$ and $y$ yields the **joint density decomposition**:
 
-*   **Gaussian Copula:** This is the copula of the multivariate normal distribution. It's defined by the correlation matrix, but it doesn't have tail dependence. This means it's not great at modeling extreme events.
-*   **Student's t Copula:** This copula is derived from the multivariate t-distribution. It has a "degrees of freedom" parameter that allows it to model tail dependence, making it very useful in finance.
+$$
+f(x, y) \;=\; c\!\bigl(F_X(x),\; F_Y(y)\bigr) \cdot f_X(x) \cdot f_Y(y),
+$$ {#eq-copula-density}
 
-The plot below shows simulated data from a Gaussian and a Student's t copula. Notice how the t-copula has more points in the corners (the tails), indicating tail dependence.
+where $c(u, v) = \frac{\partial^2 C(u,v)}{\partial u\, \partial v}$ is the **copula density**. Equation @eq-copula-density is the density analogue of Sklar's theorem: the joint density factorises into the product of the marginal densities and the copula density, which captures all dependence [@joe1997].
 
-```{python}
-#| label: fig-elliptical-copulas
-#| fig-cap: "Gaussian vs. Student's t copula simulations."
-#| fig-width: 12
-#| fig-height: 6
+This factorisation is the workhorse of parametric copula estimation. For $n$ i.i.d. observations $(x_i, y_i)$, the log-likelihood separates as
 
-# Parameters
-rho = 0.7
-nu = 3
-n_sim = 2000
-np.random.seed(42)
+$$
+\ell\!\bigl(\theta,\, \boldsymbol{\psi}\bigr)
+\;=\;
+\underbrace{
+  \sum_{i=1}^n \log c_\theta\!\bigl(F_X(x_i;\psi_X),\; F_Y(y_i;\psi_Y)\bigr)
+}_{\text{copula log-likelihood}}
+\;+\;
+\underbrace{
+  \sum_{i=1}^n \log f_X(x_i;\psi_X)
+  \;+\;
+  \sum_{i=1}^n \log f_Y(y_i;\psi_Y)
+}_{\text{marginal log-likelihoods}},
+$$
 
-# Gaussian copula simulation
-mean_gauss = [0, 0]
-cov_gauss = [[1, rho], [rho, 1]]
-gauss_samples = np.random.multivariate_normal(mean_gauss, cov_gauss, n_sim)
-u_gauss = stats.norm.cdf(gauss_samples)
-
-# Student's t copula simulation
-t_samples = np.random.multivariate_normal(mean_gauss, cov_gauss, n_sim)
-chi2_samples = np.random.chisquare(nu, n_sim)
-t_samples = t_samples * np.sqrt(nu / chi2_samples[:, np.newaxis])
-u_t = stats.t.cdf(t_samples, nu)
-
-fig, axes = plt.subplots(1, 2, figsize=(12, 6))
-
-axes[0].scatter(u_gauss[:, 0], u_gauss[:, 1], alpha=0.5, s=15)
-axes[0].set_title(f'Gaussian Copula (ρ={rho})')
-axes[0].set_xlabel('$u_1$')
-axes[0].set_ylabel('$u_2$')
-axes[0].set_aspect('equal', adjustable='box')
-
-
-axes[1].scatter(u_t[:, 0], u_t[:, 1], alpha=0.5, s=15)
-axes[1].set_title(f"Student's t Copula (ρ={rho}, ν={nu})")
-axes[1].set_xlabel('$u_1$')
-axes[1].set_ylabel('$u_2$')
-axes[1].set_aspect('equal', adjustable='box')
-
-plt.tight_layout()
-plt.show()
-```
-
-## A Quick Look at Financial Applications
-
-One of the most common uses of copulas is in financial risk management. Let's say you have a portfolio of assets and you want to calculate its Value-at-Risk (VaR), which is the maximum loss you can expect with a certain confidence level.
-
-A traditional approach might assume that asset returns are multivariate normal. However, we know this is often not true. With copulas, we can build a more realistic model:
-
-1.  Model the marginal distribution of each asset's returns individually. We can use a distribution that captures fat tails, like the Student's t-distribution.
-2.  Use a copula (e.g., a Student's t copula) to model the dependence between the assets. This will capture the tendency of assets to move together, especially in downturns.
-3.  Simulate thousands of scenarios for the portfolio's return from this copula-based model.
-4.  Calculate VaR from the simulated returns.
-
-This approach gives a much more accurate picture of the portfolio's risk than traditional methods that rely on unrealistic assumptions.
+where $\theta$ parameterises the copula and $\boldsymbol{\psi} = (\psi_X, \psi_Y)$ the marginals. The **Inference Functions for Margins (IFM)** method [@joe1996] exploits this separation by first estimating $\hat{\boldsymbol{\psi}}$ from the marginal likelihoods and then plugging $\hat{F}_X, \hat{F}_Y$ into the copula likelihood to estimate $\theta$. This reduces a high-dimensional joint optimisation to a sequence of lower-dimensional ones, greatly simplifying computation — at the cost of a modest efficiency loss relative to full maximum likelihood [@genest1993].
 
 ## Conclusion
 
-Copulas are a powerful tool for modeling complex dependencies in data. By separating the dependence structure from the marginal distributions, they provide a flexibility that is missing in many classical statistical models. While the mathematics can get complicated, the core idea is simple and intuitive. They are especially useful in finance, where they help us build more realistic models of risk.
+Copulas are a powerful tool for modeling complex dependencies in data. By separating the dependence structure from the marginal distributions, they provide a flexibility that is missing in many classical statistical models. While the mathematics can get complicated, the core idea is simple and intuitive. They are especially useful in finance and insurance, where they help us build more realistic models of risk.
