@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.43">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jan Schlegel">
+<meta name="dcterms.date" content="2026-03-11">
+
+<title>Jan Schlegel – Does Catastrophic Forgetting Happen in Tiny Subspaces?</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../logo.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="color-scheme" content="dark light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Jan Schlegel</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JHSchlegel"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Does Catastrophic Forgetting Happen in Tiny Subspaces?</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Python</div>
+                <div class="quarto-category">Machine Learning</div>
+                <div class="quarto-category">Deep Learning</div>
+                <div class="quarto-category">Continual Learning</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jan Schlegel </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">March 11, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="block-title">Abstract</div>
+      We investigate whether catastrophic forgetting in continual learning is geometrically similar to ordinary learning: concentrated in the low-curvature bulk subspace of the loss Hessian rather than its high-curvature dominant directions. By projecting gradient updates into either the bulk or dominant subspace and training on Permuted MNIST, Split-CIFAR10, and Split-CIFAR100, we confirm that learning occurs primarily in the bulk. In the Domain-IL setting, forgetting appears to reside there as well. Task-IL results are more ambiguous, motivating larger-scale experiments.
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background"><span class="header-section-number">2</span> Background</a>
+  <ul class="collapse">
+  <li><a href="#continual-learning-and-catastrophic-forgetting" id="toc-continual-learning-and-catastrophic-forgetting" class="nav-link" data-scroll-target="#continual-learning-and-catastrophic-forgetting"><span class="header-section-number">2.1</span> Continual Learning and Catastrophic Forgetting</a></li>
+  <li><a href="#gradient-descent-in-tiny-subspaces" id="toc-gradient-descent-in-tiny-subspaces" class="nav-link" data-scroll-target="#gradient-descent-in-tiny-subspaces"><span class="header-section-number">2.2</span> Gradient Descent in Tiny Subspaces</a></li>
+  </ul></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">3</span> Setup</a>
+  <ul class="collapse">
+  <li><a href="#dominant-and-bulk-subspaces" id="toc-dominant-and-bulk-subspaces" class="nav-link" data-scroll-target="#dominant-and-bulk-subspaces"><span class="header-section-number">3.1</span> Dominant and Bulk Subspaces</a></li>
+  <li><a href="#two-constrained-optimizers" id="toc-two-constrained-optimizers" class="nav-link" data-scroll-target="#two-constrained-optimizers"><span class="header-section-number">3.2</span> Two Constrained Optimizers</a></li>
+  <li><a href="#datasets-and-architecture" id="toc-datasets-and-architecture" class="nav-link" data-scroll-target="#datasets-and-architecture"><span class="header-section-number">3.3</span> Datasets and Architecture</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">4</span> Results</a>
+  <ul class="collapse">
+  <li><a href="#is-there-a-clear-dominant-subspace" id="toc-is-there-a-clear-dominant-subspace" class="nav-link" data-scroll-target="#is-there-a-clear-dominant-subspace"><span class="header-section-number">4.1</span> Is There a Clear Dominant Subspace?</a></li>
+  <li><a href="#how-task-specific-is-the-dominant-subspace" id="toc-how-task-specific-is-the-dominant-subspace" class="nav-link" data-scroll-target="#how-task-specific-is-the-dominant-subspace"><span class="header-section-number">4.2</span> How Task-Specific is the Dominant Subspace?</a></li>
+  <li><a href="#training-dynamics-under-gradient-constraints" id="toc-training-dynamics-under-gradient-constraints" class="nav-link" data-scroll-target="#training-dynamics-under-gradient-constraints"><span class="header-section-number">4.3</span> Training Dynamics Under Gradient Constraints</a></li>
+  <li><a href="#the-main-question-accuracy-and-forgetting" id="toc-the-main-question-accuracy-and-forgetting" class="nav-link" data-scroll-target="#the-main-question-accuracy-and-forgetting"><span class="header-section-number">4.4</span> The Main Question: Accuracy and Forgetting</a></li>
+  <li><a href="#max-eigenvalue-across-optimizers" id="toc-max-eigenvalue-across-optimizers" class="nav-link" data-scroll-target="#max-eigenvalue-across-optimizers"><span class="header-section-number">4.5</span> Max Eigenvalue Across Optimizers</a></li>
+  </ul></li>
+  <li><a href="#ablations" id="toc-ablations" class="nav-link" data-scroll-target="#ablations"><span class="header-section-number">5</span> Ablations</a></li>
+  <li><a href="#reflections" id="toc-reflections" class="nav-link" data-scroll-target="#reflections"><span class="header-section-number">6</span> Reflections</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p><img src="image.jpg" class="img-fluid"></p>
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>Neural networks have a frustrating habit: when you train them on a new task, they tend to forget what they learned before. This phenomenon, known as <em>catastrophic forgetting</em>, was first documented by <span class="citation" data-cites="cf-first-paper">McCloskey and Cohen (<a href="#ref-cf-first-paper" role="doc-biblioref">1989</a>)</span> and remains one of the central challenges in continual learning — the problem of training a single model on a sequence of tasks without losing previously acquired knowledge.</p>
+<p>At the same time, a separate line of work in optimization theory has produced a striking empirical finding. <span class="citation" data-cites="gurari2018gradientdescenthappenstiny">Gur-Ari, Roberts, and Dyer (<a href="#ref-gurari2018gradientdescenthappenstiny" role="doc-biblioref">2018</a>)</span> showed that gradient descent in neural networks effectively happens in a <em>tiny subspace</em> of the full parameter space — specifically, the eigenspace corresponding to the small (bulk) eigenvalues of the loss Hessian, rather than the sharper, high-curvature dominant directions. This is perhaps counterintuitive: one might expect learning to be driven by the directions of highest curvature.</p>
+<p>The full code for this project is available on <a href="https://github.com/JHSchlegel/cf-tiny-subspaces"><i class="bi bi-github"></i> GitHub</a>.</p>
+<p>In a course project for ETH’s <em>Optimization for Data Science</em> class, my co-authors Rufat Asadli, Armin Begic, and Philemon Thalmann and I asked: <strong>does catastrophic forgetting also happen in tiny subspaces?</strong> If the same geometric structure governs both learning and forgetting, that has real implications for how we might design continual learning algorithms that preserve old knowledge while acquiring new.</p>
+</section>
+<section id="background" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="background"><span class="header-section-number">2</span> Background</h2>
+<section id="continual-learning-and-catastrophic-forgetting" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="continual-learning-and-catastrophic-forgetting"><span class="header-section-number">2.1</span> Continual Learning and Catastrophic Forgetting</h3>
+<p>In continual learning, a model is trained on a sequence of tasks <span class="math inline">\(\tau_1, \tau_2, \ldots, \tau_T\)</span> — each potentially drawn from a different data distribution — without access to past data when training on later tasks. The challenge is that gradient updates on task <span class="math inline">\(\tau_t\)</span> tend to overwrite weights that were carefully tuned for earlier tasks, causing the model’s performance on <span class="math inline">\(\tau_1, \ldots, \tau_{t-1}\)</span> to degrade. This is catastrophic forgetting <span class="citation" data-cites="cf-first-paper goodfellow2013empirical">(<a href="#ref-cf-first-paper" role="doc-biblioref">McCloskey and Cohen 1989</a>; <a href="#ref-goodfellow2013empirical" role="doc-biblioref">Goodfellow et al. 2013</a>)</span>.</p>
+<p>Following <span class="citation" data-cites="van2022three">Van de Ven, Tuytelaars, and Tolias (<a href="#ref-van2022three" role="doc-biblioref">2022</a>)</span>, continual learning scenarios can be broadly classified into three settings. We focus on two:</p>
+<ul>
+<li><strong>Domain-IL</strong>: The task identity is not provided at test time; all tasks share the same output space but differ in their input distribution. Think of it as the same network solving variations of the same problem without being told which variation it is currently facing.</li>
+<li><strong>Task-IL</strong>: The task identity is available at test time, and each task has its own dedicated classification head. This is an easier setting since the network only needs to choose among the classes of the currently active task.</li>
+</ul>
+<p>Catastrophic forgetting is most severe in Domain-IL, where the network must solve all tasks from the same shared output layer.</p>
+</section>
+<section id="gradient-descent-in-tiny-subspaces" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="gradient-descent-in-tiny-subspaces"><span class="header-section-number">2.2</span> Gradient Descent in Tiny Subspaces</h3>
+<p>To understand our setup, consider the <strong>loss Hessian</strong> <span class="math inline">\(\nabla^2 \mathcal{L}(\theta)\)</span> — the matrix of all second-order derivatives of the training loss with respect to the model parameters <span class="math inline">\(\theta\)</span>. The Hessian captures the local curvature of the loss landscape. Its eigendecomposition gives eigenvalues <span class="math inline">\(\lambda_1 \geq \lambda_2 \geq \ldots \geq \lambda_p\)</span> and corresponding eigenvectors <span class="math inline">\(u_1, u_2, \ldots, u_p\)</span>.</p>
+<p>The eigenvectors with <em>large</em> eigenvalues point in the directions of highest curvature — these are the <strong>dominant</strong> directions. The eigenvectors with <em>small</em> eigenvalues point in much flatter directions — these form the <strong>bulk</strong>.</p>
+<p><span class="citation" data-cites="gurari2018gradientdescenthappenstiny">Gur-Ari, Roberts, and Dyer (<a href="#ref-gurari2018gradientdescenthappenstiny" role="doc-biblioref">2018</a>)</span> found that the gradient at any training step is almost entirely contained within the bulk subspace. In other words, gradient descent steps barely project onto the dominant directions, even though those directions are the “sharpest” in the landscape. <span class="citation" data-cites="song2024doessgdreallyhappen">Song, Ahn, and Yun (<a href="#ref-song2024doessgdreallyhappen" role="doc-biblioref">2024</a>)</span> later refined this finding, but the qualitative picture — learning lives in low-curvature territory — has proven robust.</p>
+<p>Our central question: <strong>does this geometry also govern catastrophic forgetting in continual learning?</strong></p>
+</section>
+</section>
+<section id="setup" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="setup"><span class="header-section-number">3</span> Setup</h2>
+<section id="dominant-and-bulk-subspaces" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="dominant-and-bulk-subspaces"><span class="header-section-number">3.1</span> Dominant and Bulk Subspaces</h3>
+<p>Formally, for a given task <span class="math inline">\(\tau\)</span> and model parameters <span class="math inline">\(\theta_\tau\)</span>, the <strong>dominant subspace</strong> of size <span class="math inline">\(k\)</span> is:</p>
+<p><span class="math display">\[
+\mathcal{S}_k = \text{span}\{u_i : i \in [k]\}
+\]</span></p>
+<p>with corresponding projection matrix <span class="math inline">\(P_k = \sum_{i=1}^{k} u_i u_i^\top\)</span>.</p>
+<p>The <strong>bulk subspace</strong> is its orthogonal complement, with projection <span class="math inline">\(P_k^\perp = I - P_k\)</span>. In plain terms: project a gradient onto <span class="math inline">\(P_k\)</span> to keep only the high-curvature components; project onto <span class="math inline">\(P_k^\perp\)</span> to keep only the flat, bulk components.</p>
+<p>To measure how much the dominant subspace shifts across training, we define the <strong>top-<span class="math inline">\(k\)</span> subspace overlap</strong> between parameter configurations at steps <span class="math inline">\(t\)</span> and <span class="math inline">\(t'\)</span>:</p>
+<p><span class="math display">\[
+O\!\left(\mathcal{S}_k^{(t)},\, \mathcal{S}_k^{(t')}\right) = \frac{1}{k} \sum_{j=1}^{k} \left\| P_k^{(t)}\, u_j^{(t')} \right\|_2^2
+\]</span></p>
+<p>An overlap of 1.0 means the two dominant subspaces are identical; an overlap of 0 means they are completely orthogonal. We approximate the Hessian eigenvectors using the Lanczos algorithm via the <code>pytorch-hessian-eigenthings</code> library <span class="citation" data-cites="hessian-eigenthings">(<a href="#ref-hessian-eigenthings" role="doc-biblioref">Noah Golmant 2018</a>)</span>.</p>
+</section>
+<section id="two-constrained-optimizers" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="two-constrained-optimizers"><span class="header-section-number">3.2</span> Two Constrained Optimizers</h3>
+<p>To test whether learning and forgetting are geometrically localised, we introduce two variants of SGD that constrain gradient updates to a specific subspace.</p>
+<p><strong>CL-Bulk-SGD</strong> projects each gradient update onto the bulk subspace before applying it:</p>
+<p><span class="math display">\[
+\theta \leftarrow \theta - \eta\, P_k^\perp(\theta)\, \nabla \mathcal{L}(\theta)
+\]</span></p>
+<p>The dominant directions are blocked entirely — the model can only learn in the flat, bulk directions. If learning naturally happens in the bulk, this constraint should cost almost nothing.</p>
+<p><strong>CL-Dom-SGD</strong> does the opposite and restricts updates to the dominant subspace:</p>
+<p><span class="math display">\[
+\theta \leftarrow \theta - \eta\, P_k(\theta)\, \nabla \mathcal{L}(\theta)
+\]</span></p>
+<p>If learning requires the bulk, this constraint should substantially hurt performance. Conversely, since CL-Dom-SGD never touches the bulk, it should also preserve any knowledge stored there — so if forgetting happens in the bulk, this method should reduce it (possibly at the cost of learning less).</p>
+<p>For the first task, both methods fall back to standard SGD. From task 2 onwards, the projection is applied at every gradient step.</p>
+</section>
+<section id="datasets-and-architecture" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="datasets-and-architecture"><span class="header-section-number">3.3</span> Datasets and Architecture</h3>
+<p>We experiment on three standard continual learning benchmarks:</p>
+<ul>
+<li><strong>Permuted MNIST</strong> (Domain-IL): 10 tasks, each applying a unique fixed random pixel permutation to MNIST digits. The same 10 output classes are used throughout; only the input statistics differ.</li>
+<li><strong>Split-CIFAR10</strong> (Task-IL): CIFAR-10 split into 5 tasks of 2 classes each, with a separate classification head per task.</li>
+<li><strong>Split-CIFAR100</strong> (Task-IL): CIFAR-100 split into 10 tasks of 10 classes each, again with per-task heads.</li>
+</ul>
+<p>For Permuted MNIST we use an MLP with two hidden layers of 100 ReLU units. For the CIFAR benchmarks we use a two-layer CNN with 32 output channels. All models are trained with SGD for 5 epochs per task, batch size 128. We subsample 2,000 data points per Hessian approximation, and in the Task-IL setting we only project the convolutional layers (the task-specific heads remain unconstrained).</p>
+<p>The value of <span class="math inline">\(k\)</span> — the number of dominant directions to block or preserve — is set to 10 for Permuted MNIST (matching the 10 task permutations), 2 for Split-CIFAR10 (matching the 2 classes per task), and 9 for Split-CIFAR100.</p>
+</section>
+</section>
+<section id="results" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="results"><span class="header-section-number">4</span> Results</h2>
+<section id="is-there-a-clear-dominant-subspace" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="is-there-a-clear-dominant-subspace"><span class="header-section-number">4.1</span> Is There a Clear Dominant Subspace?</h3>
+<p>Before asking whether forgetting is localised in a particular subspace, we first confirm that the loss Hessian actually has a well-separated spectral structure. The figure below plots the top-<span class="math inline">\(k\)</span> eigenvalues against the next-<span class="math inline">\(k\)</span> eigenvalues across training, with red dashed lines marking task boundaries.</p>
+<table>
+<tbody><tr>
+<td style="width:33%; padding:4px;">
+<img src="img/Top-k versus next Top-k Eigenvalues for Plain SGD/pmnist.png" width="100%"> <em>Permuted MNIST</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Top-k versus next Top-k Eigenvalues for Plain SGD/cifar10.png" width="100%"> <em>Split-CIFAR10</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Top-k versus next Top-k Eigenvalues for Plain SGD/cifar100.png" width="100%"> <em>Split-CIFAR100</em>
+</td>
+</tr>
+</tbody></table>
+<p>Across all three benchmarks, a clear <strong>spectral gap</strong> emerges: the top-<span class="math inline">\(k\)</span> eigenvalues (colored, one line per task) are substantially larger than the next-<span class="math inline">\(k\)</span> eigenvalues (gray/teal), and this gap widens over the course of training. This confirms that the dominant subspace is geometrically meaningful — it captures the genuinely sharp directions of the loss landscape, while the bulk represents a large region of much flatter directions.</p>
+</section>
+<section id="how-task-specific-is-the-dominant-subspace" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="how-task-specific-is-the-dominant-subspace"><span class="header-section-number">4.2</span> How Task-Specific is the Dominant Subspace?</h3>
+<p>If forgetting is driven by changes in the dominant subspace, we would expect abrupt shifts in that subspace at task boundaries — old tasks’ sharp directions being replaced by new ones. The overlap metric quantifies this: a value close to 1 means the dominant subspace is essentially unchanged; a value close to 0 means it has rotated entirely.</p>
+<table>
+<tbody><tr>
+<td style="width:33%; padding:4px;">
+<img src="img/Top-k Overlap for plain SGD/pmnist.png" width="100%"> <em>Permuted MNIST</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Top-k Overlap for plain SGD/cifar10.png" width="100%"> <em>Split-CIFAR10</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Top-k Overlap for plain SGD/cifar100.png" width="100%"> <em>Split-CIFAR100</em>
+</td>
+</tr>
+</tbody></table>
+<p>The pattern is notably different between Domain-IL and Task-IL. For <strong>Permuted MNIST</strong>, the overlap drops sharply at each task boundary — every new permutation requires a largely orthogonal dominant subspace, a strong signal that those directions are highly task-specific. For the <strong>CIFAR benchmarks</strong>, transitions are softer: some overlap persists across tasks, particularly between earlier tasks (the cyan line stays elevated relative to later-introduced tasks). This likely reflects that the underlying visual structure is shared across CIFAR splits even when the class labels differ.</p>
+</section>
+<section id="training-dynamics-under-gradient-constraints" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="training-dynamics-under-gradient-constraints"><span class="header-section-number">4.3</span> Training Dynamics Under Gradient Constraints</h3>
+<p>Does forcing the optimizer to work exclusively in the bulk or dominant subspace impair training? The figure below compares training cross-entropy loss across the three methods throughout the full sequential training run.</p>
+<table>
+<tbody><tr>
+<td style="width:33%; padding:4px;">
+<img src="img/Training Metrics over Time for Plain SGD versus SGD-Dom versus SGD-BULK/pmnist.png" width="100%"> <em>Permuted MNIST</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Training Metrics over Time for Plain SGD versus SGD-Dom versus SGD-BULK/cifar10.png" width="100%"> <em>Split-CIFAR10</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Training Metrics over Time for Plain SGD versus SGD-Dom versus SGD-BULK/cifar100.png" width="100%"> <em>Split-CIFAR100</em>
+</td>
+</tr>
+</tbody></table>
+<p>CL-Bulk-SGD and standard SGD are nearly indistinguishable across all tasks and benchmarks — their training loss curves follow almost the same trajectory throughout. <strong>Restricting gradient updates to the bulk subspace has essentially no cost in terms of training dynamics.</strong> The model learns just as well when the high-curvature dominant directions are blocked.</p>
+<p>CL-Dom-SGD is noticeably slower to converge, particularly on CIFAR. When only the sharp dominant directions are available for updates, learning is clearly impaired.</p>
+</section>
+<section id="the-main-question-accuracy-and-forgetting" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="the-main-question-accuracy-and-forgetting"><span class="header-section-number">4.4</span> The Main Question: Accuracy and Forgetting</h3>
+<p>The figure below shows test accuracy per task, evaluated after each new task is trained. Each colored line tracks one task’s accuracy as later tasks are introduced.</p>
+<table>
+<tbody><tr>
+<td style="width:33%; padding:4px;">
+<img src="img/Test Metrics over Time for Plain SGD versus SGD-DOM versus SGD-BULK/pmnist.png" width="100%"> <em>Permuted MNIST</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Test Metrics over Time for Plain SGD versus SGD-DOM versus SGD-BULK/cifar10.png" width="100%"> <em>Split-CIFAR10</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Test Metrics over Time for Plain SGD versus SGD-DOM versus SGD-BULK/cifar100.png" width="100%"> <em>Split-CIFAR100</em>
+</td>
+</tr>
+</tbody></table>
+<p>CL-Bulk-SGD and standard SGD produce near-identical per-task accuracy curves. CL-Dom-SGD achieves visibly lower accuracy, most strikingly on Split-CIFAR10 where one task (green) drops substantially below the other two methods.</p>
+<p>The table below summarises these results numerically. <em>Average Accuracy</em> is the mean test accuracy across all tasks at the end of training. <em>Average Maximum Forgetting</em> is the mean decrease from each task’s peak accuracy — a direct measure of how much previously learned knowledge is lost.</p>
+<p><br></p>
+<table class="table-striped table-hover caption-top table">
+<caption>Average accuracy and forgetting across methods and benchmarks. Bold rows indicate the best constrained method.</caption>
+<colgroup>
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: center;">pMNIST Acc.</th>
+<th style="text-align: center;">pMNIST Forget</th>
+<th style="text-align: center;">CIFAR-10 Acc.</th>
+<th style="text-align: center;">CIFAR-10 Forget</th>
+<th style="text-align: center;">CIFAR-100 Acc.</th>
+<th style="text-align: center;">CIFAR-100 Forget</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Joint (upper bound)</td>
+<td style="text-align: center;">96.60%</td>
+<td style="text-align: center;">0.00%</td>
+<td style="text-align: center;">79.47%</td>
+<td style="text-align: center;">0.00%</td>
+<td style="text-align: center;">46.60%</td>
+<td style="text-align: center;">0.00%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Standard SGD</td>
+<td style="text-align: center;">64.08%</td>
+<td style="text-align: center;">31.31%</td>
+<td style="text-align: center;">76.20%</td>
+<td style="text-align: center;">0.60%</td>
+<td style="text-align: center;">23.94%</td>
+<td style="text-align: center;">1.29%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>CL-Bulk-SGD</strong></td>
+<td style="text-align: center;"><strong>62.09%</strong></td>
+<td style="text-align: center;"><strong>33.50%</strong></td>
+<td style="text-align: center;"><strong>76.23%</strong></td>
+<td style="text-align: center;"><strong>0.48%</strong></td>
+<td style="text-align: center;"><strong>24.15%</strong></td>
+<td style="text-align: center;"><strong>1.53%</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CL-Dom-SGD</td>
+<td style="text-align: center;">45.72%</td>
+<td style="text-align: center;">8.01%</td>
+<td style="text-align: center;">71.59%</td>
+<td style="text-align: center;">1.24%</td>
+<td style="text-align: center;">21.77%</td>
+<td style="text-align: center;">0.32%</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p>Three findings stand out:</p>
+<ol type="1">
+<li><p><strong>CL-Bulk-SGD ≈ Standard SGD</strong> across all benchmarks — in both accuracy and forgetting. Constraining the optimizer to the bulk subspace costs essentially nothing. This is the headline result and directly confirms that learning in continual neural networks is concentrated in the bulk.</p></li>
+<li><p><strong>CL-Dom-SGD reduces forgetting on Permuted MNIST</strong> (8.01% vs 31.31%) but at the cost of much worse accuracy (45.72% vs 64.08%). This is consistent with forgetting being partly driven by bulk updates: once you block the bulk, the model stops overwriting old knowledge — but it also stops learning new tasks effectively.</p></li>
+<li><p><strong>On Task-IL (CIFAR), the picture is less clean.</strong> CL-Dom-SGD shows slightly <em>more</em> forgetting in some cases and consistently lower accuracy. The per-task classification heads likely absorb some of the task-specific information, making the subspace decomposition of the shared convolutional layers harder to interpret.</p></li>
+</ol>
+</section>
+<section id="max-eigenvalue-across-optimizers" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="max-eigenvalue-across-optimizers"><span class="header-section-number">4.5</span> Max Eigenvalue Across Optimizers</h3>
+<p>As an additional sanity check, we compare the largest Hessian eigenvalue across the three methods.</p>
+<table>
+<tbody><tr>
+<td style="width:33%; padding:4px;">
+<img src="img/Max Eigenvalue over Time for Plain SGD versus SGD-DOM versus SGD-BULK/pmnist.png" width="100%"> <em>Permuted MNIST</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Max Eigenvalue over Time for Plain SGD versus SGD-DOM versus SGD-BULK/cifar10.png" width="100%"> <em>Split-CIFAR10</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Max Eigenvalue over Time for Plain SGD versus SGD-DOM versus SGD-BULK/cifar100.png" width="100%"> <em>Split-CIFAR100</em>
+</td>
+</tr>
+</tbody></table>
+<p>CL-Bulk-SGD and standard SGD maintain comparable, steadily increasing dominant eigenvalues throughout training — consistent with the edge-of-stability phenomenon noted in <span class="citation" data-cites="cohen-CNN">Cohen et al. (<a href="#ref-cohen-CNN" role="doc-biblioref">2022</a>)</span>. CL-Dom-SGD shows noticeably different and more variable eigenvalue dynamics. Updating only in the dominant directions perturbs the curvature structure at every step, resulting in less stable Hessian behaviour. This is further evidence that the dominant subspace is not where effective learning naturally lives.</p>
+</section>
+</section>
+<section id="ablations" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="ablations"><span class="header-section-number">5</span> Ablations</h2>
+<p>To check robustness, we vary key hyperparameters for CL-Bulk-SGD: network width (hidden units / output channels), batch size, and learning rate. The figures below show the top-<span class="math inline">\(k\)</span> overlap trajectories and largest eigenvalue dynamics across these hyperparameter grids.</p>
+<table>
+<tbody><tr>
+<td style="width:33%; padding:4px;">
+<img src="img/Ablation/Top-k Overlap for SGD-BULK/pmnist.png" width="100%"> <em>Permuted MNIST</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Ablation/Top-k Overlap for SGD-BULK/cifar10.png" width="100%"> <em>Split-CIFAR10</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Ablation/Top-k Overlap for SGD-BULK/cifar100.png" width="100%"> <em>Split-CIFAR100</em>
+</td>
+</tr>
+</tbody></table>
+<table>
+<tbody><tr>
+<td style="width:33%; padding:4px;">
+<img src="img/Ablation/Eigenvalues over Time for SGD-BULK/pmnist.png" width="100%"> <em>Permuted MNIST</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Ablation/Eigenvalues over Time for SGD-BULK/cifar10.png" width="100%"> <em>Split-CIFAR10</em>
+</td>
+<td style="width:33%; padding:4px;">
+<img src="img/Ablation/Eigenvalues over Time for SGD-BULK/cifar100.png" width="100%"> <em>Split-CIFAR100</em>
+</td>
+</tr>
+</tbody></table>
+<p>Network width and batch size have at most a mild effect on the qualitative patterns — the dominant subspace still shifts at task transitions, and the spectral gap persists across architectures. <strong>Learning rate is the most influential hyperparameter</strong>: very small rates produce noisy, hard-to-interpret overlap trajectories (likely because the model does not fully converge within the 5-epoch budget), while moderate rates yield the cleaner dynamics we observe in the main experiments.</p>
+</section>
+<section id="reflections" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="reflections"><span class="header-section-number">6</span> Reflections</h2>
+<p>The central finding is clear: <strong>learning in continual neural networks happens in the bulk subspace</strong>, exactly as it does in standard single-task training. Projecting away the dominant directions (CL-Bulk-SGD) leaves both training loss and test accuracy essentially unchanged relative to standard SGD — and this holds across three benchmarks, two continual learning paradigms, and a range of hyperparameter choices.</p>
+<p>The forgetting story is more nuanced. On Permuted MNIST (Domain-IL), the dominant subspace rotates significantly at each task boundary, and CL-Dom-SGD succeeds in reducing measured forgetting — albeit at the cost of worse accuracy. This is consistent with the hypothesis that forgetting, too, is driven by bulk updates: once you block the bulk, the model can no longer effectively overwrite old task knowledge. On Split-CIFAR (Task-IL), the picture is murkier. The per-task classification heads absorb part of the task-specific signal, leaving the shared convolutional backbone less clearly partitioned between tasks.</p>
+<p>There are real limitations to this study worth acknowledging. The architectures are deliberately small — an MLP with 100 hidden units and a two-layer CNN — and trained with vanilla SGD for just 5 epochs per task. Scaling to larger models (e.g., ResNet-18), adaptive optimizers (e.g., Adam <span class="citation" data-cites="kingma2014adam">(<a href="#ref-kingma2014adam" role="doc-biblioref">Kingma 2014</a>)</span>), and longer training horizons may change the qualitative picture. Computing Hessian eigenvectors via the Lanczos algorithm at every training step also has a non-trivial computational cost, which limits scalability to larger networks.</p>
+<p>That said, the framework offers a principled, geometry-first lens for reasoning about <em>where</em> in parameter space learning and forgetting are concentrated — and the evidence points consistently to the low-curvature bulk. Whether that structure can be exploited to design better continual learning algorithms remains, we think, a genuinely open and interesting question.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-cohen-CNN" class="csl-entry" role="listitem">
+Cohen, Jeremy M., Simran Kaur, Yuanzhi Li, J. Zico Kolter, and Ameet Talwalkar. 2022. <span>“Gradient Descent on Neural Networks Typically Occurs at the Edge of Stability.”</span> <a href="https://arxiv.org/abs/2103.00065">https://arxiv.org/abs/2103.00065</a>.
+</div>
+<div id="ref-goodfellow2013empirical" class="csl-entry" role="listitem">
+Goodfellow, Ian J, Mehdi Mirza, Da Xiao, Aaron Courville, and Yoshua Bengio. 2013. <span>“An Empirical Investigation of Catastrophic Forgetting in Gradient-Based Neural Networks.”</span> <em>arXiv Preprint arXiv:1312.6211</em>.
+</div>
+<div id="ref-gurari2018gradientdescenthappenstiny" class="csl-entry" role="listitem">
+Gur-Ari, Guy, Daniel A. Roberts, and Ethan Dyer. 2018. <span>“Gradient Descent Happens in a Tiny Subspace.”</span> <a href="https://arxiv.org/abs/1812.04754">https://arxiv.org/abs/1812.04754</a>.
+</div>
+<div id="ref-kingma2014adam" class="csl-entry" role="listitem">
+Kingma, Diederik P. 2014. <span>“Adam: A Method for Stochastic Optimization.”</span> <em>arXiv Preprint arXiv:1412.6980</em>.
+</div>
+<div id="ref-cf-first-paper" class="csl-entry" role="listitem">
+McCloskey, Michael, and Neal J. Cohen. 1989. <span>“Catastrophic Interference in Connectionist Networks: The Sequential Learning Problem.”</span> In, edited by Gordon H. Bower, 24:109–65. Psychology of Learning and Motivation. Academic Press. https://doi.org/<a href="https://doi.org/10.1016/S0079-7421(08)60536-8">https://doi.org/10.1016/S0079-7421(08)60536-8</a>.
+</div>
+<div id="ref-hessian-eigenthings" class="csl-entry" role="listitem">
+Noah Golmant, Amir Gholami, Zhewei Yao. 2018. <span>“Pytorch-Hessian-Eigenthings: Efficient PyTorch Hessian Eigendecomposition.”</span> <a href="https://github.com/noahgolmant/pytorch-hessian-eigenthings">https://github.com/noahgolmant/pytorch-hessian-eigenthings</a>.
+</div>
+<div id="ref-song2024doessgdreallyhappen" class="csl-entry" role="listitem">
+Song, Minhak, Kwangjun Ahn, and Chulhee Yun. 2024. <span>“Does SGD Really Happen in Tiny Subspaces?”</span> <a href="https://arxiv.org/abs/2405.16002">https://arxiv.org/abs/2405.16002</a>.
+</div>
+<div id="ref-van2022three" class="csl-entry" role="listitem">
+Van de Ven, Gido M, Tinne Tuytelaars, and Andreas S Tolias. 2022. <span>“Three Types of Incremental Learning.”</span> <em>Nature Machine Intelligence</em> 4 (12): 1185–97.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
