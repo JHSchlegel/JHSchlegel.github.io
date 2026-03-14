@@ -6,18 +6,17 @@
   background-color: var(--bs-body-bg) !important;
   border: 1px solid var(--bs-gray-200) !important;
   border-left: 3px solid #2563eb !important;
-  border-radius: 6px !important;
-  padding: 1.25rem 1.5rem !important;
-  margin-bottom: 1.5rem !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+  border-radius: 5px !important;
+  padding: 1.1rem 1.4rem !important;
+  margin-bottom: 1.25rem !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
   color: var(--bs-body-color) !important;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition: box-shadow 0.2s ease;
   z-index: 1 !important;
 }
 
 .education-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 .education-card h3 {
@@ -54,9 +53,9 @@
   flex-wrap: wrap !important;
   align-items: center !important;
   gap: 0.15rem 0.4rem !important;
-  font-size: 0.85rem !important;
+  font-size: 0.84rem !important;
   color: #6b7280 !important;
-  margin-bottom: 0.75rem !important;
+  margin-bottom: 0.5rem !important;
 }
 
 .meta-info i {
@@ -132,15 +131,15 @@
   margin: 0.25rem 0 0.75rem !important;
   border-radius: 4px !important;
   width: fit-content !important;
-  background: #ecfdf5 !important;
-  color: #059669 !important;
-  border: 1px solid #a7f3d0 !important;
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  border: 1px solid #bfdbfe !important;
 }
 
 .quarto-dark .gpa-badge {
-  background: #064e3b !important;
-  color: #34d399 !important;
-  border-color: #065f46 !important;
+  background: #172554 !important;
+  color: #60a5fa !important;
+  border-color: #1e3a5f !important;
 }
 
 /* ------------------------------------
@@ -208,30 +207,30 @@
   content: '' !important;
   position: absolute !important;
   left: -39px !important;
-  top: 1.4rem !important;
-  width: 10px !important;
-  height: 10px !important;
+  top: 1.35rem !important;
+  width: 9px !important;
+  height: 9px !important;
   border-radius: 50% !important;
   background-color: #2563eb !important;
   border: 2px solid #ffffff !important;
   z-index: 3 !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
 }
 
 .quarto-dark .education-card::before {
   background-color: #60a5fa !important;
   border-color: #1e1e2e !important;
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.15) !important;
 }
 
 /* Horizontal connector */
 .education-card::after {
   content: '' !important;
   position: absolute !important;
-  left: -29px !important;
-  top: calc(1.4rem + 4px) !important;
-  width: 26px !important;
-  height: 2px !important;
+  left: -30px !important;
+  top: calc(1.35rem + 3.5px) !important;
+  width: 27px !important;
+  height: 1.5px !important;
   background-color: #bfdbfe !important;
   z-index: 2 !important;
 }
