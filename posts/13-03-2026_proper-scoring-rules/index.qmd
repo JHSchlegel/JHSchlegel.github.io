@@ -1,0 +1,646 @@
+---
+title: "Proper Scoring Rules: Evaluating Probabilistic Forecasts in Energy Markets"
+abstract: "We examine the application of proper scoring rules in evaluating probabilistic forecasts within energy markets. These rules provide a rigorous framework for assessing the quality of probabilistic predictions, ensuring that forecasters are incentivized to provide accurate and well-calibrated probabilities. Our focus lies on the Continuous Ranked Probability Score (CRPS) and its multivariate generalizations — the Energy Score and Variogram Score — with practical examples from electricity price and wind power forecasting."
+categories:
+  - Python
+  - Statistics
+  - Data Science
+  - Energy
+  - Machine Learning
+  - Forecasting
+author: "Jan Schlegel"
+date: "2026-03-13"
+image: "image.png"
+format:
+  html:
+    code-fold: true
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    fig-width: 5
+    fig-height: 3.5
+    fig-dpi: 150
+
+jupyter: python3
+bibliography: references.bib
+---
+
+![](image.png)
+
+```{python}
+#| echo: false
+#| output: false
+
+import numpy as np
+import pandas as pd
+import plotnine as pn
+from scipy import stats
+import warnings
+warnings.filterwarnings('ignore')
+
+from plotnine import theme, element_text, element_rect, element_line, element_blank
+from plotnine.scales import scale_color_manual, scale_fill_manual
+
+# ---------------------------------------------------------------------------
+# Colour palette — perceptually distinct, print-safe, colour-blind-aware
+# ---------------------------------------------------------------------------
+
+ACADEMIC_COLORS = {
+    "cobalt":       "#2166AC",
+    "vermillion":   "#D6604D",
+    "teal":         "#35978F",
+    "amber":        "#F4A736",
+    "plum":         "#762A83",
+    "sky":          "#74ADD1",
+    "salmon":       "#F4A582",
+    "mint":         "#80CDC1",
+    "wheat":        "#FDD49E",
+    "lavender":     "#C2A5CF",
+    "ink":          "#1A1A2E",
+    "smoke":        "#F5F5F5",
+    "stone":        "#CCCCCC",
+}
+
+_COLOR_SEQUENCE = [
+    ACADEMIC_COLORS["cobalt"],
+    ACADEMIC_COLORS["vermillion"],
+    ACADEMIC_COLORS["teal"],
+    ACADEMIC_COLORS["amber"],
+    ACADEMIC_COLORS["plum"],
+    ACADEMIC_COLORS["sky"],
+    ACADEMIC_COLORS["salmon"],
+    ACADEMIC_COLORS["mint"],
+    ACADEMIC_COLORS["wheat"],
+    ACADEMIC_COLORS["lavender"],
+]
+
+
+def academic_scale_color(**kwargs):
+    return scale_color_manual(values=_COLOR_SEQUENCE, **kwargs)
+
+
+def academic_scale_fill(**kwargs):
+    return scale_fill_manual(values=_COLOR_SEQUENCE, **kwargs)
+
+
+def theme_academic(
+    base_size: float = 9.0,
+    base_family: str = "Liberation Sans",
+    grid: str = "xy",
+    border: bool = True,
+):
+    _ink   = ACADEMIC_COLORS["ink"]
+    _stone = ACADEMIC_COLORS["stone"]
+    _smoke = ACADEMIC_COLORS["smoke"]
+
+    half  = base_size * 0.5
+    small = base_size * 0.85
+
+    show_x_grid = "x" in grid
+    show_y_grid = "y" in grid
+    gridline = element_line(color=_stone, size=0.35, linetype="solid")
+
+    t = theme(
+        figure_size        = (3.5, 2.8),
+        plot_background    = element_rect(fill="white", color="none"),
+        panel_background   = element_rect(fill="white", color="none"),
+        panel_border       = (
+            element_rect(color=_ink, fill="none", size=0.6)
+            if border else element_blank()
+        ),
+        axis_line          = (
+            element_blank()
+            if border
+            else element_line(color=_ink, size=0.6)
+        ),
+        panel_grid_major_x = gridline if show_x_grid else element_blank(),
+        panel_grid_major_y = gridline if show_y_grid else element_blank(),
+        panel_grid_minor_x = element_blank(),
+        panel_grid_minor_y = element_blank(),
+        axis_ticks         = element_line(color=_ink, size=0.5),
+        axis_ticks_length  = 0.15,
+        axis_text          = element_text(
+            family=base_family, size=small, color=_ink,
+            margin={"t": 2, "r": 2, "b": 2, "l": 2}
+        ),
+        axis_text_x        = element_text(family=base_family, size=small, color=_ink),
+        axis_text_y        = element_text(family=base_family, size=small, color=_ink),
+        axis_title         = element_text(
+            family=base_family, size=base_size, color=_ink,
+            margin={"t": 4, "r": 4, "b": 4, "l": 4}
+        ),
+        axis_title_x       = element_text(family=base_family, size=base_size, color=_ink,
+                                          margin={"t": 6}),
+        axis_title_y       = element_text(family=base_family, size=base_size, color=_ink,
+                                          margin={"r": 6}),
+        plot_title         = element_text(
+            family=base_family, size=base_size + 1,
+            color=_ink, face="bold",
+            margin={"b": 4}
+        ),
+        plot_subtitle      = element_text(
+            family=base_family, size=small, color="#555555",
+            margin={"b": 6}
+        ),
+        plot_caption       = element_text(
+            family=base_family, size=base_size * 0.78, color="#888888",
+            ha="left", margin={"t": 6}
+        ),
+        legend_background  = element_rect(fill="white", color="none"),
+        legend_key         = element_rect(fill="white", color="none"),
+        legend_text        = element_text(family=base_family, size=small, color=_ink),
+        legend_title       = element_text(
+            family=base_family, size=small, color=_ink, face="bold"
+        ),
+        legend_key_size    = 0.45,
+        legend_entry_spacing= 2,
+        strip_background   = element_rect(fill=_smoke, color=_stone, size=0.4),
+        strip_text         = element_text(
+            family=base_family, size=small, color=_ink, face="bold",
+            margin={"t": 3, "b": 3, "l": 4, "r": 4}
+        ),
+        plot_margin        = 0.05,
+    )
+    return t
+```
+
+## Introduction
+
+In many real-world decision problems — from dispatching power plants to hedging financial positions — what matters is not a single point forecast but a full *probabilistic* forecast that quantifies the uncertainty around future outcomes. A probabilistic forecast issues a predictive distribution $F$ for a future quantity $Y$, and the natural question becomes: *how do we evaluate such forecasts?*
+
+Point forecasts are commonly assessed by the mean absolute error (MAE) or root mean squared error (RMSE). But these metrics are blind to the shape, spread, and calibration of a predictive distribution. A well-calibrated 90% prediction interval that is too wide is useless for trading; a tight interval that misses 30% of observations is dangerously overconfident. We need evaluation tools that reward the full predictive distribution — and penalize misspecification of any of its features.
+
+**Scoring rules** provide exactly this framework. A scoring rule $S(F, y)$ assigns a numerical penalty (or reward) to a forecast distribution $F$ when the outcome $y$ materializes. The key requirement for a *proper* scoring rule is that it incentivizes honesty: the forecaster's expected score is optimized when the issued forecast $F$ coincides with the true data-generating distribution $G$. This property is fundamental for principled forecast evaluation and comparison [@gneiting2007strictly; @winkler1996scoring].
+
+In this post we develop the theory of proper scoring rules from the ground up, survey the most important examples — Brier Score, Logarithmic Score, CRPS, Energy Score, and Variogram Score — and discuss essential diagnostic tools: PIT histograms for calibration assessment and the Diebold-Mariano test for formal model comparison.
+
+## Proper Scoring Rules
+
+### Setup and Core Definitions
+
+Let $\mathcal{F}$ denote a convex class of probability distributions on $\mathbb{R}^d$ and let $y \in \mathbb{R}^d$ be the verifying observation.
+
+::: {.callout-note}
+### Definition (Scoring Rule)
+A **scoring rule** is a function
+$$
+S: \mathcal{F} \times \mathbb{R}^d \to \overline{\mathbb{R}},
+$$
+where $S(F, y)$ quantifies the quality of the predictive distribution $F$ when the outcome $y$ is observed. By convention we adopt the *negatively oriented* framework: **lower scores indicate better forecasts**.
+:::
+
+The expected score under the true distribution $G$ is
+$$
+S(F, G) = \mathbb{E}_{Y \sim G}[S(F, Y)].
+$$
+
+::: {.callout-note}
+### Definition (Propriety) [@gneiting2007strictly]
+A scoring rule $S$ is **proper** relative to $\mathcal{F}$ if
+$$
+S(G, G) \leq S(F, G), \qquad \forall\, F, G \in \mathcal{F},
+$$
+i.e. the expected score is minimized when the forecast $F$ equals the true distribution $G$.
+
+It is **strictly proper** if equality holds only when $F = G$.
+:::
+
+Propriety guarantees that a forecaster cannot improve their expected score by *hedging* — issuing a distribution different from their true belief. Strict propriety goes further: it ensures that only the true distribution achieves the optimum, making the scoring rule a *faithful* evaluation tool.
+
+::: {.callout-tip icon="false"}
+### Theorem (Characterization via Divergence) [@gneiting2007strictly]
+A scoring rule $S$ is proper if and only if the **divergence function**
+$$
+d(F, G) = S(F, G) - S(G, G)
+$$
+satisfies $d(F, G) \geq 0$ for all $F, G \in \mathcal{F}$, with $d(G, G) = 0$.
+
+For a strictly proper scoring rule, $d(F, G) = 0 \iff F = G$.
+:::
+
+The divergence $d(F, G)$ measures the *penalty for misspecification*: the excess expected loss incurred by reporting $F$ when the truth is $G$. For the Logarithmic Score, this divergence is the Kullback–Leibler divergence; for the CRPS, it is related to the integrated squared difference between CDFs.
+
+
+### Univariate Scoring Rules
+
+We now present the most important scoring rules, starting with the discrete/binary case and building toward continuous and multivariate settings.
+
+#### Brier Score
+
+::: {.callout-note}
+### Definition (Brier Score) [@brier1950verification]
+For a binary event with forecast probability $p \in [0,1]$ and outcome $y \in \{0, 1\}$, the **Brier Score** is
+$$
+\operatorname{BS}(p, y) = (p - y)^2.
+$$
+More generally, for $K$ mutually exclusive categories with forecast probabilities $\mathbf{p} = (p_1, \ldots, p_K)$ and one-hot outcome $\mathbf{y}$:
+$$
+\operatorname{BS}(\mathbf{p}, \mathbf{y}) = \sum_{k=1}^{K} (p_k - y_k)^2.
+$$
+:::
+
+The Brier Score is strictly proper. It can be decomposed into **reliability** (calibration), **resolution** (sharpness), and **uncertainty** components, making it useful for diagnostic analysis of categorical forecasts.
+
+#### Logarithmic Score
+
+::: {.callout-note}
+### Definition (Logarithmic Score) [@good1952rational]
+For a predictive density $f$ and outcome $y$, the **Logarithmic Score** (negative log-likelihood) is
+$$
+\operatorname{LogS}(f, y) = -\log f(y).
+$$
+:::
+
+The Logarithmic Score is strictly proper and is the only *local* proper scoring rule — it depends on $f$ only through the value $f(y)$ at the realized outcome. This makes it extremely sensitive to tail behavior: assigning near-zero probability to an event that occurs yields an arbitrarily large penalty. While this sensitivity is desirable for detecting overconfidence, it can make the LogS less robust in practice than other scores.
+
+::: {.callout-tip icon="false"}
+### Theorem (Locality of the LogS) [@gneiting2007strictly]
+The Logarithmic Score is the **unique** proper scoring rule (up to equivalence) that is *local*, i.e. $S(F, y)$ depends on $F$ only through $f(y)$.
+:::
+
+
+#### Continuous Ranked Probability Score (CRPS)
+
+The CRPS is perhaps the most widely used proper scoring rule for continuous univariate forecasts. It generalizes the absolute error to distributional forecasts.
+
+::: {.callout-note}
+### Definition (CRPS) [@matheson1976scoring]
+For a predictive CDF $F$ and observation $y \in \mathbb{R}$, the **Continuous Ranked Probability Score** is
+$$
+\operatorname{CRPS}(F, y) = \int_{-\infty}^{\infty} \bigl(F(z) - \mathbf{1}\{y \leq z\}\bigr)^2 \, dz.
+$$ {#eq-crps}
+Equivalently, using the representation in terms of expectations:
+$$
+\operatorname{CRPS}(F, y) = \mathbb{E}_F|X - y| - \tfrac{1}{2}\mathbb{E}_F|X - X'|,
+$$ {#eq-crps-expectation}
+where $X, X' \stackrel{\text{iid}}{\sim} F$.
+:::
+
+::: {.callout-tip icon="false"}
+### Theorem (Propriety of the CRPS) [@gneiting2007strictly]
+The CRPS is a strictly proper scoring rule. Its associated divergence function is
+$$
+d(F, G) = \int_{-\infty}^{\infty} \bigl(F(z) - G(z)\bigr)^2 \, dz,
+$$
+the integrated squared CDF distance (Cramér distance).
+:::
+
+The CRPS has several attractive properties:
+
+- **Same unit as the observation**: unlike the LogS, the CRPS is measured in the same unit as $y$, making it directly interpretable.
+- **Reduces to MAE**: if $F$ is a point mass at $\hat{y}$, then $\operatorname{CRPS}(\delta_{\hat{y}}, y) = |\hat{y} - y|$.
+- **Closed-form expressions** are available for many parametric families (normal, Student-$t$, logistic, log-normal, etc.) — @jordan2019evaluating catalog around 30 such distributions.
+- **Ensemble estimation**: for an ensemble $\{x_1, \ldots, x_m\}$, the CRPS can be estimated via @eq-crps-expectation as
+$$
+\widehat{\operatorname{CRPS}}(\{x_i\}, y) = \frac{1}{m}\sum_{i=1}^{m}|x_i - y| - \frac{1}{2m^2}\sum_{i=1}^{m}\sum_{j=1}^{m}|x_i - x_j|.
+$$
+
+The **bias-corrected** (fair) version replaces $\frac{1}{2m^2}$ by $\frac{1}{2m(m-1)}$ and excludes $i = j$ terms.
+
+
+#### Quantile-Weighted CRPS
+
+In many applications — e.g. risk management or trading at extreme quantiles — we care more about specific regions of the distribution. The quantile-weighted CRPS allows emphasizing particular probability levels.
+
+::: {.callout-note}
+### Definition (Threshold-Weighted CRPS) [@gneiting2011comparing]
+For a non-negative weight function $w: \mathbb{R} \to [0, \infty)$, the **threshold-weighted CRPS** is
+$$
+\operatorname{twCRPS}(F, y) = \int_{-\infty}^{\infty} \bigl(F(z) - \mathbf{1}\{y \leq z\}\bigr)^2 \, w(z) \, dz.
+$$
+This is a proper scoring rule for any non-negative weight function $w$.
+:::
+
+By choosing $w$ to emphasize the upper or lower tail (e.g. $w(z) = \mathbf{1}\{z \geq q_{0.9}\}$), one can build scoring rules that focus on the region of economic interest — such as high-price events in electricity markets.
+
+
+### Multivariate Scoring Rules
+
+When forecasting multiple quantities jointly — e.g. electricity prices at several delivery hours, or wind power at multiple sites — we need scoring rules that assess the *joint* predictive distribution. Two prominent choices are the Energy Score and the Variogram Score.
+
+#### Energy Score
+
+::: {.callout-note}
+### Definition (Energy Score) [@gneiting2007strictly]
+The **Energy Score** is a multivariate generalization of the CRPS. For a predictive distribution $F$ on $\mathbb{R}^d$ and observation $\mathbf{y} \in \mathbb{R}^d$:
+$$
+\operatorname{ES}(F, \mathbf{y}) = \mathbb{E}_F \|\mathbf{X} - \mathbf{y}\|^\beta - \frac{1}{2} \mathbb{E}_F \|\mathbf{X} - \mathbf{X}'\|^\beta,
+$$
+with $0 < \beta < 2$ (typically $\beta = 1$), where $\mathbf{X}, \mathbf{X}' \stackrel{\text{iid}}{\sim} F$.
+:::
+
+::: {.callout-tip icon="false"}
+### Theorem (Propriety of the Energy Score) [@gneiting2007strictly]
+The Energy Score with $0 < \beta < 2$ is strictly proper. For $d = 1$ and $\beta = 1$, it reduces to the CRPS.
+:::
+
+In practice, for an ensemble of $m$ members $\{\mathbf{x}_1, \ldots, \mathbf{x}_m\}\subset \mathbb{R}^d$ (e.g. obtained from sampling from a diffusion model), the Energy Score can be estimated as
+$$
+\widehat{\operatorname{ES}}(\{\mathbf{x}_i\}, \mathbf{y}) = \frac{1}{m}\sum_{i=1}^{m} \|\mathbf{x}^{(i)} - \mathbf{y}\| - \frac{1}{2m^2}\sum_{i=1}^{m}\sum_{j=1}^{m} \|\mathbf{x}^{(i)} - \mathbf{x}^{(j)}\|,
+$$
+
+and we can obtain its bias-corrected version as
+$$
+\widehat{\operatorname{ES}}_{\text{fair}}(\{\mathbf{x}_i\}, \mathbf{y}) = \frac{1}{m}\sum_{i=1}^{m} \|\mathbf{x}^{(i)} - \mathbf{y}\| - \frac{1}{2m(m-1)}\sum_{i \neq j} \|\mathbf{x}^{(i)} - \mathbf{x}^{(j)}\|.
+$$
+Note that this is $\mathcal{O}(m^2d)$ due to the pairwise distance calculations, which can be computationally expensive for large ensembles and high-dimensional data. However, there are efficient algorithms and approximations that can be used to compute the Energy Score in practice.
+
+A known limitation of the Energy Score is its relatively low sensitivity to misspecification of the *correlation structure* — it is primarily driven by marginal calibration. This motivates the Variogram Score.
+
+
+#### Variogram Score
+
+::: {.callout-note}
+### Definition (Variogram Score) [@scheuerer2015variogram]
+The **Variogram Score** of order $p > 0$ for a predictive distribution $F$ on $\mathbb{R}^d$ and observation $\mathbf{y} = (y_1, \ldots, y_d)$ is
+$$
+\operatorname{VS}_p(F, \mathbf{y}) = \sum_{i=1}^{d}\sum_{j=1}^{d} w_{ij}\Bigl(|y_i - y_j|^p - \mathbb{E}_F|X_i - X_j|^p\Bigr)^2,
+$$
+where $w_{ij} \geq 0$ are non-negative weights (typically $w_{ij} = 1$) and $p = 0.5$ or $p = 1$ are common choices.
+:::
+
+::: {.callout-tip icon="false"}
+### Theorem (Propriety of the Variogram Score) [@scheuerer2015variogram]
+The Variogram Score $\operatorname{VS}_p$ is proper for any $p \in (0, 2)$ and non-negative weights $w_{ij}$.
+:::
+
+The Variogram Score is designed to be sensitive to the *dependence structure* of the predictive distribution, as it compares pairwise differences between components. The ensemble estimate is straightforward:
+$$
+\widehat{\operatorname{VS}}_p(\{\mathbf{x}_k\}, \mathbf{y}) = \sum_{i=1}^{d}\sum_{j=1}^{d} w_{ij}\Bigl(|y_i - y_j|^p - \frac{1}{m}\sum_{k=1}^{m}|x_i^{(k)} - x_j^{(k)}|^p\Bigr)^2.
+$$
+
+In practice, using both the Energy Score and the Variogram Score together gives a complementary picture: the ES primarily assesses marginal calibration, while the VS probes the dependence structure.
+
+
+## Practical Guide: Using Scoring Rules
+
+### When to Use Which Score
+
+| Scoring Rule | Setting | Strengths | Limitations |
+|:---|:---|:---|:---|
+| **Brier Score** | Binary/categorical | Decomposable (reliability, resolution, uncertainty) | Discrete events only |
+| **Log Score** | Continuous (density) | Uniquely local; maximum sensitivity to misspecification | Requires density; sensitive to tails; not robust |
+| **CRPS** | Continuous univariate | Same unit as data; robust; closed forms available | Univariate only |
+| **tw-CRPS** | Continuous univariate | Emphasizes regions of interest (tails) | Requires weight function choice |
+| **Energy Score** | Multivariate | Generalizes CRPS; simple to compute | Low sensitivity to correlation misspecification |
+| **Variogram Score** | Multivariate | Sensitive to dependence structure | Only proper, not strictly proper in general |
+
+
+### Implementation Tips
+
+1. **Always use bias-corrected (fair) versions** when scoring ensembles, especially with small ensemble sizes. The standard estimators are biased toward smaller values for underdispersed forecasts.
+
+2. **Report average scores** over a test set. A single score value is noisy — the power of scoring rules emerges through aggregation.
+
+3. **Use the Diebold-Mariano test** (or its variants) to assess whether differences in average scores between competing models are statistically significant.
+
+4. **Combine scores**: no single score captures all aspects of forecast quality. Using CRPS + calibration diagnostics (e.g. PIT histograms) gives a more complete picture than any single metric.
+
+
+## Calibration Diagnostics: PIT Histograms
+
+Scoring rules quantify forecast quality with a single number, but they do not *diagnose* where or how a forecast fails. A fundamental complement is the **Probability Integral Transform (PIT) histogram**, which provides a visual assessment of calibration — the statistical consistency between the predictive distribution and the observations [@dawid1984present; @gneiting2007probabilistic].
+
+::: {.callout-note}
+### Definition (Probability Integral Transform)
+Given a predictive CDF $F$ and a verifying observation $y$, the **PIT value** is
+$$
+u = F(y).
+$$
+If $F$ is the true data-generating distribution and is continuous, then $U = F(Y) \sim \mathrm{Uniform}(0, 1)$.
+:::
+
+::: {.callout-tip icon="false"}
+### Theorem (Calibration Criterion) [@dawid1984present]
+A sequence of probabilistic forecasts $\{F_t\}_{t=1}^T$ is **probabilistically calibrated** if the PIT values $u_t = F_t(y_t)$ are i.i.d. $\mathrm{Uniform}(0, 1)$.
+
+A histogram of PIT values that is approximately flat (uniform) indicates good calibration. Systematic deviations reveal specific deficiencies:
+
+- **$\cup$-shape**: underdispersion (prediction intervals too narrow).
+- **$\cap$-shape**: overdispersion (prediction intervals too wide).
+- **Right-skewed** (mass near 0): systematic overestimation (forecasted values too high).
+- **Left-skewed** (mass near 1): systematic underestimation (forecasted values too low).
+:::
+
+To illustrate, we simulate PIT values from four scenarios: a well-calibrated forecast and three common miscalibrations.
+
+```{python}
+#| label: fig-pit
+#| fig-cap: "PIT histograms for four forecast scenarios. A uniform histogram (top-left) indicates calibration. Deviations reveal underdispersion ($\\cup$-shape), overdispersion ($\\cap$-shape), and location bias (skewed)."
+#| fig-width: 7
+#| fig-height: 5
+
+np.random.seed(42)
+n = 2000
+
+# Well-calibrated: PIT ~ Uniform(0,1)
+pit_calibrated = np.random.uniform(0, 1, n)
+
+# Underdispersed: true variance > forecast variance => U-shape
+# Observations drawn from N(0, 2^2), forecast assumes N(0, 1)
+y_underdispersed = np.random.normal(0, 2, n)
+pit_underdispersed = stats.norm.cdf(y_underdispersed, loc=0, scale=1)
+
+# Overdispersed: true variance < forecast variance => hump-shape
+# Observations drawn from N(0, 0.5^2), forecast assumes N(0, 1)
+y_overdispersed = np.random.normal(0, 0.5, n)
+pit_overdispersed = stats.norm.cdf(y_overdispersed, loc=0, scale=1)
+
+# Biased (overestimation): forecast mean too high => mass near 1
+# Observations from N(0, 1), forecast assumes N(1.5, 1)
+y_biased = np.random.normal(0, 1, n)
+pit_biased = stats.norm.cdf(y_biased, loc=1.5, scale=1)
+
+df_pit = pd.DataFrame({
+    "PIT": np.concatenate([pit_calibrated, pit_underdispersed,
+                           pit_overdispersed, pit_biased]),
+    "Scenario": (["Well-calibrated"] * n + ["Underdispersed"] * n +
+                 ["Overdispersed"] * n + ["Biased (overestimation)"] * n),
+})
+df_pit["Scenario"] = pd.Categorical(
+    df_pit["Scenario"],
+    categories=["Well-calibrated", "Underdispersed",
+                 "Overdispersed", "Biased (overestimation)"],
+    ordered=True,
+)
+
+fill_colors = {
+    "Well-calibrated": ACADEMIC_COLORS["cobalt"],
+    "Underdispersed": ACADEMIC_COLORS["vermillion"],
+    "Overdispersed": ACADEMIC_COLORS["teal"],
+    "Biased (overestimation)": ACADEMIC_COLORS["amber"],
+}
+
+p = (
+    pn.ggplot(df_pit, pn.aes(x="PIT", fill="Scenario"))
+    + pn.geom_histogram(bins=20, color="white", size=0.3, alpha=0.85)
+    + pn.geom_hline(yintercept=n / 20, linetype="dashed",
+                    color=ACADEMIC_COLORS["ink"], size=0.5, alpha=0.6)
+    + pn.facet_wrap("~Scenario", ncol=2, scales="free_y")
+    + pn.scale_fill_manual(values=fill_colors)
+    + pn.labs(x="PIT value", y="Count")
+    + theme_academic(base_size=9, grid="y")
+    + pn.theme(
+        figure_size=(7, 5),
+        legend_position="none",
+        strip_text=element_text(size=8, face="bold"),
+    )
+)
+p
+```
+
+In practice, PIT histograms are the first diagnostic to check *before* comparing scoring rules across models. A model with a lower CRPS but a strongly non-uniform PIT histogram may be getting lucky on average while being systematically miscalibrated — a situation that is dangerous for decision-making.
+
+For **ensemble forecasts** where the predictive CDF is not available analytically, the PIT can be approximated using the empirical CDF of the ensemble. Given an ensemble $\{x_1, \ldots, x_m\}$ and observation $y$, the rank-based PIT is
+$$
+u = \frac{1}{m+1}\sum_{i=1}^{m} \mathbf{1}\{x_i \leq y\},
+$$
+which avoids boundary effects at 0 and 1. For multivariate forecasts, one typically examines PIT histograms *marginally* (one per component) or uses the multivariate rank histogram.
+
+## Formal Model Comparison: The Diebold-Mariano Test
+
+While scoring rules provide a natural ranking of forecasting models via their average scores, a critical question remains: *is the observed difference in scores statistically significant, or could it have arisen by chance?* The **Diebold-Mariano (DM) test** [@diebold1995comparing] provides a formal answer.
+
+::: {.callout-note}
+### Definition (Score Differential)
+Given two competing forecast models $A$ and $B$ with score sequences $\{S_t^A\}_{t=1}^T$ and $\{S_t^B\}_{t=1}^T$ (e.g. CRPS values at each time step), the **score differential** is
+$$
+\delta_t = S_t^A - S_t^B, \qquad t = 1, \ldots, T.
+$$
+Under negatively oriented scores (lower is better), $\bar{\delta} < 0$ suggests that model $A$ is superior.
+:::
+
+::: {.callout-tip icon="false"}
+### Theorem (Diebold-Mariano Test) [@diebold1995comparing]
+Under the null hypothesis $H_0: \mathbb{E}[\delta_t] = 0$ (equal predictive ability), the test statistic
+$$
+\mathrm{DM} = \frac{\bar{\delta}}{\widehat{\sigma}_{\bar{\delta}}}
+$$
+is asymptotically standard normal, where $\bar{\delta} = T^{-1}\sum_{t=1}^T \delta_t$ and $\widehat{\sigma}_{\bar{\delta}}$ is a HAC (heteroskedasticity and autocorrelation consistent) estimate of the standard deviation of $\bar{\delta}$.
+
+For $h$-step-ahead forecasts, the score differentials are at most $(h-1)$-dependent, and the long-run variance can be estimated as
+$$
+\widehat{\sigma}_{\bar{\delta}}^2 = \frac{1}{T}\left(\hat{\gamma}_0 + 2\sum_{k=1}^{h-1}\hat{\gamma}_k\right),
+$$
+where $\hat{\gamma}_k = T^{-1}\sum_{t=k+1}^{T}(\delta_t - \bar{\delta})(\delta_{t-k} - \bar{\delta})$.
+:::
+
+@harvey1997testing propose a small-sample correction that replaces the normal reference distribution with a Student-$t$ distribution with $T - 1$ degrees of freedom and applies a finite-sample bias correction to the variance:
+$$
+\mathrm{DM}^* = \mathrm{DM} \cdot \sqrt{\frac{T + 1 - 2h + h(h-1)/T}{T}}.
+$$
+
+We now implement the DM test and demonstrate it on simulated forecasts.
+
+```{python}
+def diebold_mariano(scores_A, scores_B, h=1, harvey_correction=True):
+    """
+    Diebold-Mariano test for equal predictive ability.
+
+    Parameters
+    ----------
+    scores_A, scores_B : array-like
+        Score sequences for models A and B (lower = better).
+    h : int
+        Forecast horizon (for HAC variance estimation).
+    harvey_correction : bool
+        Apply the Harvey, Leybourne & Newbold (1997) small-sample correction.
+
+    Returns
+    -------
+    dict with keys: statistic, p_value, mean_diff
+    """
+    scores_A = np.asarray(scores_A)
+    scores_B = np.asarray(scores_B)
+    delta = scores_A - scores_B
+    T = len(delta)
+    d_bar = delta.mean()
+
+    # HAC variance (Newey-West with h-1 lags)
+    gamma_0 = np.mean((delta - d_bar) ** 2)
+    gamma_sum = 0.0
+    for k in range(1, h):
+        gamma_k = np.mean((delta[k:] - d_bar) * (delta[:-k] - d_bar))
+        gamma_sum += gamma_k
+    var_d_bar = (gamma_0 + 2 * gamma_sum) / T
+
+    if var_d_bar <= 0:
+        return {"statistic": np.nan, "p_value": np.nan, "mean_diff": d_bar}
+
+    dm_stat = d_bar / np.sqrt(var_d_bar)
+
+    if harvey_correction:
+        correction = np.sqrt((T + 1 - 2 * h + h * (h - 1) / T) / T)
+        dm_stat = dm_stat * correction
+        p_value = 2 * stats.t.sf(np.abs(dm_stat), df=T - 1)
+    else:
+        p_value = 2 * stats.norm.sf(np.abs(dm_stat))
+
+    return {"statistic": dm_stat, "p_value": p_value, "mean_diff": d_bar}
+```
+
+```{python}
+#| label: fig-dm-test
+#| fig-cap: "Diebold-Mariano test applied to CRPS score differentials. Model A (well-calibrated) vs Model B (biased). The distribution of score differentials $\\delta_t = S_t^A - S_t^B$ is centered below zero, confirming that Model A significantly outperforms Model B."
+#| fig-width: 5
+#| fig-height: 3.5
+
+np.random.seed(42)
+T = 500
+
+# Model A: well-calibrated N(0, 1) forecasts, true DGP is N(0, 1)
+y_true = np.random.normal(0, 1, T)
+
+# CRPS for N(mu, sigma^2): closed-form
+def crps_normal(y, mu, sigma):
+    z = (y - mu) / sigma
+    return sigma * (z * (2 * stats.norm.cdf(z) - 1) + 2 * stats.norm.pdf(z) - 1 / np.sqrt(np.pi))
+
+scores_A = crps_normal(y_true, mu=0.0, sigma=1.0)
+scores_B = crps_normal(y_true, mu=0.8, sigma=1.0)  # biased model
+
+result = diebold_mariano(scores_A, scores_B, h=1)
+
+delta = scores_A - scores_B
+df_delta = pd.DataFrame({"delta": delta})
+
+p = (
+    pn.ggplot(df_delta, pn.aes(x="delta"))
+    + pn.geom_histogram(bins=40, fill=ACADEMIC_COLORS["cobalt"],
+                        color="white", size=0.3, alpha=0.8)
+    + pn.geom_vline(xintercept=0, linetype="dashed",
+                    color=ACADEMIC_COLORS["ink"], size=0.6)
+    + pn.geom_vline(xintercept=delta.mean(), linetype="solid",
+                    color=ACADEMIC_COLORS["vermillion"], size=0.8)
+    + pn.annotate(
+        "text",
+        x=delta.mean() - 0.02, y=40,
+        label=f"$\\bar{{\\delta}}$ = {delta.mean():.3f}",
+        color=ACADEMIC_COLORS["vermillion"], size=8, ha="right",
+    )
+    + pn.annotate(
+        "text",
+        x=max(delta) * 0.55, y=35,
+        label=f"DM = {result['statistic']:.2f}\np = {result['p_value']:.4f}",
+        color=ACADEMIC_COLORS["ink"], size=7.5, ha="left",
+    )
+    + pn.labs(
+        x="Score differential  $\\delta_t = S_t^A - S_t^B$",
+        y="Count",
+    )
+    + theme_academic(base_size=9, grid="y")
+    + pn.theme(figure_size=(5, 3.5))
+)
+p
+```
+
+The negative mean differential $\bar{\delta} < 0$ and the highly significant $p$-value confirm that Model A's forecast quality is genuinely superior — the difference is not due to sampling noise.
+
+### Practical Considerations
+
+- **Multiple comparisons**: when comparing $K > 2$ models, apply a correction (e.g. Bonferroni or the Model Confidence Set procedure) to control the family-wise error rate.
+- **Score choice matters**: the DM test can be applied with *any* scoring rule. Using the CRPS tests for overall distributional superiority; using a tail-weighted CRPS tests for superiority in the region that matters most for your application.
+- **Autocorrelation**: for multi-step forecasts ($h > 1$), the HAC variance estimator is essential. Ignoring autocorrelation in score differentials inflates the DM statistic and produces spuriously small $p$-values.
+- **Sample size**: the DM test is asymptotic. For small test sets ($T < 50$), the Harvey-Leybourne-Newbold correction with $t$-distribution critical values is strongly recommended.
+
+## References

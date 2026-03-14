@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.43">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jan Schlegel">
+<meta name="dcterms.date" content="2026-03-13">
+
+<title>Jan Schlegel – Proper Scoring Rules: Evaluating Probabilistic Forecasts in Energy Markets</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../logo.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="color-scheme" content="dark light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Jan Schlegel</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JHSchlegel"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Proper Scoring Rules: Evaluating Probabilistic Forecasts in Energy Markets</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Python</div>
+                <div class="quarto-category">Statistics</div>
+                <div class="quarto-category">Data Science</div>
+                <div class="quarto-category">Energy</div>
+                <div class="quarto-category">Machine Learning</div>
+                <div class="quarto-category">Forecasting</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jan Schlegel </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">March 13, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="block-title">Abstract</div>
+      We examine the application of proper scoring rules in evaluating probabilistic forecasts within energy markets. These rules provide a rigorous framework for assessing the quality of probabilistic predictions, ensuring that forecasters are incentivized to provide accurate and well-calibrated probabilities. Our focus lies on the Continuous Ranked Probability Score (CRPS) and its multivariate generalizations — the Energy Score and Variogram Score — with practical examples from electricity price and wind power forecasting.
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#proper-scoring-rules" id="toc-proper-scoring-rules" class="nav-link" data-scroll-target="#proper-scoring-rules"><span class="header-section-number">2</span> Proper Scoring Rules</a>
+  <ul class="collapse">
+  <li><a href="#setup-and-core-definitions" id="toc-setup-and-core-definitions" class="nav-link" data-scroll-target="#setup-and-core-definitions"><span class="header-section-number">2.1</span> Setup and Core Definitions</a></li>
+  <li><a href="#univariate-scoring-rules" id="toc-univariate-scoring-rules" class="nav-link" data-scroll-target="#univariate-scoring-rules"><span class="header-section-number">2.2</span> Univariate Scoring Rules</a></li>
+  <li><a href="#multivariate-scoring-rules" id="toc-multivariate-scoring-rules" class="nav-link" data-scroll-target="#multivariate-scoring-rules"><span class="header-section-number">2.3</span> Multivariate Scoring Rules</a></li>
+  </ul></li>
+  <li><a href="#practical-guide-using-scoring-rules" id="toc-practical-guide-using-scoring-rules" class="nav-link" data-scroll-target="#practical-guide-using-scoring-rules"><span class="header-section-number">3</span> Practical Guide: Using Scoring Rules</a>
+  <ul class="collapse">
+  <li><a href="#when-to-use-which-score" id="toc-when-to-use-which-score" class="nav-link" data-scroll-target="#when-to-use-which-score"><span class="header-section-number">3.1</span> When to Use Which Score</a></li>
+  <li><a href="#implementation-tips" id="toc-implementation-tips" class="nav-link" data-scroll-target="#implementation-tips"><span class="header-section-number">3.2</span> Implementation Tips</a></li>
+  </ul></li>
+  <li><a href="#calibration-diagnostics-pit-histograms" id="toc-calibration-diagnostics-pit-histograms" class="nav-link" data-scroll-target="#calibration-diagnostics-pit-histograms"><span class="header-section-number">4</span> Calibration Diagnostics: PIT Histograms</a></li>
+  <li><a href="#formal-model-comparison-the-diebold-mariano-test" id="toc-formal-model-comparison-the-diebold-mariano-test" class="nav-link" data-scroll-target="#formal-model-comparison-the-diebold-mariano-test"><span class="header-section-number">5</span> Formal Model Comparison: The Diebold-Mariano Test</a>
+  <ul class="collapse">
+  <li><a href="#practical-considerations" id="toc-practical-considerations" class="nav-link" data-scroll-target="#practical-considerations"><span class="header-section-number">5.1</span> Practical Considerations</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">6</span> References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p><img src="image.png" class="img-fluid"></p>
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In many real-world decision problems — from dispatching power plants to hedging financial positions — what matters is not a single point forecast but a full <em>probabilistic</em> forecast that quantifies the uncertainty around future outcomes. A probabilistic forecast issues a predictive distribution <span class="math inline">\(F\)</span> for a future quantity <span class="math inline">\(Y\)</span>, and the natural question becomes: <em>how do we evaluate such forecasts?</em></p>
+<p>Point forecasts are commonly assessed by the mean absolute error (MAE) or root mean squared error (RMSE). But these metrics are blind to the shape, spread, and calibration of a predictive distribution. A well-calibrated 90% prediction interval that is too wide is useless for trading; a tight interval that misses 30% of observations is dangerously overconfident. We need evaluation tools that reward the full predictive distribution — and penalize misspecification of any of its features.</p>
+<p><strong>Scoring rules</strong> provide exactly this framework. A scoring rule <span class="math inline">\(S(F, y)\)</span> assigns a numerical penalty (or reward) to a forecast distribution <span class="math inline">\(F\)</span> when the outcome <span class="math inline">\(y\)</span> materializes. The key requirement for a <em>proper</em> scoring rule is that it incentivizes honesty: the forecaster’s expected score is optimized when the issued forecast <span class="math inline">\(F\)</span> coincides with the true data-generating distribution <span class="math inline">\(G\)</span>. This property is fundamental for principled forecast evaluation and comparison <span class="citation" data-cites="gneiting2007strictly winkler1996scoring">(<a href="#ref-gneiting2007strictly" role="doc-biblioref">Gneiting and Raftery 2007</a>; <a href="#ref-winkler1996scoring" role="doc-biblioref">Winkler et al. 1996</a>)</span>.</p>
+<p>In this post we develop the theory of proper scoring rules from the ground up, survey the most important examples — Brier Score, Logarithmic Score, CRPS, Energy Score, and Variogram Score — and discuss essential diagnostic tools: PIT histograms for calibration assessment and the Diebold-Mariano test for formal model comparison.</p>
+</section>
+<section id="proper-scoring-rules" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="proper-scoring-rules"><span class="header-section-number">2</span> Proper Scoring Rules</h2>
+<section id="setup-and-core-definitions" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="setup-and-core-definitions"><span class="header-section-number">2.1</span> Setup and Core Definitions</h3>
+<p>Let <span class="math inline">\(\mathcal{F}\)</span> denote a convex class of probability distributions on <span class="math inline">\(\mathbb{R}^d\)</span> and let <span class="math inline">\(y \in \mathbb{R}^d\)</span> be the verifying observation.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (Scoring Rule)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A <strong>scoring rule</strong> is a function <span class="math display">\[
+S: \mathcal{F} \times \mathbb{R}^d \to \overline{\mathbb{R}},
+\]</span> where <span class="math inline">\(S(F, y)\)</span> quantifies the quality of the predictive distribution <span class="math inline">\(F\)</span> when the outcome <span class="math inline">\(y\)</span> is observed. By convention we adopt the <em>negatively oriented</em> framework: <strong>lower scores indicate better forecasts</strong>.</p>
+</div>
+</div>
+<p>The expected score under the true distribution <span class="math inline">\(G\)</span> is <span class="math display">\[
+S(F, G) = \mathbb{E}_{Y \sim G}[S(F, Y)].
+\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (Propriety) <span class="citation" data-cites="gneiting2007strictly">(<a href="#ref-gneiting2007strictly" role="doc-biblioref">Gneiting and Raftery 2007</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A scoring rule <span class="math inline">\(S\)</span> is <strong>proper</strong> relative to <span class="math inline">\(\mathcal{F}\)</span> if <span class="math display">\[
+S(G, G) \leq S(F, G), \qquad \forall\, F, G \in \mathcal{F},
+\]</span> i.e.&nbsp;the expected score is minimized when the forecast <span class="math inline">\(F\)</span> equals the true distribution <span class="math inline">\(G\)</span>.</p>
+<p>It is <strong>strictly proper</strong> if equality holds only when <span class="math inline">\(F = G\)</span>.</p>
+</div>
+</div>
+<p>Propriety guarantees that a forecaster cannot improve their expected score by <em>hedging</em> — issuing a distribution different from their true belief. Strict propriety goes further: it ensures that only the true distribution achieves the optimum, making the scoring rule a <em>faithful</em> evaluation tool.</p>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem (Characterization via Divergence) <span class="citation" data-cites="gneiting2007strictly">(<a href="#ref-gneiting2007strictly" role="doc-biblioref">Gneiting and Raftery 2007</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A scoring rule <span class="math inline">\(S\)</span> is proper if and only if the <strong>divergence function</strong> <span class="math display">\[
+d(F, G) = S(F, G) - S(G, G)
+\]</span> satisfies <span class="math inline">\(d(F, G) \geq 0\)</span> for all <span class="math inline">\(F, G \in \mathcal{F}\)</span>, with <span class="math inline">\(d(G, G) = 0\)</span>.</p>
+<p>For a strictly proper scoring rule, <span class="math inline">\(d(F, G) = 0 \iff F = G\)</span>.</p>
+</div>
+</div>
+<p>The divergence <span class="math inline">\(d(F, G)\)</span> measures the <em>penalty for misspecification</em>: the excess expected loss incurred by reporting <span class="math inline">\(F\)</span> when the truth is <span class="math inline">\(G\)</span>. For the Logarithmic Score, this divergence is the Kullback–Leibler divergence; for the CRPS, it is related to the integrated squared difference between CDFs.</p>
+</section>
+<section id="univariate-scoring-rules" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="univariate-scoring-rules"><span class="header-section-number">2.2</span> Univariate Scoring Rules</h3>
+<p>We now present the most important scoring rules, starting with the discrete/binary case and building toward continuous and multivariate settings.</p>
+<section id="brier-score" class="level4" data-number="2.2.1">
+<h4 data-number="2.2.1" class="anchored" data-anchor-id="brier-score"><span class="header-section-number">2.2.1</span> Brier Score</h4>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (Brier Score) <span class="citation" data-cites="brier1950verification">(<a href="#ref-brier1950verification" role="doc-biblioref">Brier 1950</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a binary event with forecast probability <span class="math inline">\(p \in [0,1]\)</span> and outcome <span class="math inline">\(y \in \{0, 1\}\)</span>, the <strong>Brier Score</strong> is <span class="math display">\[
+\operatorname{BS}(p, y) = (p - y)^2.
+\]</span> More generally, for <span class="math inline">\(K\)</span> mutually exclusive categories with forecast probabilities <span class="math inline">\(\mathbf{p} = (p_1, \ldots, p_K)\)</span> and one-hot outcome <span class="math inline">\(\mathbf{y}\)</span>: <span class="math display">\[
+\operatorname{BS}(\mathbf{p}, \mathbf{y}) = \sum_{k=1}^{K} (p_k - y_k)^2.
+\]</span></p>
+</div>
+</div>
+<p>The Brier Score is strictly proper. It can be decomposed into <strong>reliability</strong> (calibration), <strong>resolution</strong> (sharpness), and <strong>uncertainty</strong> components, making it useful for diagnostic analysis of categorical forecasts.</p>
+</section>
+<section id="logarithmic-score" class="level4" data-number="2.2.2">
+<h4 data-number="2.2.2" class="anchored" data-anchor-id="logarithmic-score"><span class="header-section-number">2.2.2</span> Logarithmic Score</h4>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (Logarithmic Score) <span class="citation" data-cites="good1952rational">(<a href="#ref-good1952rational" role="doc-biblioref">Good 1952</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a predictive density <span class="math inline">\(f\)</span> and outcome <span class="math inline">\(y\)</span>, the <strong>Logarithmic Score</strong> (negative log-likelihood) is <span class="math display">\[
+\operatorname{LogS}(f, y) = -\log f(y).
+\]</span></p>
+</div>
+</div>
+<p>The Logarithmic Score is strictly proper and is the only <em>local</em> proper scoring rule — it depends on <span class="math inline">\(f\)</span> only through the value <span class="math inline">\(f(y)\)</span> at the realized outcome. This makes it extremely sensitive to tail behavior: assigning near-zero probability to an event that occurs yields an arbitrarily large penalty. While this sensitivity is desirable for detecting overconfidence, it can make the LogS less robust in practice than other scores.</p>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem (Locality of the LogS) <span class="citation" data-cites="gneiting2007strictly">(<a href="#ref-gneiting2007strictly" role="doc-biblioref">Gneiting and Raftery 2007</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Logarithmic Score is the <strong>unique</strong> proper scoring rule (up to equivalence) that is <em>local</em>, i.e.&nbsp;<span class="math inline">\(S(F, y)\)</span> depends on <span class="math inline">\(F\)</span> only through <span class="math inline">\(f(y)\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="continuous-ranked-probability-score-crps" class="level4" data-number="2.2.3">
+<h4 data-number="2.2.3" class="anchored" data-anchor-id="continuous-ranked-probability-score-crps"><span class="header-section-number">2.2.3</span> Continuous Ranked Probability Score (CRPS)</h4>
+<p>The CRPS is perhaps the most widely used proper scoring rule for continuous univariate forecasts. It generalizes the absolute error to distributional forecasts.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (CRPS) <span class="citation" data-cites="matheson1976scoring">(<a href="#ref-matheson1976scoring" role="doc-biblioref">Matheson and Winkler 1976</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a predictive CDF <span class="math inline">\(F\)</span> and observation <span class="math inline">\(y \in \mathbb{R}\)</span>, the <strong>Continuous Ranked Probability Score</strong> is <span id="eq-crps"><span class="math display">\[
+\operatorname{CRPS}(F, y) = \int_{-\infty}^{\infty} \bigl(F(z) - \mathbf{1}\{y \leq z\}\bigr)^2 \, dz.
+\tag{1}\]</span></span> Equivalently, using the representation in terms of expectations: <span id="eq-crps-expectation"><span class="math display">\[
+\operatorname{CRPS}(F, y) = \mathbb{E}_F|X - y| - \tfrac{1}{2}\mathbb{E}_F|X - X'|,
+\tag{2}\]</span></span> where <span class="math inline">\(X, X' \stackrel{\text{iid}}{\sim} F\)</span>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem (Propriety of the CRPS) <span class="citation" data-cites="gneiting2007strictly">(<a href="#ref-gneiting2007strictly" role="doc-biblioref">Gneiting and Raftery 2007</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The CRPS is a strictly proper scoring rule. Its associated divergence function is <span class="math display">\[
+d(F, G) = \int_{-\infty}^{\infty} \bigl(F(z) - G(z)\bigr)^2 \, dz,
+\]</span> the integrated squared CDF distance (Cramér distance).</p>
+</div>
+</div>
+<p>The CRPS has several attractive properties:</p>
+<ul>
+<li><strong>Same unit as the observation</strong>: unlike the LogS, the CRPS is measured in the same unit as <span class="math inline">\(y\)</span>, making it directly interpretable.</li>
+<li><strong>Reduces to MAE</strong>: if <span class="math inline">\(F\)</span> is a point mass at <span class="math inline">\(\hat{y}\)</span>, then <span class="math inline">\(\operatorname{CRPS}(\delta_{\hat{y}}, y) = |\hat{y} - y|\)</span>.</li>
+<li><strong>Closed-form expressions</strong> are available for many parametric families (normal, Student-<span class="math inline">\(t\)</span>, logistic, log-normal, etc.) — <span class="citation" data-cites="jordan2019evaluating">Jordan, Krüger, and Lerch (<a href="#ref-jordan2019evaluating" role="doc-biblioref">2019</a>)</span> catalog around 30 such distributions.</li>
+<li><strong>Ensemble estimation</strong>: for an ensemble <span class="math inline">\(\{x_1, \ldots, x_m\}\)</span>, the CRPS can be estimated via <a href="#eq-crps-expectation" class="quarto-xref">Equation&nbsp;2</a> as <span class="math display">\[
+\widehat{\operatorname{CRPS}}(\{x_i\}, y) = \frac{1}{m}\sum_{i=1}^{m}|x_i - y| - \frac{1}{2m^2}\sum_{i=1}^{m}\sum_{j=1}^{m}|x_i - x_j|.
+\]</span></li>
+</ul>
+<p>The <strong>bias-corrected</strong> (fair) version replaces <span class="math inline">\(\frac{1}{2m^2}\)</span> by <span class="math inline">\(\frac{1}{2m(m-1)}\)</span> and excludes <span class="math inline">\(i = j\)</span> terms.</p>
+</section>
+<section id="quantile-weighted-crps" class="level4" data-number="2.2.4">
+<h4 data-number="2.2.4" class="anchored" data-anchor-id="quantile-weighted-crps"><span class="header-section-number">2.2.4</span> Quantile-Weighted CRPS</h4>
+<p>In many applications — e.g.&nbsp;risk management or trading at extreme quantiles — we care more about specific regions of the distribution. The quantile-weighted CRPS allows emphasizing particular probability levels.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (Threshold-Weighted CRPS) <span class="citation" data-cites="gneiting2011comparing">(<a href="#ref-gneiting2011comparing" role="doc-biblioref">Gneiting and Ranjan 2011</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a non-negative weight function <span class="math inline">\(w: \mathbb{R} \to [0, \infty)\)</span>, the <strong>threshold-weighted CRPS</strong> is <span class="math display">\[
+\operatorname{twCRPS}(F, y) = \int_{-\infty}^{\infty} \bigl(F(z) - \mathbf{1}\{y \leq z\}\bigr)^2 \, w(z) \, dz.
+\]</span> This is a proper scoring rule for any non-negative weight function <span class="math inline">\(w\)</span>.</p>
+</div>
+</div>
+<p>By choosing <span class="math inline">\(w\)</span> to emphasize the upper or lower tail (e.g.&nbsp;<span class="math inline">\(w(z) = \mathbf{1}\{z \geq q_{0.9}\}\)</span>), one can build scoring rules that focus on the region of economic interest — such as high-price events in electricity markets.</p>
+</section>
+</section>
+<section id="multivariate-scoring-rules" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="multivariate-scoring-rules"><span class="header-section-number">2.3</span> Multivariate Scoring Rules</h3>
+<p>When forecasting multiple quantities jointly — e.g.&nbsp;electricity prices at several delivery hours, or wind power at multiple sites — we need scoring rules that assess the <em>joint</em> predictive distribution. Two prominent choices are the Energy Score and the Variogram Score.</p>
+<section id="energy-score" class="level4" data-number="2.3.1">
+<h4 data-number="2.3.1" class="anchored" data-anchor-id="energy-score"><span class="header-section-number">2.3.1</span> Energy Score</h4>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (Energy Score) <span class="citation" data-cites="gneiting2007strictly">(<a href="#ref-gneiting2007strictly" role="doc-biblioref">Gneiting and Raftery 2007</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <strong>Energy Score</strong> is a multivariate generalization of the CRPS. For a predictive distribution <span class="math inline">\(F\)</span> on <span class="math inline">\(\mathbb{R}^d\)</span> and observation <span class="math inline">\(\mathbf{y} \in \mathbb{R}^d\)</span>: <span class="math display">\[
+\operatorname{ES}(F, \mathbf{y}) = \mathbb{E}_F \|\mathbf{X} - \mathbf{y}\|^\beta - \frac{1}{2} \mathbb{E}_F \|\mathbf{X} - \mathbf{X}'\|^\beta,
+\]</span> with <span class="math inline">\(0 &lt; \beta &lt; 2\)</span> (typically <span class="math inline">\(\beta = 1\)</span>), where <span class="math inline">\(\mathbf{X}, \mathbf{X}' \stackrel{\text{iid}}{\sim} F\)</span>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem (Propriety of the Energy Score) <span class="citation" data-cites="gneiting2007strictly">(<a href="#ref-gneiting2007strictly" role="doc-biblioref">Gneiting and Raftery 2007</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Energy Score with <span class="math inline">\(0 &lt; \beta &lt; 2\)</span> is strictly proper. For <span class="math inline">\(d = 1\)</span> and <span class="math inline">\(\beta = 1\)</span>, it reduces to the CRPS.</p>
+</div>
+</div>
+<p>In practice, for an ensemble of <span class="math inline">\(m\)</span> members <span class="math inline">\(\{\mathbf{x}_1, \ldots, \mathbf{x}_m\}\subset \mathbb{R}^d\)</span> (e.g.&nbsp;obtained from sampling from a diffusion model), the Energy Score can be estimated as <span class="math display">\[
+\widehat{\operatorname{ES}}(\{\mathbf{x}_i\}, \mathbf{y}) = \frac{1}{m}\sum_{i=1}^{m} \|\mathbf{x}^{(i)} - \mathbf{y}\| - \frac{1}{2m^2}\sum_{i=1}^{m}\sum_{j=1}^{m} \|\mathbf{x}^{(i)} - \mathbf{x}^{(j)}\|,
+\]</span></p>
+<p>and we can obtain its bias-corrected version as <span class="math display">\[
+\widehat{\operatorname{ES}}_{\text{fair}}(\{\mathbf{x}_i\}, \mathbf{y}) = \frac{1}{m}\sum_{i=1}^{m} \|\mathbf{x}^{(i)} - \mathbf{y}\| - \frac{1}{2m(m-1)}\sum_{i \neq j} \|\mathbf{x}^{(i)} - \mathbf{x}^{(j)}\|.
+\]</span> Note that this is <span class="math inline">\(\mathcal{O}(m^2d)\)</span> due to the pairwise distance calculations, which can be computationally expensive for large ensembles and high-dimensional data. However, there are efficient algorithms and approximations that can be used to compute the Energy Score in practice.</p>
+<p>A known limitation of the Energy Score is its relatively low sensitivity to misspecification of the <em>correlation structure</em> — it is primarily driven by marginal calibration. This motivates the Variogram Score.</p>
+</section>
+<section id="variogram-score" class="level4" data-number="2.3.2">
+<h4 data-number="2.3.2" class="anchored" data-anchor-id="variogram-score"><span class="header-section-number">2.3.2</span> Variogram Score</h4>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (Variogram Score) <span class="citation" data-cites="scheuerer2015variogram">(<a href="#ref-scheuerer2015variogram" role="doc-biblioref">Scheuerer and Hamill 2015</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <strong>Variogram Score</strong> of order <span class="math inline">\(p &gt; 0\)</span> for a predictive distribution <span class="math inline">\(F\)</span> on <span class="math inline">\(\mathbb{R}^d\)</span> and observation <span class="math inline">\(\mathbf{y} = (y_1, \ldots, y_d)\)</span> is <span class="math display">\[
+\operatorname{VS}_p(F, \mathbf{y}) = \sum_{i=1}^{d}\sum_{j=1}^{d} w_{ij}\Bigl(|y_i - y_j|^p - \mathbb{E}_F|X_i - X_j|^p\Bigr)^2,
+\]</span> where <span class="math inline">\(w_{ij} \geq 0\)</span> are non-negative weights (typically <span class="math inline">\(w_{ij} = 1\)</span>) and <span class="math inline">\(p = 0.5\)</span> or <span class="math inline">\(p = 1\)</span> are common choices.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem (Propriety of the Variogram Score) <span class="citation" data-cites="scheuerer2015variogram">(<a href="#ref-scheuerer2015variogram" role="doc-biblioref">Scheuerer and Hamill 2015</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Variogram Score <span class="math inline">\(\operatorname{VS}_p\)</span> is proper for any <span class="math inline">\(p \in (0, 2)\)</span> and non-negative weights <span class="math inline">\(w_{ij}\)</span>.</p>
+</div>
+</div>
+<p>The Variogram Score is designed to be sensitive to the <em>dependence structure</em> of the predictive distribution, as it compares pairwise differences between components. The ensemble estimate is straightforward: <span class="math display">\[
+\widehat{\operatorname{VS}}_p(\{\mathbf{x}_k\}, \mathbf{y}) = \sum_{i=1}^{d}\sum_{j=1}^{d} w_{ij}\Bigl(|y_i - y_j|^p - \frac{1}{m}\sum_{k=1}^{m}|x_i^{(k)} - x_j^{(k)}|^p\Bigr)^2.
+\]</span></p>
+<p>In practice, using both the Energy Score and the Variogram Score together gives a complementary picture: the ES primarily assesses marginal calibration, while the VS probes the dependence structure.</p>
+</section>
+</section>
+</section>
+<section id="practical-guide-using-scoring-rules" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="practical-guide-using-scoring-rules"><span class="header-section-number">3</span> Practical Guide: Using Scoring Rules</h2>
+<section id="when-to-use-which-score" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="when-to-use-which-score"><span class="header-section-number">3.1</span> When to Use Which Score</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Scoring Rule</th>
+<th style="text-align: left;">Setting</th>
+<th style="text-align: left;">Strengths</th>
+<th style="text-align: left;">Limitations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Brier Score</strong></td>
+<td style="text-align: left;">Binary/categorical</td>
+<td style="text-align: left;">Decomposable (reliability, resolution, uncertainty)</td>
+<td style="text-align: left;">Discrete events only</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Log Score</strong></td>
+<td style="text-align: left;">Continuous (density)</td>
+<td style="text-align: left;">Uniquely local; maximum sensitivity to misspecification</td>
+<td style="text-align: left;">Requires density; sensitive to tails; not robust</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>CRPS</strong></td>
+<td style="text-align: left;">Continuous univariate</td>
+<td style="text-align: left;">Same unit as data; robust; closed forms available</td>
+<td style="text-align: left;">Univariate only</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>tw-CRPS</strong></td>
+<td style="text-align: left;">Continuous univariate</td>
+<td style="text-align: left;">Emphasizes regions of interest (tails)</td>
+<td style="text-align: left;">Requires weight function choice</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Energy Score</strong></td>
+<td style="text-align: left;">Multivariate</td>
+<td style="text-align: left;">Generalizes CRPS; simple to compute</td>
+<td style="text-align: left;">Low sensitivity to correlation misspecification</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Variogram Score</strong></td>
+<td style="text-align: left;">Multivariate</td>
+<td style="text-align: left;">Sensitive to dependence structure</td>
+<td style="text-align: left;">Only proper, not strictly proper in general</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="implementation-tips" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="implementation-tips"><span class="header-section-number">3.2</span> Implementation Tips</h3>
+<ol type="1">
+<li><p><strong>Always use bias-corrected (fair) versions</strong> when scoring ensembles, especially with small ensemble sizes. The standard estimators are biased toward smaller values for underdispersed forecasts.</p></li>
+<li><p><strong>Report average scores</strong> over a test set. A single score value is noisy — the power of scoring rules emerges through aggregation.</p></li>
+<li><p><strong>Use the Diebold-Mariano test</strong> (or its variants) to assess whether differences in average scores between competing models are statistically significant.</p></li>
+<li><p><strong>Combine scores</strong>: no single score captures all aspects of forecast quality. Using CRPS + calibration diagnostics (e.g.&nbsp;PIT histograms) gives a more complete picture than any single metric.</p></li>
+</ol>
+</section>
+</section>
+<section id="calibration-diagnostics-pit-histograms" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="calibration-diagnostics-pit-histograms"><span class="header-section-number">4</span> Calibration Diagnostics: PIT Histograms</h2>
+<p>Scoring rules quantify forecast quality with a single number, but they do not <em>diagnose</em> where or how a forecast fails. A fundamental complement is the <strong>Probability Integral Transform (PIT) histogram</strong>, which provides a visual assessment of calibration — the statistical consistency between the predictive distribution and the observations <span class="citation" data-cites="dawid1984present gneiting2007probabilistic">(<a href="#ref-dawid1984present" role="doc-biblioref">Dawid 1984</a>; <a href="#ref-gneiting2007probabilistic" role="doc-biblioref">Gneiting, Balabdaoui, and Raftery 2007</a>)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (Probability Integral Transform)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given a predictive CDF <span class="math inline">\(F\)</span> and a verifying observation <span class="math inline">\(y\)</span>, the <strong>PIT value</strong> is <span class="math display">\[
+u = F(y).
+\]</span> If <span class="math inline">\(F\)</span> is the true data-generating distribution and is continuous, then <span class="math inline">\(U = F(Y) \sim \mathrm{Uniform}(0, 1)\)</span>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem (Calibration Criterion) <span class="citation" data-cites="dawid1984present">(<a href="#ref-dawid1984present" role="doc-biblioref">Dawid 1984</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A sequence of probabilistic forecasts <span class="math inline">\(\{F_t\}_{t=1}^T\)</span> is <strong>probabilistically calibrated</strong> if the PIT values <span class="math inline">\(u_t = F_t(y_t)\)</span> are i.i.d. <span class="math inline">\(\mathrm{Uniform}(0, 1)\)</span>.</p>
+<p>A histogram of PIT values that is approximately flat (uniform) indicates good calibration. Systematic deviations reveal specific deficiencies:</p>
+<ul>
+<li><strong><span class="math inline">\(\cup\)</span>-shape</strong>: underdispersion (prediction intervals too narrow).</li>
+<li><strong><span class="math inline">\(\cap\)</span>-shape</strong>: overdispersion (prediction intervals too wide).</li>
+<li><strong>Right-skewed</strong> (mass near 0): systematic overestimation (forecasted values too high).</li>
+<li><strong>Left-skewed</strong> (mass near 1): systematic underestimation (forecasted values too low).</li>
+</ul>
+</div>
+</div>
+<p>To illustrate, we simulate PIT values from four scenarios: a well-calibrated forecast and three common miscalibrations.</p>
+<div id="cell-fig-pit" class="cell" data-fig-height="5" data-fig-width="7" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">2000</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Well-calibrated: PIT ~ Uniform(0,1)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>pit_calibrated <span class="op">=</span> np.random.uniform(<span class="dv">0</span>, <span class="dv">1</span>, n)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Underdispersed: true variance &gt; forecast variance =&gt; U-shape</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Observations drawn from N(0, 2^2), forecast assumes N(0, 1)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>y_underdispersed <span class="op">=</span> np.random.normal(<span class="dv">0</span>, <span class="dv">2</span>, n)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>pit_underdispersed <span class="op">=</span> stats.norm.cdf(y_underdispersed, loc<span class="op">=</span><span class="dv">0</span>, scale<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Overdispersed: true variance &lt; forecast variance =&gt; hump-shape</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Observations drawn from N(0, 0.5^2), forecast assumes N(0, 1)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>y_overdispersed <span class="op">=</span> np.random.normal(<span class="dv">0</span>, <span class="fl">0.5</span>, n)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>pit_overdispersed <span class="op">=</span> stats.norm.cdf(y_overdispersed, loc<span class="op">=</span><span class="dv">0</span>, scale<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Biased (overestimation): forecast mean too high =&gt; mass near 1</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Observations from N(0, 1), forecast assumes N(1.5, 1)</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>y_biased <span class="op">=</span> np.random.normal(<span class="dv">0</span>, <span class="dv">1</span>, n)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>pit_biased <span class="op">=</span> stats.norm.cdf(y_biased, loc<span class="op">=</span><span class="fl">1.5</span>, scale<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>df_pit <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"PIT"</span>: np.concatenate([pit_calibrated, pit_underdispersed,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>                           pit_overdispersed, pit_biased]),</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Scenario"</span>: ([<span class="st">"Well-calibrated"</span>] <span class="op">*</span> n <span class="op">+</span> [<span class="st">"Underdispersed"</span>] <span class="op">*</span> n <span class="op">+</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>                 [<span class="st">"Overdispersed"</span>] <span class="op">*</span> n <span class="op">+</span> [<span class="st">"Biased (overestimation)"</span>] <span class="op">*</span> n),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>df_pit[<span class="st">"Scenario"</span>] <span class="op">=</span> pd.Categorical(</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    df_pit[<span class="st">"Scenario"</span>],</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    categories<span class="op">=</span>[<span class="st">"Well-calibrated"</span>, <span class="st">"Underdispersed"</span>,</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Overdispersed"</span>, <span class="st">"Biased (overestimation)"</span>],</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    ordered<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>fill_colors <span class="op">=</span> {</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Well-calibrated"</span>: ACADEMIC_COLORS[<span class="st">"cobalt"</span>],</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Underdispersed"</span>: ACADEMIC_COLORS[<span class="st">"vermillion"</span>],</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Overdispersed"</span>: ACADEMIC_COLORS[<span class="st">"teal"</span>],</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Biased (overestimation)"</span>: ACADEMIC_COLORS[<span class="st">"amber"</span>],</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> (</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    pn.ggplot(df_pit, pn.aes(x<span class="op">=</span><span class="st">"PIT"</span>, fill<span class="op">=</span><span class="st">"Scenario"</span>))</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_histogram(bins<span class="op">=</span><span class="dv">20</span>, color<span class="op">=</span><span class="st">"white"</span>, size<span class="op">=</span><span class="fl">0.3</span>, alpha<span class="op">=</span><span class="fl">0.85</span>)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_hline(yintercept<span class="op">=</span>n <span class="op">/</span> <span class="dv">20</span>, linetype<span class="op">=</span><span class="st">"dashed"</span>,</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>                    color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">"ink"</span>], size<span class="op">=</span><span class="fl">0.5</span>, alpha<span class="op">=</span><span class="fl">0.6</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.facet_wrap(<span class="st">"~Scenario"</span>, ncol<span class="op">=</span><span class="dv">2</span>, scales<span class="op">=</span><span class="st">"free_y"</span>)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.scale_fill_manual(values<span class="op">=</span>fill_colors)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.labs(x<span class="op">=</span><span class="st">"PIT value"</span>, y<span class="op">=</span><span class="st">"Count"</span>)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> theme_academic(base_size<span class="op">=</span><span class="dv">9</span>, grid<span class="op">=</span><span class="st">"y"</span>)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.theme(</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>        figure_size<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">5</span>),</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>        legend_position<span class="op">=</span><span class="st">"none"</span>,</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>        strip_text<span class="op">=</span>element_text(size<span class="op">=</span><span class="dv">8</span>, face<span class="op">=</span><span class="st">"bold"</span>),</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div id="fig-pit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-pit-output-1.png" width="1050" height="750" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: PIT histograms for four forecast scenarios. A uniform histogram (top-left) indicates calibration. Deviations reveal underdispersion (<span class="math inline">\(\cup\)</span>-shape), overdispersion (<span class="math inline">\(\cap\)</span>-shape), and location bias (skewed).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>In practice, PIT histograms are the first diagnostic to check <em>before</em> comparing scoring rules across models. A model with a lower CRPS but a strongly non-uniform PIT histogram may be getting lucky on average while being systematically miscalibrated — a situation that is dangerous for decision-making.</p>
+<p>For <strong>ensemble forecasts</strong> where the predictive CDF is not available analytically, the PIT can be approximated using the empirical CDF of the ensemble. Given an ensemble <span class="math inline">\(\{x_1, \ldots, x_m\}\)</span> and observation <span class="math inline">\(y\)</span>, the rank-based PIT is <span class="math display">\[
+u = \frac{1}{m+1}\sum_{i=1}^{m} \mathbf{1}\{x_i \leq y\},
+\]</span> which avoids boundary effects at 0 and 1. For multivariate forecasts, one typically examines PIT histograms <em>marginally</em> (one per component) or uses the multivariate rank histogram.</p>
+</section>
+<section id="formal-model-comparison-the-diebold-mariano-test" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="formal-model-comparison-the-diebold-mariano-test"><span class="header-section-number">5</span> Formal Model Comparison: The Diebold-Mariano Test</h2>
+<p>While scoring rules provide a natural ranking of forecasting models via their average scores, a critical question remains: <em>is the observed difference in scores statistically significant, or could it have arisen by chance?</em> The <strong>Diebold-Mariano (DM) test</strong> <span class="citation" data-cites="diebold1995comparing">(<a href="#ref-diebold1995comparing" role="doc-biblioref">Diebold and Mariano 1995</a>)</span> provides a formal answer.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (Score Differential)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given two competing forecast models <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> with score sequences <span class="math inline">\(\{S_t^A\}_{t=1}^T\)</span> and <span class="math inline">\(\{S_t^B\}_{t=1}^T\)</span> (e.g.&nbsp;CRPS values at each time step), the <strong>score differential</strong> is <span class="math display">\[
+\delta_t = S_t^A - S_t^B, \qquad t = 1, \ldots, T.
+\]</span> Under negatively oriented scores (lower is better), <span class="math inline">\(\bar{\delta} &lt; 0\)</span> suggests that model <span class="math inline">\(A\)</span> is superior.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem (Diebold-Mariano Test) <span class="citation" data-cites="diebold1995comparing">(<a href="#ref-diebold1995comparing" role="doc-biblioref">Diebold and Mariano 1995</a>)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Under the null hypothesis <span class="math inline">\(H_0: \mathbb{E}[\delta_t] = 0\)</span> (equal predictive ability), the test statistic <span class="math display">\[
+\mathrm{DM} = \frac{\bar{\delta}}{\widehat{\sigma}_{\bar{\delta}}}
+\]</span> is asymptotically standard normal, where <span class="math inline">\(\bar{\delta} = T^{-1}\sum_{t=1}^T \delta_t\)</span> and <span class="math inline">\(\widehat{\sigma}_{\bar{\delta}}\)</span> is a HAC (heteroskedasticity and autocorrelation consistent) estimate of the standard deviation of <span class="math inline">\(\bar{\delta}\)</span>.</p>
+<p>For <span class="math inline">\(h\)</span>-step-ahead forecasts, the score differentials are at most <span class="math inline">\((h-1)\)</span>-dependent, and the long-run variance can be estimated as <span class="math display">\[
+\widehat{\sigma}_{\bar{\delta}}^2 = \frac{1}{T}\left(\hat{\gamma}_0 + 2\sum_{k=1}^{h-1}\hat{\gamma}_k\right),
+\]</span> where <span class="math inline">\(\hat{\gamma}_k = T^{-1}\sum_{t=k+1}^{T}(\delta_t - \bar{\delta})(\delta_{t-k} - \bar{\delta})\)</span>.</p>
+</div>
+</div>
+<p><span class="citation" data-cites="harvey1997testing">Harvey, Leybourne, and Newbold (<a href="#ref-harvey1997testing" role="doc-biblioref">1997</a>)</span> propose a small-sample correction that replaces the normal reference distribution with a Student-<span class="math inline">\(t\)</span> distribution with <span class="math inline">\(T - 1\)</span> degrees of freedom and applies a finite-sample bias correction to the variance: <span class="math display">\[
+\mathrm{DM}^* = \mathrm{DM} \cdot \sqrt{\frac{T + 1 - 2h + h(h-1)/T}{T}}.
+\]</span></p>
+<p>We now implement the DM test and demonstrate it on simulated forecasts.</p>
+<div id="8c21f09f" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> diebold_mariano(scores_A, scores_B, h<span class="op">=</span><span class="dv">1</span>, harvey_correction<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Diebold-Mariano test for equal predictive ability.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">    scores_A, scores_B : array-like</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">        Score sequences for models A and B (lower = better).</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">    h : int</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">        Forecast horizon (for HAC variance estimation).</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">    harvey_correction : bool</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">        Apply the Harvey, Leybourne &amp; Newbold (1997) small-sample correction.</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">    dict with keys: statistic, p_value, mean_diff</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    scores_A <span class="op">=</span> np.asarray(scores_A)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    scores_B <span class="op">=</span> np.asarray(scores_B)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    delta <span class="op">=</span> scores_A <span class="op">-</span> scores_B</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    T <span class="op">=</span> <span class="bu">len</span>(delta)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    d_bar <span class="op">=</span> delta.mean()</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># HAC variance (Newey-West with h-1 lags)</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    gamma_0 <span class="op">=</span> np.mean((delta <span class="op">-</span> d_bar) <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    gamma_sum <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, h):</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        gamma_k <span class="op">=</span> np.mean((delta[k:] <span class="op">-</span> d_bar) <span class="op">*</span> (delta[:<span class="op">-</span>k] <span class="op">-</span> d_bar))</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        gamma_sum <span class="op">+=</span> gamma_k</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    var_d_bar <span class="op">=</span> (gamma_0 <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> gamma_sum) <span class="op">/</span> T</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> var_d_bar <span class="op">&lt;=</span> <span class="dv">0</span>:</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">"statistic"</span>: np.nan, <span class="st">"p_value"</span>: np.nan, <span class="st">"mean_diff"</span>: d_bar}</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    dm_stat <span class="op">=</span> d_bar <span class="op">/</span> np.sqrt(var_d_bar)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> harvey_correction:</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        correction <span class="op">=</span> np.sqrt((T <span class="op">+</span> <span class="dv">1</span> <span class="op">-</span> <span class="dv">2</span> <span class="op">*</span> h <span class="op">+</span> h <span class="op">*</span> (h <span class="op">-</span> <span class="dv">1</span>) <span class="op">/</span> T) <span class="op">/</span> T)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        dm_stat <span class="op">=</span> dm_stat <span class="op">*</span> correction</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        p_value <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> stats.t.sf(np.<span class="bu">abs</span>(dm_stat), df<span class="op">=</span>T <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        p_value <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> stats.norm.sf(np.<span class="bu">abs</span>(dm_stat))</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"statistic"</span>: dm_stat, <span class="st">"p_value"</span>: p_value, <span class="st">"mean_diff"</span>: d_bar}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="cell-fig-dm-test" class="cell" data-fig-height="3.5" data-fig-width="5" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Model A: well-calibrated N(0, 1) forecasts, true DGP is N(0, 1)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>y_true <span class="op">=</span> np.random.normal(<span class="dv">0</span>, <span class="dv">1</span>, T)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># CRPS for N(mu, sigma^2): closed-form</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> crps_normal(y, mu, sigma):</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> (y <span class="op">-</span> mu) <span class="op">/</span> sigma</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sigma <span class="op">*</span> (z <span class="op">*</span> (<span class="dv">2</span> <span class="op">*</span> stats.norm.cdf(z) <span class="op">-</span> <span class="dv">1</span>) <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> stats.norm.pdf(z) <span class="op">-</span> <span class="dv">1</span> <span class="op">/</span> np.sqrt(np.pi))</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>scores_A <span class="op">=</span> crps_normal(y_true, mu<span class="op">=</span><span class="fl">0.0</span>, sigma<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>scores_B <span class="op">=</span> crps_normal(y_true, mu<span class="op">=</span><span class="fl">0.8</span>, sigma<span class="op">=</span><span class="fl">1.0</span>)  <span class="co"># biased model</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> diebold_mariano(scores_A, scores_B, h<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> scores_A <span class="op">-</span> scores_B</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>df_delta <span class="op">=</span> pd.DataFrame({<span class="st">"delta"</span>: delta})</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> (</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    pn.ggplot(df_delta, pn.aes(x<span class="op">=</span><span class="st">"delta"</span>))</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_histogram(bins<span class="op">=</span><span class="dv">40</span>, fill<span class="op">=</span>ACADEMIC_COLORS[<span class="st">"cobalt"</span>],</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>                        color<span class="op">=</span><span class="st">"white"</span>, size<span class="op">=</span><span class="fl">0.3</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_vline(xintercept<span class="op">=</span><span class="dv">0</span>, linetype<span class="op">=</span><span class="st">"dashed"</span>,</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>                    color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">"ink"</span>], size<span class="op">=</span><span class="fl">0.6</span>)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_vline(xintercept<span class="op">=</span>delta.mean(), linetype<span class="op">=</span><span class="st">"solid"</span>,</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>                    color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">"vermillion"</span>], size<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.annotate(</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">"text"</span>,</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        x<span class="op">=</span>delta.mean() <span class="op">-</span> <span class="fl">0.02</span>, y<span class="op">=</span><span class="dv">40</span>,</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="ss">f"$</span><span class="ch">\\</span><span class="ss">bar</span><span class="ch">{{\\</span><span class="ss">delta</span><span class="ch">}}</span><span class="ss">$ = </span><span class="sc">{</span>delta<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>,</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">"vermillion"</span>], size<span class="op">=</span><span class="dv">8</span>, ha<span class="op">=</span><span class="st">"right"</span>,</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.annotate(</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        <span class="st">"text"</span>,</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        x<span class="op">=</span><span class="bu">max</span>(delta) <span class="op">*</span> <span class="fl">0.55</span>, y<span class="op">=</span><span class="dv">35</span>,</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="ss">f"DM = </span><span class="sc">{</span>result[<span class="st">'statistic'</span>]<span class="sc">:.2f}</span><span class="ch">\n</span><span class="ss">p = </span><span class="sc">{</span>result[<span class="st">'p_value'</span>]<span class="sc">:.4f}</span><span class="ss">"</span>,</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">"ink"</span>], size<span class="op">=</span><span class="fl">7.5</span>, ha<span class="op">=</span><span class="st">"left"</span>,</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.labs(</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        x<span class="op">=</span><span class="st">"Score differential  $</span><span class="ch">\\</span><span class="st">delta_t = S_t^A - S_t^B$"</span>,</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        y<span class="op">=</span><span class="st">"Count"</span>,</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> theme_academic(base_size<span class="op">=</span><span class="dv">9</span>, grid<span class="op">=</span><span class="st">"y"</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.theme(figure_size<span class="op">=</span>(<span class="dv">5</span>, <span class="fl">3.5</span>))</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div id="fig-dm-test" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-dm-test-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-dm-test-output-1.png" width="750" height="525" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-dm-test-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Diebold-Mariano test applied to CRPS score differentials. Model A (well-calibrated) vs Model B (biased). The distribution of score differentials <span class="math inline">\(\delta_t = S_t^A - S_t^B\)</span> is centered below zero, confirming that Model A significantly outperforms Model B.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The negative mean differential <span class="math inline">\(\bar{\delta} &lt; 0\)</span> and the highly significant <span class="math inline">\(p\)</span>-value confirm that Model A’s forecast quality is genuinely superior — the difference is not due to sampling noise.</p>
+<section id="practical-considerations" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="practical-considerations"><span class="header-section-number">5.1</span> Practical Considerations</h3>
+<ul>
+<li><strong>Multiple comparisons</strong>: when comparing <span class="math inline">\(K &gt; 2\)</span> models, apply a correction (e.g.&nbsp;Bonferroni or the Model Confidence Set procedure) to control the family-wise error rate.</li>
+<li><strong>Score choice matters</strong>: the DM test can be applied with <em>any</em> scoring rule. Using the CRPS tests for overall distributional superiority; using a tail-weighted CRPS tests for superiority in the region that matters most for your application.</li>
+<li><strong>Autocorrelation</strong>: for multi-step forecasts (<span class="math inline">\(h &gt; 1\)</span>), the HAC variance estimator is essential. Ignoring autocorrelation in score differentials inflates the DM statistic and produces spuriously small <span class="math inline">\(p\)</span>-values.</li>
+<li><strong>Sample size</strong>: the DM test is asymptotic. For small test sets (<span class="math inline">\(T &lt; 50\)</span>), the Harvey-Leybourne-Newbold correction with <span class="math inline">\(t\)</span>-distribution critical values is strongly recommended.</li>
+</ul>
+</section>
+</section>
+<section id="references" class="level2" data-number="6">
+
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">6 References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-brier1950verification" class="csl-entry" role="listitem">
+Brier, Glenn W. 1950. <span>“Verification of Forecasts Expressed in Terms of Probability.”</span> <em>Monthly Weather Review</em> 78 (1): 1–3.
+</div>
+<div id="ref-dawid1984present" class="csl-entry" role="listitem">
+Dawid, A Philip. 1984. <span>“Present Position and Potential Developments: Some Personal Views: Statistical Theory: The Prequential Approach.”</span> <em>Journal of the Royal Statistical Society: Series A (General)</em> 147 (2): 278–92.
+</div>
+<div id="ref-diebold1995comparing" class="csl-entry" role="listitem">
+Diebold, Francis X, and Roberto S Mariano. 1995. <span>“Comparing Predictive Accuracy.”</span> <em>Journal of Business &amp; Economic Statistics</em> 13 (3): 253–63.
+</div>
+<div id="ref-gneiting2007probabilistic" class="csl-entry" role="listitem">
+Gneiting, Tilmann, Fadoua Balabdaoui, and Adrian E Raftery. 2007. <span>“Probabilistic Forecasts, Calibration and Sharpness.”</span> <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em> 69 (2): 243–68.
+</div>
+<div id="ref-gneiting2007strictly" class="csl-entry" role="listitem">
+Gneiting, Tilmann, and Adrian E Raftery. 2007. <span>“Strictly Proper Scoring Rules, Prediction, and Estimation.”</span> <em>Journal of the American Statistical Association</em> 102 (477): 359–78.
+</div>
+<div id="ref-gneiting2011comparing" class="csl-entry" role="listitem">
+Gneiting, Tilmann, and Roopesh Ranjan. 2011. <span>“Comparing Density Forecasts Using Threshold-and Quantile-Weighted Scoring Rules.”</span> <em>Journal of Business &amp; Economic Statistics</em> 29 (3): 411–22.
+</div>
+<div id="ref-good1952rational" class="csl-entry" role="listitem">
+Good, Irving John. 1952. <span>“Rational Decisions.”</span> <em>Journal of the Royal Statistical Society: Series B (Methodological)</em> 14 (1): 107–14.
+</div>
+<div id="ref-harvey1997testing" class="csl-entry" role="listitem">
+Harvey, David, Stephen Leybourne, and Paul Newbold. 1997. <span>“Testing the Equality of Prediction Mean Squared Errors.”</span> <em>International Journal of Forecasting</em> 13 (2): 281–91.
+</div>
+<div id="ref-jordan2019evaluating" class="csl-entry" role="listitem">
+Jordan, Alexander, Fabian Krüger, and Sebastian Lerch. 2019. <span>“Evaluating Probabilistic Forecasts with scoringRules.”</span> <em>Journal of Statistical Software</em> 90 (12): 1–37.
+</div>
+<div id="ref-matheson1976scoring" class="csl-entry" role="listitem">
+Matheson, James E, and Robert L Winkler. 1976. <span>“Scoring Rules for Continuous Probability Distributions.”</span> <em>Management Science</em> 22 (10): 1087–96.
+</div>
+<div id="ref-scheuerer2015variogram" class="csl-entry" role="listitem">
+Scheuerer, Michael, and Thomas M Hamill. 2015. <span>“Variogram-Based Proper Scoring Rules for Probabilistic Forecasts of Multivariate Quantities.”</span> <em>Monthly Weather Review</em> 143 (4): 1321–34.
+</div>
+<div id="ref-winkler1996scoring" class="csl-entry" role="listitem">
+Winkler, Robert L, José Muñoz, José L Cervera, José M Bernardo, Gail Blattenberger, Joseph B Kadane, Dennis V Lindley, Allan H Murphy, Robert M Oliver, and David Rı́os-Insua. 1996. <span>“Scoring Rules and the Evaluation of Probabilities.”</span> <em>Test</em> 5: 1–60.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

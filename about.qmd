@@ -38,7 +38,7 @@ When I'm not working on difficult (for me) problems, you'll find me running, in 
 :::
 
 ::: {.gpa-badge}
-GPA: 5.99 / 6.00
+GPA: 5.99 / 6.00 (Class Rank 1)
 :::
 - **Focus:** (Probabilistic) Machine Learning, Statistical Learning Theory, Computational Statistics, Causality
 - **Thesis:** Mechanistic Interpretability in Text-to-Image Diffusion Models (Grade: 6.00/6.00)
