@@ -17,6 +17,8 @@ website:
         href: about.qmd
       - text: Blog
         href: index.qmd
+      - text: Photography
+        href: photography.qmd
       - icon: linkedin
         href: https://www.linkedin.com/in/jan-heinrich-schlegel/
       - icon: github
