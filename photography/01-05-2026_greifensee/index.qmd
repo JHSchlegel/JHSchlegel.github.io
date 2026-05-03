@@ -1,0 +1,37 @@
+---
+title: "Greifensee in Spring"
+subtitle: "Uster · May 2026"
+categories:
+  - Birds
+  - Nature
+  - Greifensee
+  - Architecture
+date: "2026-05-01"
+image: "images/lantern.JPG"
+format:
+  html:
+    toc: false
+    lightbox: true
+---
+
+::: {layout-ncol=2}
+
+![](images/lantern.JPG){group="greifensee"}
+
+![](images/gasse.JPG){group="greifensee"}
+
+![](images/sunset.JPG){group="greifensee"}
+
+![](images/schwan.JPG){group="greifensee"}
+
+![](images/gemeinde.JPG){group="greifensee"}
+
+![](images/blässhuhn.JPG){group="greifensee"}
+
+![](images/towers.JPG){group="greifensee"}
+
+![](images/skyline.JPG){group="greifensee"}
+
+![](images/drachen.JPG){group="greifensee"}
+
+:::

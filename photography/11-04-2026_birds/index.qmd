@@ -1,54 +1,34 @@
 ---
 title: "Birding at Lake Zurich"
-subtitle: "An afternoon of bird photography at Stampf and Nuolen"
+subtitle: "Stampf & Nuolen · April 2026"
 categories:
   - Birds
   - Nature
   - Lake Zurich
-author: "Jan Schlegel"
 date: "2026-04-11"
 image: "images/swan.jpg"
 format:
   html:
     toc: false
+    lightbox: true
 ---
 
-A spring afternoon along the shores of Lake Zurich --- perfect conditions for spotting waterbirds and waders. The first stop was Stampf, where the pebbly shore attracted a swan, a pair of Egyptian geese, and a busy group of black-headed gulls. Later, the fields around Nuolen revealed a pair of lapwings foraging in the open grassland.
+A spring afternoon along the shores of Lake Zurich --- waterbirds at Stampf, lapwings in the fields around Nuolen.
 
----
+::: {layout-ncol=3}
 
-## Stampf
+![*Mute Swan*](images/swan.jpg){group="birds" fig-alt="Mute swan standing on a pebbly lakeshore"}
 
-### Mute Swan
+![*Egyptian Geese*](images/egyptian-goose.jpg){group="birds" fig-alt="A pair of Egyptian geese on a gravel shore"}
 
-A mute swan standing tall on the gravel shore, feathers ruffled by the breeze.
+![*Black-headed Gulls*](images/black-headed-gull.jpg){group="birds" fig-alt="Black-headed gulls in shallow water, one taking flight"}
 
-![](images/swan.jpg){fig-alt="Mute swan standing on a pebbly lakeshore with soft blue water in the background"}
-
-### Egyptian Geese
-
-A pair of Egyptian geese scanning the horizon from the water's edge --- the iridescent teal wing patches catching the afternoon light.
-
-![](images/egyptian-goose.jpg){fig-alt="A pair of Egyptian geese standing side by side on a gravel shore with calm blue water behind them"}
-
-### Black-headed Gulls
-
-A small flock of black-headed gulls gathered on the shallow water, one just taking off.
-
-![](images/black-headed-gull.jpg){fig-alt="Black-headed gulls standing in shallow water, one gull taking flight with wings spread"}
-
----
-
-## Nuolen
-
-### Northern Lapwing
-
-The lapwing's unmistakable crest and iridescent plumage make it one of the most striking waders in Switzerland. Spotted a pair foraging in the fields.
+:::
 
 ::: {layout-ncol=2}
 
-![](images/lapwing-1.jpg){fig-alt="Northern lapwing standing in green grass, showing its distinctive crest and dark iridescent plumage" group="lapwing"}
+![*Northern Lapwing*](images/lapwing-1.jpg){group="birds" fig-alt="Northern lapwing standing in green grass"}
 
-![](images/lapwing-2.jpg){fig-alt="Northern lapwing walking on muddy plowed ground with green vegetation in the background" group="lapwing"}
+![*Northern Lapwing*](images/lapwing-2.jpg){group="birds" fig-alt="Northern lapwing walking on muddy plowed ground"}
 
 :::
