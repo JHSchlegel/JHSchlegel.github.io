@@ -189,6 +189,13 @@
     "text": "6 Reflections\nThe most striking finding is how competitive classical tree-based methods are once they receive well-engineered features. A LightGBM model trained on extracted time-series statistics matches or exceeds most deep learning architectures. For univariate ECG signals with relatively clear diagnostic markers, the bottleneck is often the input representation rather than the model.\nDeep learning earns its keep in two ways. First, it removes the need for manual feature engineering by learning directly from the raw signal. Second, architectures like the transformer provide attention-based interpretability that can surface clinically meaningful patterns without any domain-specific preprocessing. The fact that our transformer independently learns to focus on the QRS complex and T wave abnormalities is reassuring from a clinical trustworthiness perspective.\nThe contrastive learning results point to a promising direction for label-scarce settings. By learning general ECG representations without supervision, we obtain an encoder that transfers more effectively than one trained with task-specific labels. The practical challenge is that contrastive pretraining requires careful augmentation design and is considerably more expensive to train.\nAcross the board, the margins between top-performing models are thin. The residual CNN, the contrastive encoder with full finetuning, and LightGBM with engineered features all cluster above 0.99 on most metrics. In this regime, the choice of model matters less than the quality of data preprocessing and the degree to which the practitioner understands what the model has actually learned."
   },
   {
+    "objectID": "photography/01-05-2026_greifensee/index.html",
+    "href": "photography/01-05-2026_greifensee/index.html",
+    "title": "Greifensee in Spring",
+    "section": "",
+    "text": "Beatiful spring evenings in the city of Uster and along the shores of Greifensee in the Zürich Oberland."
+  },
+  {
     "objectID": "photography.html",
     "href": "photography.html",
     "title": "Photography",

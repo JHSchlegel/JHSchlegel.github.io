@@ -14,24 +14,24 @@ format:
     lightbox: true
 ---
 
-::: {layout-ncol=2}
+Beatiful spring evenings in the city of Uster and along the shores of Greifensee in the Zürich Oberland.
 
-![](images/lantern.JPG){group="greifensee"}
-
-![](images/gasse.JPG){group="greifensee"}
-
-![](images/sunset.JPG){group="greifensee"}
-
+::: {layout-ncol=1}
 ![](images/schwan.JPG){group="greifensee"}
-
-![](images/gemeinde.JPG){group="greifensee"}
 
 ![](images/blässhuhn.JPG){group="greifensee"}
 
 ![](images/towers.JPG){group="greifensee"}
 
-![](images/skyline.JPG){group="greifensee"}
-
 ![](images/drachen.JPG){group="greifensee"}
 
+![](images/skyline.JPG){group="greifensee"}
+
+![](images/gasse.JPG){group="greifensee"}
+
+![](images/lantern.JPG){group="greifensee"}
+
+![](images/gemeinde.JPG){group="greifensee"}
+
+![](images/sunset.JPG){group="greifensee"}
 :::
