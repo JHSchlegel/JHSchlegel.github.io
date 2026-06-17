@@ -275,8 +275,7 @@ window.Quarto = {
 <section id="what-are-copulas" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="what-are-copulas"><span class="header-section-number">1</span> What are Copulas?</h2>
 <p>Have you ever tried to model the relationship between two or more variables, but found that they don’t follow a nice, clean multivariate normal distribution? Real-world data, especially in finance or insurance, is often messy. Variables can have different distributions (some normal, some skewed, some with fat tails), and their dependence can be more complicated than simple linear correlation.</p>
-<p>This is where copulas come in. The word “copula” means “link” or “tie,” and that’s exactly what they do: they <strong>link</strong> marginal distributions of variables together to form a multivariate distribution. The key idea is to separate the dependence structure from the marginal distributions. This means you can model the distribution of each variable on its own, and then use a copula to describe how they move together.</p>
-<p>This separation is incredibly powerful. It allows us to model complex dependencies, like the tendency of assets to crash together in a financial crisis (tail dependence), without being constrained by assumptions like normality.</p>
+<p>This is where copulas come in. The word “copula” originates from Latin and means “link” or “tie” — and that’s exactly what they do: they <strong>link</strong> marginal distributions of individual variables together into a joint multivariate distribution, while capturing their dependence structure separately. This separation is the key idea: you can model each variable’s marginal distribution independently, and then use a copula to describe how the variables move together. This enables the modelling of complex dependencies - like the tendency of assets to crash together in a financial crisis (tail dependence) - without being constrained by assumptions like normality.</p>
 </section>
 <section id="sklars-theorem" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="sklars-theorem"><span class="header-section-number">2</span> Sklar’s Theorem</h2>
@@ -291,17 +290,18 @@ Definition (Copula)
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>A <strong>bivariate copula</strong> is a function <span class="math inline">\(C: [0,1]^2 \to [0,1]\)</span> that satisfies:</p>
+<p>A <strong>copula</strong> is a function <span class="math inline">\(C: [0,1]^d \to [0,1]\)</span> that is the joint CDF of a random vector <span class="math inline">\((U_1,\ldots, U_d)\)</span> where each <span class="math inline">\(U_k \sim\mathcal{U}(0,1)\)</span>.</p>
+<p>Equivalently, <span class="math inline">\(C: [0,1]^d \to [0,1]\)</span> is a copula if and only if it satisfies the following properties:</p>
 <ol type="1">
-<li><strong>Grounded</strong>: <span class="math inline">\(C(u, 0) = C(0, v) = 0\)</span> for all <span class="math inline">\(u, v \in [0,1]\)</span>.</li>
-<li><strong>Standard uniform margins</strong>: <span class="math inline">\(C(u, 1) = u\)</span> and <span class="math inline">\(C(1, v) = v\)</span> for all <span class="math inline">\(u, v \in [0,1]\)</span>.</li>
-<li><strong>2-increasing</strong>: For every rectangle <span class="math inline">\([u_1, u_2] \times [v_1, v_2] \subseteq [0,1]^2\)</span>, <span class="math display">\[
-C(u_2, v_2) - C(u_2, v_1) - C(u_1, v_2) + C(u_1, v_1) \;\geq\; 0.
+<li><strong>Grounded</strong>: <span class="math inline">\(C(u_1, \ldots, u_d) = 0\)</span> if at least one <span class="math inline">\(u_k = 0\)</span>.</li>
+<li><strong>Uniform marginals</strong>: <span class="math inline">\(C(1, \ldots, u_k, \ldots, 1) = u_k\)</span> for all <span class="math inline">\(k\)</span> and <span class="math inline">\(u_k \in [0,1]\)</span>.</li>
+<li><strong>d-increasing (rectangularly increasing)</strong>: For every hyperrectangle <span class="math inline">\(\prod_{k=1}^d [a_k, b_k] \subseteq [0,1]^d\)</span> with <span class="math inline">\(a_k \leq b_k\)</span>, the C-volume is non-negative: <span class="math display">\[
+V_C\left(\prod_{k=1}^d [a_k, b_k]\right) = \sum_{v\in\{a_1, b_1\}\times\cdots\times\{a_d, b_d\}} (-1)^{|\{k: v_k = a_k\}|} C(v) \geq 0,
 \]</span></li>
 </ol>
 </div>
 </div>
-<p>In plain terms, a copula is simply a joint CDF on <span class="math inline">\([0,1]^2\)</span> whose marginals are both <span class="math inline">\(\mathrm{Uniform}(0,1)\)</span>. The 2-increasing condition ensures that the probability assigned to any axis-aligned rectangle is non-negative — i.e., <span class="math inline">\(C\)</span> is a valid distribution function.</p>
+<p>Note that the third condition is the analogue of non-decreasingness for univariate CDFs and ensures that <span class="math inline">\(C\)</span> assigns non-negative probability mass to every rectangle in <span class="math inline">\([0,1]^d\)</span>. Hence, in plain terms, a copula is simply a joint CDF on <span class="math inline">\([0,1]^d\)</span> whose marginals are all <span class="math inline">\(\mathcal{U}(0,1)\)</span>.</p>
 <p>Three special copulas serve as reference points. The <strong>Fréchet–Hoeffding bounds</strong> define the extreme cases of dependence <span class="citation" data-cites="nelsen2006">(<a href="#ref-nelsen2006" role="doc-biblioref">Nelsen 2006</a>)</span>:</p>
 <p><span class="math display">\[
 W(u, v) = \max(u + v - 1,\, 0) \;\leq\; C(u, v) \;\leq\; \min(u, v) = M(u, v),
@@ -317,18 +317,18 @@ Theorem (Sklar, 1959) <span class="citation" data-cites="sklar1959">(<a href="#r
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Let <span class="math inline">\(F\)</span> be a bivariate joint CDF with marginal CDFs <span class="math inline">\(F_X\)</span> and <span class="math inline">\(F_Y\)</span>. Then there exists a copula <span class="math inline">\(C: [0,1]^2 \to [0,1]\)</span> such that</p>
+<p>Let <span class="math inline">\(H\)</span> be a <span class="math inline">\(d\)</span>-dimensional joint CDF with marginals <span class="math inline">\(F_1, \ldots, F_d\)</span>. Then there exists a copula <span class="math inline">\(C: [0,1]^d \to [0,1]\)</span> such that for all <span class="math inline">\((x_1, \ldots, x_d) \in \bar{\mathbb{R}}^d\)</span>,</p>
 <p><span id="eq-sklar"><span class="math display">\[
-F(x, y) \;=\; C\!\bigl(F_X(x),\; F_Y(y)\bigr), \qquad \forall\,(x, y) \in \mathbb{R}^2.
+H(x_1, \ldots, x_d) \;=\; C\!\bigl(F_1(x_1), \ldots, F_d(x_d)\bigr).
 \tag{1}\]</span></span></p>
-<p>If <span class="math inline">\(F_X\)</span> and <span class="math inline">\(F_Y\)</span> are <strong>continuous</strong>, then <span class="math inline">\(C\)</span> is <strong>unique</strong> and is given explicitly by</p>
+<p>If <span class="math inline">\(F_1, \ldots, F_d\)</span> are <strong>continuous</strong>, then <span class="math inline">\(C\)</span> is <strong>unique</strong> and is given explicitly by</p>
 <p><span class="math display">\[
-C(u, v) \;=\; F\!\bigl(F_X^{-1}(u),\; F_Y^{-1}(v)\bigr).
+C(u_1, \ldots, u_d) \;=\; H(F_1^{-1}(u_1), \ldots, F_d^{-1}(u_d)).
 \]</span></p>
-<p>Conversely, for any copula <span class="math inline">\(C\)</span> and any CDFs <span class="math inline">\(F_X, F_Y\)</span>, the function <span class="math inline">\(F(x,y) = C(F_X(x), F_Y(y))\)</span> is a valid bivariate CDF with marginals <span class="math inline">\(F_X\)</span> and <span class="math inline">\(F_Y\)</span>.</p>
+<p>Conversely, for any copula <span class="math inline">\(C\)</span> and any CDFs <span class="math inline">\(F_1, \ldots, F_d\)</span>, the function <span class="math inline">\(H(x_1, \ldots, x_d) = C(F_1(x_1), \ldots, F_d(x_d))\)</span> is a valid joint CDF with marginals <span class="math inline">\(F_1, \ldots, F_d\)</span>.</p>
 </div>
 </div>
-<p>Sklar’s theorem has two profound consequences. First, <em>every</em> bivariate distribution — however exotic its marginals or dependence — admits a copula representation. Copulas are not a restricted model class; they provide an exact characterisation of all joint distributions. Second, continuity of the marginals pins down the copula uniquely, making the dependence structure an intrinsic property of the distribution rather than an artefact of parameterisation.</p>
+<p>Sklar’s theorem has two profound consequences. First, <em>every</em> distribution — however exotic its marginals or dependence — admits a copula representation. Copulas are not a restricted model class; they provide an exact characterisation of all joint distributions. Second, continuity of the marginals pins down the copula uniquely, making the dependence structure an intrinsic property of the distribution rather than an artefact of parameterisation.</p>
 <section id="the-probability-integral-transform" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="the-probability-integral-transform"><span class="header-section-number">2.1</span> The Probability Integral Transform</h3>
 <p>The bridge between the original variables and the unit square is the <strong>Probability Integral Transform (PIT)</strong>. If <span class="math inline">\(X\)</span> is a continuous random variable with CDF <span class="math inline">\(F_X\)</span>, then</p>
