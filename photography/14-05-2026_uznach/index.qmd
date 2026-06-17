@@ -1,0 +1,47 @@
+---
+title: "Macro Wonders of Uznach"
+subtitle: "Uznach · May 2026"
+categories:
+  - Macro
+  - Insects
+  - Nature
+  - Uznach
+date: "2026-05-14"
+image: "images/macro_fly_3.JPG"
+format:
+  html:
+    toc: false
+    lightbox: true
+---
+
+Getting close to the small things around a pond near Uznach --- flies, a dragonfly, and a wasp's last moments among the blossoms, then a family of geese on the water.
+
+### Macro
+
+::: {layout-ncol=3}
+
+![](images/macro_fly_3.JPG){group="uznach" fig-alt="A long-legged fly resting on a green leaf, wings spread"}
+
+![](images/fly_macro.JPG){group="uznach" fig-alt="A fly resting on a cluster of small white wayfaring-tree flowers"}
+
+![](images/fly_macro_2.JPG){group="uznach" fig-alt="A fly feeding among clusters of white blossom"}
+
+![](images/dragonfly.JPG){group="uznach" fig-alt="A slender, long-legged insect perched among small white wildflowers"}
+
+![](images/flower_macro.JPG){group="uznach" fig-alt="Close-up of a yellow iris flower with dew drops on its petals"}
+
+![](images/macro_dying_wasp.JPG){group="uznach" fig-alt="An insect entangled in a fine thread of spider silk, wings spread, suspended in mid-air"}
+
+:::
+
+### Pond Wildlife
+
+::: {layout-ncol=3}
+
+![*Goose Family*](images/duck_family.JPG){group="uznach" fig-alt="A family of geese with several fluffy goslings standing in grass"}
+
+![*Goose Family Swimming*](images/duck_family_swimming.JPG){group="uznach" fig-alt="A goose family swimming together among reeds in a pond"}
+
+![*Frog at the Surface*](images/frog_side.JPG){group="uznach" fig-alt="A green frog floating at the water's surface"}
+
+:::
