@@ -238,26 +238,25 @@ Have you ever tried to model the relationship between two or more variables, but
 
 This is where copulas come in. The word "copula" originates from Latin and means "link" or "tie" — and that's exactly what they do: they **link** marginal distributions of individual variables together into a joint multivariate distribution, while capturing their dependence structure separately. This separation is the key idea: you can model each variable's marginal distribution independently, and then use a copula to describe how the variables move together. This enables the modelling of complex dependencies - like the tendency of assets to crash together in a financial crisis (tail dependence) - without being constrained by assumptions like normality.
 
-
-
 ## Sklar's Theorem
 
 Before we can state the theorem, we need a precise definition of what a copula actually is.
 
-::: {.callout-note}
+::: callout-note
 ### Definition (Copula)
+
 A **copula** is a function $C: [0,1]^d \to [0,1]$ that is the joint CDF of a random vector $(U_1,\ldots, U_d)$ where each $U_k \sim\mathcal{U}(0,1)$.
 
-Equivalently, $C: [0,1]^d \to [0,1]$ is a copula if and only ifit satisfies the following properties:
+Equivalently, $C: [0,1]^d \to [0,1]$ is a copula if and only if it satisfies the following properties:
 
-1. **Grounded**: $C(u_1, \ldots, u_d) = 0$ if at least one $u_k = 0$.
-2. **Uniform marginals**: $C(1, \ldots, u_k, \ldots, 1) = u_k$ for all $k$ and $u_k \in [0,1]$.
-3. **d-increasing (rectangularly increasing)**: For every hyperrectangle $\prod_{k=1}^d [a_k, b_k] \subseteq [0,1]^d$ with $a_k \leq b_k$, the C-volume is non-negative:
-   $$
-   V_C\left(\prod_{k=1}^d [a_k, b_k]\right) = \sum_{v\in\{a_1, b_1\}\times\cdots\times\{a_d, b_d\}} (-1)^{|\{k: v_k = a_k\}|} C(v) \geq 0,
-   $$
+1.  **Grounded**: $C(u_1, \ldots, u_d) = 0$ if at least one $u_k = 0$.
+2.  **Uniform marginals**: $C(1, \ldots, u_k, \ldots, 1) = u_k$ for all $k$ and $u_k \in [0,1]$.
+3.  **d-increasing (rectangularly increasing)**: For every hyperrectangle $\prod_{k=1}^d [a_k, b_k] \subseteq [0,1]^d$ with $a_k \leq b_k$, the C-volume is non-negative: $$
+    V_C\left(\prod_{k=1}^d [a_k, b_k]\right) = \sum_{v\in\{a_1, b_1\}\times\cdots\times\{a_d, b_d\}} (-1)^{|\{k: v_k = a_k\}|} C(v) \geq 0,
+    $$
 :::
-Note that the third condition is the analogue of non-decreasingness for univariate CDFs and ensures that $C$ assigns non-negative probability mass to every rectangle in $[0,1]^d$. Hence, in plain terms, a copula is simply a joint CDF on $[0,1]^d$ whose marginals are all $\mathrm{Uniform}(0,1)$.
+
+Note that the third condition is the analogue of non-decreasingness for univariate CDFs and ensures that $C$ assigns non-negative probability mass to every rectangle in $[0,1]^d$. Hence, in plain terms, a copula is simply a joint CDF on $[0,1]^d$ whose marginals are all $\mathcal{U}(0,1)$.
 
 Three special copulas serve as reference points. The **Fréchet–Hoeffding bounds** define the extreme cases of dependence [@nelsen2006]:
 
@@ -270,7 +269,7 @@ where $W$ represents perfect negative dependence (countermonotonicity) and $M$ p
 ::: {.callout-tip icon="false"}
 ### Theorem (Sklar, 1959) [@sklar1959]
 
-Let $H$ be a $d$-dimensional joint CDF with marginals $F_1, \ldots, F_d$. Then there exists a copula $C: [0,1]^d \to [0,1]$ such that for all $(x_1, \ldots, x_d) \in \widebar{\mathbb{R}}^d$,
+Let $H$ be a $d$-dimensional joint CDF with marginals $F_1, \ldots, F_d$. Then there exists a copula $C: [0,1]^d \to [0,1]$ such that for all $(x_1, \ldots, x_d) \in \bar{\mathbb{R}}^d$,
 
 $$
 H(x_1, \ldots, x_d) \;=\; C\!\bigl(F_1(x_1), \ldots, F_d(x_d)\bigr).
@@ -285,7 +284,7 @@ $$
 Conversely, for any copula $C$ and any CDFs $F_1, \ldots, F_d$, the function $H(x_1, \ldots, x_d) = C(F_1(x_1), \ldots, F_d(x_d))$ is a valid joint CDF with marginals $F_1, \ldots, F_d$.
 :::
 
-Sklar's theorem has two profound consequences. First, *every* distribution — however exotic its marginals or dependence — admits a copula representation. Copulas are not a restricted model class; they provide an exact characterisation of all joint distributions. Second, continuity of the marginals pins down the copula uniquely, making the dependence structure an intrinsic property of the distribution rather than an artefact of parameterisation.
+Sklar's theorem has two profound consequences. First, *every* distribution — however exotic its marginals or dependence — admits a copula representation. Copulas are not a restricted model class; they provide an exact characterisation (unique when marginals are continuous) of all joint distributions. Second, continuity of the marginals pins down the copula uniquely, making the dependence structure an intrinsic property of the distribution rather than an artefact of parameterisation.
 
 ### The Probability Integral Transform
 
