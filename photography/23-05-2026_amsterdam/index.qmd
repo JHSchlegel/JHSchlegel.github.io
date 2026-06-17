@@ -1,11 +1,11 @@
 ---
-title: "Amsterdam by Day and Night"
-subtitle: "Amsterdam · May 2026"
+title: "Around Amsterdam: By Day and Night"
+subtitle: "Amsterdam, Haarlem & Utrecht · May 2026"
 categories:
   - Travel
   - Architecture
   - Cityscape
-  - Amsterdam
+  - Netherlands
 date: "2026-05-23"
 image: "images/great_crested_grebe.JPG"
 format:
@@ -14,7 +14,7 @@ format:
     lightbox: true
 ---
 
-A day wandering the canals and a converted prison turned university, then back out along the IJ after dark.
+A few days around Amsterdam, Haarlem, and Utrecht --- wandering canals, a converted prison turned university, and a windmill, then back out along the IJ after dark.
 
 ### By Day
 
