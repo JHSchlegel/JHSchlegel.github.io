@@ -1,0 +1,47 @@
+---
+title: "Amsterdam by Day and Night"
+subtitle: "Amsterdam · May 2026"
+categories:
+  - Travel
+  - Architecture
+  - Cityscape
+  - Amsterdam
+date: "2026-05-23"
+image: "images/great_crested_grebe.JPG"
+format:
+  html:
+    toc: false
+    lightbox: true
+---
+
+A day wandering the canals and a converted prison turned university, then back out along the IJ after dark.
+
+### By Day
+
+::: {layout-ncol=3}
+
+![*Great Crested Grebe with Catch*](images/great_crested_grebe.JPG){group="amsterdam" fig-alt="A great crested grebe swimming with a fish in its beak"}
+
+![*Canal in Bloom*](images/canal_flowers.JPG){group="amsterdam" fig-alt="White and orange flowers in the foreground with an Amsterdam canal and houses behind"}
+
+![*Windmill on the Canal*](images/windmill.JPG){group="amsterdam" fig-alt="A traditional Dutch windmill at the end of a tree-lined canal"}
+
+![*\"This Prison Has the Best Escape Plan\"*](images/prison_uni_sign.JPG){group="amsterdam" fig-alt="A banner reading 'This Prison Has the Best Escape Plan: A Degree' outside SRH Haarlem University of Applied Sciences"}
+
+![*Inside the Old Prison*](images/prison_uni_stairs.JPG){group="amsterdam" fig-alt="A spiral staircase inside a converted prison building, now part of a university"}
+
+:::
+
+### By Night
+
+::: {layout-ncol=2}
+
+![*Illuminated Steps*](images/light_stairs.JPG){group="amsterdam" fig-alt="Glowing steps along a waterfront promenade at night"}
+
+![*A'DAM Tower at Night*](images/night_tower.JPG){group="amsterdam" fig-alt="The illuminated crown of the A'DAM Tower against a dark night sky, reflected in the water"}
+
+![*Skyline at Dusk*](images/skyline.JPG){group="amsterdam" fig-alt="Silhouetted skyline glowing under an orange dusk sky with a bird flying overhead"}
+
+![*The Crew*](images/group_selfie.JPG){group="amsterdam" fig-alt="A group selfie taken from above with several people looking up at the camera at night"}
+
+:::
