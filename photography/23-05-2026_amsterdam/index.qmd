@@ -14,34 +14,34 @@ format:
     lightbox: true
 ---
 
-A few days around Amsterdam, Haarlem, and Utrecht --- wandering canals, a converted prison turned university, and a windmill, then back out along the IJ after dark.
+A few days around Amsterdam, Haarlem, Zandvoort, and Utrecht.
 
 ### By Day
 
-::: {layout-ncol=3}
+::: {layout-ncol=1}
 
-![*Great Crested Grebe with Catch*](images/great_crested_grebe.JPG){group="amsterdam" fig-alt="A great crested grebe swimming with a fish in its beak"}
+![*Great Crested Grebe with Catch*](images/great_crested_grebe.JPG)
 
-![*Canal in Bloom*](images/canal_flowers.JPG){group="amsterdam" fig-alt="White and orange flowers in the foreground with an Amsterdam canal and houses behind"}
+![*Canal in Bloom*](images/canal_flowers.JPG)
 
-![*Windmill on the Canal*](images/windmill.JPG){group="amsterdam" fig-alt="A traditional Dutch windmill at the end of a tree-lined canal"}
+![*Windmill on the Canal*](images/windmill.JPG)
 
-![*\"This Prison Has the Best Escape Plan\"*](images/prison_uni_sign.JPG){group="amsterdam" fig-alt="A banner reading 'This Prison Has the Best Escape Plan: A Degree' outside SRH Haarlem University of Applied Sciences"}
+![*\"This Prison Has the Best Escape Plan\"*](images/prison_uni_sign.JPG)
 
-![*Inside the Old Prison*](images/prison_uni_stairs.JPG){group="amsterdam" fig-alt="A spiral staircase inside a converted prison building, now part of a university"}
+![*Inside the Old Prison*](images/prison_uni_stairs.JPG)
 
 :::
 
 ### By Night
 
-::: {layout-ncol=2}
+::: {layout-ncol=1}
 
-![*Illuminated Steps*](images/light_stairs.JPG){group="amsterdam" fig-alt="Glowing steps along a waterfront promenade at night"}
+![*Illuminated Steps*](images/light_stairs.JPG)
 
-![*A'DAM Tower at Night*](images/night_tower.JPG){group="amsterdam" fig-alt="The illuminated crown of the A'DAM Tower against a dark night sky, reflected in the water"}
+![*A'DAM Tower at Night*](images/night_tower.JPG)
 
-![*Skyline at Dusk*](images/skyline.JPG){group="amsterdam" fig-alt="Silhouetted skyline glowing under an orange dusk sky with a bird flying overhead"}
+![*Skyline at Dusk*](images/skyline.JPG)
 
-![*The Crew*](images/group_selfie.JPG){group="amsterdam" fig-alt="A group selfie taken from above with several people looking up at the camera at night"}
+![*The Crew*](images/group_selfie.JPG)
 
 :::
