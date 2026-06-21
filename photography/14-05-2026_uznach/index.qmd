@@ -18,7 +18,7 @@ Macro shots from a pond near Uznach: flies, a dragonfly, a dying wasp, and a goo
 
 ### Macro
 
-::: {layout-ncol=3}
+::: {layout-ncol=1}
 
 ![](images/macro_fly_3.JPG){group="uznach" fig-alt="A long-legged fly resting on a green leaf, wings spread"}
 
@@ -36,7 +36,7 @@ Macro shots from a pond near Uznach: flies, a dragonfly, a dying wasp, and a goo
 
 ### Pond Wildlife
 
-::: {layout-ncol=3}
+::: {layout-ncol=1}
 
 ![*Goose Family*](images/duck_family.JPG){group="uznach" fig-alt="A family of geese with several fluffy goslings standing in grass"}
 
