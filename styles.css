@@ -227,4 +227,63 @@
 /* Dark mode horizontal connector */
 .quarto-dark .education-card::after {
   background-color: #60a5fa !important;
-}/*# sourceMappingURL=styles.css.map */
+}
+
+/* ------------------------------------
+   ALGORITHM CALLOUT
+   A reusable "algorithm" environment, matching the definition (callout-note)
+   and theorem (callout-tip) convention used in the blog posts. Apply with:
+       ::: {.callout-important .callout-algorithm icon="false"}
+       ### Algorithm (...)
+       1. step one
+       2. step two
+       :::
+--------------------------------------- */
+.callout-algorithm.callout {
+  border-left-color: #762a83 !important; /* plum accent (academic palette) */
+}
+
+.callout-algorithm .callout-header {
+  background-color: rgba(118, 42, 131, 0.1) !important;
+}
+
+.callout-algorithm .callout-title-container {
+  font-weight: 600 !important;
+}
+
+/* Numbered steps: tabular monospace counters in the accent colour */
+.callout-algorithm .callout-body ol {
+  counter-reset: algo-step;
+  list-style: none;
+  padding-left: 1.7rem;
+}
+
+.callout-algorithm .callout-body ol > li {
+  counter-increment: algo-step;
+  position: relative;
+  margin-bottom: 0.4rem;
+  line-height: 1.6;
+}
+
+.callout-algorithm .callout-body ol > li::before {
+  content: counter(algo-step) ".";
+  position: absolute;
+  left: -1.7rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #762a83;
+}
+
+/* Dark mode */
+.quarto-dark .callout-algorithm.callout {
+  border-left-color: #c2a5cf !important; /* lavender */
+}
+
+.quarto-dark .callout-algorithm .callout-header {
+  background-color: rgba(194, 165, 207, 0.14) !important;
+}
+
+.quarto-dark .callout-algorithm .callout-body ol > li::before {
+  color: #c2a5cf;
+}
+/*# sourceMappingURL=styles.css.map */
