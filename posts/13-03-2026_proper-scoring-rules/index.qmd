@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "Proper Scoring Rules: Evaluating Probabilistic Forecasts in Energy Markets"
 abstract: "We examine the application of proper scoring rules in evaluating probabilistic forecasts within energy markets. These rules provide a rigorous framework for assessing the quality of probabilistic predictions, ensuring that forecasters are incentivized to provide accurate and well-calibrated probabilities. Our focus lies on the Continuous Ranked Probability Score (CRPS) and its multivariate generalizations — the Energy Score and Variogram Score — with practical examples from electricity price and wind power forecasting."
 categories:
