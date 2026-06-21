@@ -37,12 +37,38 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotnine as pn
 from scipy import stats
-from scipy.optimize import minimize, minimize_scalar
+from scipy.stats import genpareto, kendalltau
+from scipy.optimize import minimize, minimize_scalar, brentq
 from scipy.special import gamma, digamma, polygamma
 from scipy.integrate import quad, dblquad
 from scipy.linalg import cholesky, solve_triangular
+from statsmodels.distributions.copula.api import (
+    GaussianCopula, StudentTCopula, ClaytonCopula, GumbelCopula, FrankCopula,
+)
 import warnings
 warnings.filterwarnings('ignore')
+
+
+# ---------------------------------------------------------------------------
+# Kendall's tau -> copula parameter (so families are compared at equal strength)
+# ---------------------------------------------------------------------------
+
+def _debye1(x):
+    """First Debye function D_1(x)."""
+    return (1.0 / x) * quad(lambda t: t / (np.exp(t) - 1), 0, x)[0]
+
+
+def tau_to_param(family, tau):
+    """Map a target Kendall's tau to the parameter of the given copula family."""
+    if family in ("Gaussian", "Student-t"):
+        return np.sin(np.pi * tau / 2)                      # correlation rho
+    if family == "Clayton":
+        return 2 * tau / (1 - tau)
+    if family == "Gumbel":
+        return 1 / (1 - tau)
+    if family == "Frank":
+        return brentq(lambda th: (1 - 4 / th * (1 - _debye1(th))) - tau, 1e-6, 50)
+    raise ValueError(family)
 
 plt.style.use('seaborn-v0_8-whitegrid')
 sns.set_palette("husl")
@@ -258,13 +284,7 @@ Equivalently, $C: [0,1]^d \to [0,1]$ is a copula if and only if it satisfies the
 
 Note that the third condition is the analogue of non-decreasingness for univariate CDFs and ensures that $C$ assigns non-negative probability mass to every rectangle in $[0,1]^d$. Hence, in plain terms, a copula is simply a joint CDF on $[0,1]^d$ whose marginals are all $\mathcal{U}(0,1)$.
 
-Three special copulas serve as reference points. The **Fréchet–Hoeffding bounds** define the extreme cases of dependence [@nelsen2006]:
-
-$$
-W(u, v) = \max(u + v - 1,\, 0) \;\leq\; C(u, v) \;\leq\; \min(u, v) = M(u, v),
-$$
-
-where $W$ represents perfect negative dependence (countermonotonicity) and $M$ perfect positive dependence (comonotonicity). Between the two extremes lies the **independence copula** $\Pi(u, v) = uv$. With this machinery in place, we are ready for the central result of copula theory.
+With this machinery in place, we are ready for the central result of copula theory.
 
 ::: {.callout-tip icon="false"}
 ### Theorem (Sklar, 1959) [@sklar1959]
@@ -286,113 +306,255 @@ Conversely, for any copula $C$ and any CDFs $F_1, \ldots, F_d$, the function $H(
 
 Sklar's theorem has two profound consequences. First, *every* distribution — however exotic its marginals or dependence — admits a copula representation. Copulas are not a restricted model class; they provide an exact characterisation (unique when marginals are continuous) of all joint distributions. Second, continuity of the marginals pins down the copula uniquely, making the dependence structure an intrinsic property of the distribution rather than an artefact of parameterisation.
 
-### The Probability Integral Transform
 
-The bridge between the original variables and the unit square is the **Probability Integral Transform (PIT)**. If $X$ is a continuous random variable with CDF $F_X$, then
+## Copula Families
 
-$$
-U \;=\; F_X(X) \;\sim\; \mathrm{Uniform}(0, 1).
-$$
-
-The proof is immediate: $\mathbb{P}(U \leq u) = \mathbb{P}(F_X(X) \leq u) = \mathbb{P}(X \leq F_X^{-1}(u)) = u$. The PIT *standardises* any continuous random variable onto $[0,1]$, removing its marginal distribution while preserving its rank structure.
-
-Applied to a bivariate pair $(X, Y)$, the PIT yields pseudo-observations
+Sklar's theorem guarantees that a copula *exists*, but to actually model data we need concrete parametric families. Two reference points bound the whole landscape. The **independence copula** $\Pi(u_1,\dots,u_d)=\prod_k u_k$ describes mutually independent margins, while the **Fréchet–Hoeffding bounds**
 
 $$
-U = F_X(X), \qquad V = F_Y(Y),
+W(\mathbf{u}) = \max\!\Big(\textstyle\sum_k u_k - d + 1,\, 0\Big) \;\le\; C(\mathbf{u}) \;\le\; \min(u_1,\dots,u_d) = M(\mathbf{u})
 $$
 
-both of which are $\mathrm{Uniform}(0,1)$ by construction. Their joint distribution is the copula:
+mark the extremes of perfect negative ($W$, the lower bound, attainable only for $d=2$) and perfect positive ($M$) dependence [@nelsen2006]. Every copula lives between these two surfaces. The parametric families below interpolate within this space, each emphasising a different *shape* of dependence — in particular **tail dependence**, the tendency of variables to take extreme values jointly.
 
-$$
-\mathbb{P}(U \leq u,\; V \leq v)
-= \mathbb{P}\!\bigl(F_X(X) \leq u,\; F_Y(Y) \leq v\bigr)
-= F\!\bigl(F_X^{-1}(u),\; F_Y^{-1}(v)\bigr)
-= C(u, v).
-$$
+::: callout-note
+### Tail dependence
 
-@fig-sklar illustrates this for a bivariate distribution with Log-Normal and Gamma marginals coupled by a Gaussian copula with $\rho = 0.72$. The left panel shows the original joint distribution in the natural observation scale; the right panel shows what remains after the PIT — the copula structure, freed from the marginal shapes.
+The **lower** and **upper tail-dependence coefficients** of a bivariate copula are
+$$
+\lambda_L = \lim_{u\to 0^+}\frac{C(u,u)}{u}, \qquad
+\lambda_U = \lim_{u\to 1^-}\frac{1 - 2u + C(u,u)}{1-u},
+$$
+each lying in $[0,1]$. They measure the probability that one variable is extreme *given* that the other is — for example, the propensity of two assets to crash together ($\lambda_L>0$). This single quantity is what most sharply distinguishes the families below.
+:::
+
+### Elliptical copulas
+
+Elliptical copulas are extracted (via the PIT) from elliptical distributions such as the multivariate normal and $t$. They are parameterised by a $d\times d$ correlation matrix $R$, which makes them natural in high dimensions and easy to calibrate, but they are **radially symmetric** — they treat joint booms and joint crashes identically.
+
+- **Gaussian copula** [@li2000]: $C_R^{\mathrm{Ga}}(\mathbf{u}) = \Phi_R\!\big(\Phi^{-1}(u_1),\dots,\Phi^{-1}(u_d)\big)$, where $\Phi_R$ is the joint CDF of $\mathcal{N}(\mathbf 0, R)$. It has **no tail dependence** ($\lambda_L=\lambda_U=0$) whenever $|\rho|<1$: extremes decouple.
+- **Student-$t$ copula** [@embrechts2002]: adds a degrees-of-freedom parameter $\nu>0$, giving **symmetric tail dependence** $\lambda_L=\lambda_U = 2\,t_{\nu+1}\!\big(-\sqrt{\nu+1}\,\sqrt{1-\rho}/\sqrt{1+\rho}\big) > 0$. As $\nu\to\infty$ it converges to the Gaussian copula. The extra parameter lets it capture joint extremes that the Gaussian misses, which is why it is the default workhorse in quantitative risk management [@mcneil2015quantitative].
+
+### Archimedean copulas
+
+Archimedean copulas are built from a single **generator** $\psi:[0,1]\to[0,\infty]$, a convex, decreasing function with $\psi(1)=0$:
+$$
+C(u_1,\dots,u_d) = \psi^{-1}\!\big(\psi(u_1)+\cdots+\psi(u_d)\big).
+$$
+A whole multivariate dependence structure is thus encoded by one univariate function and, typically, a **single scalar parameter** $\theta$. This parsimony makes them ideal in low dimensions and allows them to model *asymmetric* tail behaviour that elliptical copulas cannot [@joe1997; @nelsen2006].
+
+- **Clayton** [@clayton1978], $\theta\in(0,\infty)$ with $\psi(t)=\tfrac1\theta(t^{-\theta}-1)$: strong **lower**-tail dependence ($\lambda_L = 2^{-1/\theta}$, $\lambda_U=0$). Models variables that crash together but decouple in booms; independence as $\theta\to0$.
+- **Gumbel** [@gumbel1960], $\theta\in[1,\infty)$ with $\psi(t)=(-\ln t)^\theta$: strong **upper**-tail dependence ($\lambda_U = 2-2^{1/\theta}$, $\lambda_L=0$). An extreme-value copula, suited to joint *maxima* and upside clustering; independence at $\theta=1$.
+- **Frank** [@frank1979], $\theta\in\mathbb{R}\setminus\{0\}$: symmetric and **tail-independent** ($\lambda_L=\lambda_U=0$), but unlike the Gaussian it permits *negative* dependence. Useful when dependence is strong in the middle of the distribution but absent in the tails.
+
+@fig-copula-zoo makes these differences concrete. Each panel is the estimated copula density in $[0,1]^2$ for a different family, all calibrated to the *same* Kendall's $\tau = 0.5$ — so only the **shape** of the dependence differs, not its strength.
 
 ```{python}
-#| label: fig-sklar
-#| fig-cap: "**Sklar's Theorem in action.** Both panels show 2,000 draws from a distribution with Log-Normal and Gamma marginals linked by a Gaussian copula ($\\rho = 0.72$). Filled density contours and scattered points (coloured to match each space) reveal the distributional shape. (*Left*) Original joint distribution $F(x,y)$ in the natural observation scale. (*Right*) After applying the PIT, both variables become uniform and the copula $C(u,v)$ is exposed — the same dependence structure, stripped of marginal effects."
-#| layout-ncol: 2
-#| fig-subcap:
-#|   - "Joint distribution $F(x,\\,y)$ — original space"
-#|   - "Gaussian copula $C(u,\\,v)$,\\  $\\rho = 0.72$ — copula space"
-#| fig-width: 4.5
-#| fig-height: 4.3
+#| label: fig-copula-zoo
+#| fig-cap: "**Same dependence strength, five different shapes.** Kernel-density estimate of 8,000 simulated $(u, v)$ points from each family, all calibrated to Kendall's $\\tau = 0.5$. Clayton concentrates toward the lower-left corner (lower-tail dependence) and Gumbel toward the upper-right (upper-tail dependence); the Student-$t$ thickens in *both* corners. The Gaussian and Frank copulas instead taper away from the corners — identical rank correlation, but no tail dependence."
+#| fig-width: 11
+#| fig-height: 2.6
 
-np.random.seed(42)
-_n   = 2000
-_rho = 0.72
-_Z   = np.random.multivariate_normal([0, 0], [[1, _rho], [_rho, 1]], _n)
-_U   = stats.norm.cdf(_Z[:, 0])
-_V   = stats.norm.cdf(_Z[:, 1])
-_X   = stats.lognorm.ppf(_U, s=0.7, scale=np.exp(0.3))
-_Y   = stats.gamma.ppf(_V, a=2.5, scale=1.5)
+from scipy.stats import gaussian_kde
 
-df_xy = pd.DataFrame({'x': _X, 'y': _Y})
-df_uv = pd.DataFrame({'u': _U, 'v': _V})
+_tau_zoo  = 0.5
+_families = ['Gaussian', 'Student-t', 'Clayton', 'Gumbel', 'Frank']
+_n_zoo    = 8000
 
-_th_scatter = (
-    theme_academic(base_size=9)
-    + pn.theme(legend_position='none', figure_size=(4.5, 4.3))
-)
+def _make_copula(family, tau):
+    p = tau_to_param(family, tau)
+    if family == 'Gaussian':  return GaussianCopula(corr=p)
+    if family == 'Student-t': return StudentTCopula(corr=p, df=4)
+    if family == 'Clayton':   return ClaytonCopula(theta=p)
+    if family == 'Gumbel':    return GumbelCopula(theta=p)
+    return FrankCopula(theta=p)
 
-p_joint = (
-    pn.ggplot(df_xy, pn.aes('x', 'y'))
-    + pn.stat_density_2d(
-        pn.aes(fill=pn.after_stat('level')),
-        geom='polygon', alpha=0.55
-    )
-    + pn.geom_point(alpha=0.15, size=0.65, color=ACADEMIC_COLORS['cobalt'])
-    + pn.scale_fill_gradient(
-        low='#EEF4FB', high=ACADEMIC_COLORS['cobalt']
-    )
-    + pn.labs(
-        x='$x$ \u2014 Log-Normal margin',
-        y='$y$ \u2014 Gamma margin'
-    )
-    + _th_scatter
-)
+# Evaluate each copula density on a fixed grid and show as a square viridis heatmap
+_g  = np.linspace(0.005, 0.995, 140)
+_GX, _GY = np.meshgrid(_g, _g)
+_pos = np.vstack([_GX.ravel(), _GY.ravel()])
 
-p_cop = (
-    pn.ggplot(df_uv, pn.aes('u', 'v'))
-    + pn.stat_density_2d(
-        pn.aes(fill=pn.after_stat('level')),
-        geom='polygon', alpha=0.55
-    )
-    + pn.geom_point(alpha=0.15, size=0.65, color=ACADEMIC_COLORS['teal'])
-    + pn.scale_fill_gradient(
-        low='#EBF7F5', high=ACADEMIC_COLORS['teal']
-    )
-    + pn.coord_cartesian(xlim=(0, 1), ylim=(0, 1))
-    + pn.scale_x_continuous(breaks=[0, 0.25, 0.5, 0.75, 1.0],
-                             labels=['0', '0.25', '0.50', '0.75', '1'])
-    + pn.scale_y_continuous(breaks=[0, 0.25, 0.5, 0.75, 1.0],
-                             labels=['0', '0.25', '0.50', '0.75', '1'])
-    + pn.labs(
-        x='$u = F_X(X)$ \u2014 Uniform margin',
-        y='$v = F_Y(Y)$ \u2014 Uniform margin'
-    )
-    + _th_scatter
-)
-
-from IPython.display import display
-display(p_joint)
-display(p_cop)
+fig, _axes = plt.subplots(1, 5, figsize=(11, 2.6), constrained_layout=True)
+for _ax, _fam, _i in zip(_axes, _families, range(5)):
+    _uv   = _make_copula(_fam, _tau_zoo).rvs(_n_zoo, random_state=100 + _i)
+    _dens = gaussian_kde(_uv.T, bw_method=0.18)(_pos).reshape(_GX.shape)
+    _ax.imshow(_dens, origin='lower', extent=[0, 1, 0, 1],
+               cmap='viridis', aspect='equal', interpolation='bilinear')
+    _ax.set_title(_fam, fontsize=10, color=ACADEMIC_COLORS['ink'])
+    _ax.set_xticks([0, 0.5, 1]); _ax.set_yticks([0, 0.5, 1])
+    _ax.set_xlabel('$u$')
+    _ax.tick_params(labelsize=8)
+    _ax.grid(False)
+_axes[0].set_ylabel('$v$')
+for _ax in _axes[1:]:
+    _ax.set_yticklabels([])
+plt.show()
 ```
 
-@fig-sklar-marginals shows the two marginal CDFs that mediate the transformation. The dashed vermillion curve in each panel is the CDF scaled to the PDF axis for visual comparison; it is this curve that is applied pointwise to each observation to produce the pseudo-observations $(U_i, V_i)$.
+All of this generalises beyond two variables: a $d$-variate copula is simply a distribution on the hypercube $[0,1]^d$, and the classic way to inspect one is the **pairs plot**, which lays out every bivariate projection at once. @fig-pairs-3d shows a 3-dimensional Student-$t$ copula viewed this way — scatter clouds below the diagonal, their rank correlations above it.
 
 ```{python}
-#| label: fig-sklar-marginals
+#| label: fig-pairs-3d
+#| fig-cap: "**A copula in three dimensions.** Pairs plot of 3,000 draws from a 3-D Student-$t$ copula ($\\nu = 4$) with three deliberately different pairwise correlations. *Lower triangle*: each bivariate margin $(u_j, u_i)$, itself a valid 2-D copula. *Diagonal*: the uniform univariate margins. *Upper triangle*: the corresponding Spearman rank correlation (blue positive, red negative, sized by magnitude). The strong-positive, near-zero, and negative pairs give visibly different clouds — yet the $t$-copula's tail dependence keeps mass in the corners even when the rank correlation is near zero."
+#| fig-width: 5.6
+#| fig-height: 5.6
+
+from scipy.stats import spearmanr
+
+# Three deliberately different pairwise correlations: strong +, near-zero, negative
+_R3 = np.array([
+    [1.00,  0.80,  0.10],
+    [0.80,  1.00, -0.50],
+    [0.10, -0.50,  1.00],
+])
+_u3 = StudentTCopula(corr=_R3, df=4, k_dim=3).rvs(3000, random_state=7)
+_labels = ['$u_1$', '$u_2$', '$u_3$']
+_d = _u3.shape[1]
+
+fig, _axes = plt.subplots(_d, _d, figsize=(5.6, 5.6), constrained_layout=True)
+for _i in range(_d):
+    for _j in range(_d):
+        _ax = _axes[_i, _j]
+        _ax.grid(False)
+        if _i == _j:                                   # diagonal: uniform margin
+            _ax.hist(_u3[:, _i], bins=22, range=(0, 1),
+                     color='black', edgecolor='white')
+            _ax.set_yticks([]); _ax.set_xlim(0, 1); _ax.set_xticks([0, 0.5, 1])
+        elif _i > _j:                                  # lower triangle: scatter
+            _ax.scatter(_u3[:, _j], _u3[:, _i], s=4, alpha=0.12, color='black')
+            _ax.set_xlim(0, 1); _ax.set_ylim(0, 1)
+            _ax.set_xticks([0, 0.5, 1]); _ax.set_yticks([0, 0.5, 1])
+        else:                                          # upper triangle: rank corr
+            _r = spearmanr(_u3[:, _i], _u3[:, _j]).correlation
+            _ax.text(0.5, 0.5, f'{_r:+.2f}', ha='center', va='center',
+                     fontsize=13, color='black')
+            _ax.set_xlim(0, 1); _ax.set_ylim(0, 1)
+            _ax.set_xticks([]); _ax.set_yticks([])
+        if _i != _d - 1:
+            _ax.set_xticklabels([])
+        if _j != 0 or _i == _j:
+            _ax.set_yticklabels([])
+        if _j == 0 and _i != 0:
+            _ax.set_ylabel(_labels[_i])
+        if _i == _d - 1:
+            _ax.set_xlabel(_labels[_j])
+plt.show()
+```
+
+In higher dimensions, a single Archimedean parameter is often too rigid and a single correlation matrix too symmetric; **vine copulas** [@bedford2002; @aas2009] overcome this by decomposing a $d$-dimensional copula into a cascade of bivariate ones, mixing families pair by pair. The choice of family is ultimately an empirical question, addressed by the estimation and goodness-of-fit tools discussed later.
+
+## The Probability Integral Transform
+
+::: callout-note
+### Definition (PIT)
+Let $X$ be a real-valued random variable with continuous CDF $F_X$. The *probability integral transform* of $X$ is
+$$
+U = F_X(X).
+$$
+:::
+
+::: {.callout-tip icon="false"}
+
+### Theorem (PIT)
+If $F_X$ is continuous, then $U = F_X(X) \sim \mathrm{Uniform}(0,1)$.
+
+*Proof sketch.* For $u\in[0,1]$,
+$$
+\mathbb{P}(U \le u) = \mathbb{P}\big(F_X(X) \le u\big) = \mathbb{P}\big(X \le F_X^{-1}(u)\big) = F_X\big(F_X^{-1}(u)\big) = u,
+$$
+using that continuity of $F_X$ guarantees a well-defined (generalized) inverse and that $F_X$ is non-decreasing, so $\{F_X(X)\le u\} = \{X \le F_X^{-1}(u)\}$ almost surely. Hence $U$ has the CDF of a Uniform$(0,1)$ random variable. $\blacksquare$
+:::
+
+The converse (sometimes called the *inverse PIT* or *quantile transform*) is equally important: if $U\sim\mathrm{Uniform}(0,1)$, then $F_X^{-1}(U)$ has CDF $F_X$. This is the basis of inverse-transform sampling that we will cover later.
+
+This essentially means that the PIT is how the copula is *extracted* from a joint distribution. Given $\mathbf{X}=(X_1,\dots,X_d)$ with continuous margins $F_1,\dots,F_d$, applying the PIT componentwise,
+$$
+U_j = F_j(X_j), \qquad j=1,\dots,d,
+$$
+sends each marginal to Uniform$(0,1)$ while preserving the *rank structure* of $\mathbf{X}$, since each $F_j$ is monotone. The joint law of $\mathbf{U}=(U_1,\dots,U_d)$ is, by definition, the copula $C$ of $\mathbf{X}$:
+$$
+C(u_1,\dots,u_d) = \mathbb{P}(U_1\le u_1,\dots,U_d\le u_d) = F\big(F_1^{-1}(u_1),\dots,F_d^{-1}(u_d)\big).
+$$
+This is exactly the content of Sklar's theorem read "backwards": the PIT is the constructive map that *strips away the marginals*, leaving only the copula.
+
+In practice $F_j$ is unknown, so one can either make a distributional assumption or use the empirical PIT, i.e. (rescaled) empirical CDFs:
+$$
+\hat U_{ij} = \frac{n}{n+1}\,\hat F_j(X_{ij}), \qquad \hat F_j(x) = \frac{1}{n}\sum_{i=1}^n \mathbb{1}\{X_{ij}\le x\},
+$$
+producing *pseudo-observations* $\hat{\mathbf{U}}_i$.
+
+## The Quantile Transform
+
+The PIT turns a known margin into a uniform; the **quantile transform** runs this in reverse, turning a uniform back into any margin we choose. It rests on the *generalized inverse* of a CDF.
+
+::: callout-note
+### Definition (Quantile function)
+
+Let $X$ be a real-valued random variable with CDF $F_X$. The **quantile function** (generalized inverse) of $F_X$ is
+$$
+F_X^{-1}(u) = \inf\{x \in \mathbb{R} : F_X(x) \ge u\}, \qquad u \in (0,1).
+$$
+:::
+
+Defining the inverse through an infimum keeps it well-defined even when $F_X$ is flat or has jumps — as for discrete or mixed distributions — where an ordinary functional inverse would not exist.
+
+::: {.callout-tip icon="false"}
+### Theorem (Quantile transform / inverse PIT)
+
+Let $U \sim \mathrm{Uniform}(0,1)$ and let $F$ be any CDF on $\mathbb{R}$. Then $X := F^{-1}(U)$ has CDF $F$.
+
+*Proof sketch.* For any $x\in\mathbb{R}$,
+$$
+\mathbb{P}(X \le x) = \mathbb{P}\big(F^{-1}(U) \le x\big) = \mathbb{P}\big(U \le F(x)\big) = F(x),
+$$
+where the middle equality uses the defining property of the generalized inverse, $F^{-1}(u) \le x \iff u \le F(x)$ (valid because $F$ is right-continuous and non-decreasing), and the last is the CDF of $U\sim\mathrm{Uniform}(0,1)$ evaluated at $F(x)$. $\blacksquare$
+:::
+
+The PIT and the quantile transform are exact converses: the PIT *removes* a marginal ($X \mapsto F(X)$ is uniform), while the quantile transform *imposes* one ($U \mapsto F^{-1}(U)$ has law $F$). When $F$ is continuous and strictly increasing they form an (almost sure) invertible pair — precisely the machinery Sklar's theorem exploits to move between a joint distribution and its copula-plus-margins representation.
+
+
+
+
+
+## Copula Sampling Algorithm
+
+### The algorithm
+
+This is where the quantile transform earns its keep: paired with Sklar's theorem, it gives the **standard recipe** for simulating from *any* copula-based model.
+
+::: {.callout-important .callout-algorithm icon="false"}
+### Algorithm (Copula sampling via the quantile transform)
+
+**Input:** a copula $C$ and marginal CDFs $F_1,\dots,F_d$.
+
+1. Draw $\mathbf{U} = (U_1,\dots,U_d) \sim C$ from the chosen copula (Gaussian, $t$, Clayton, a fitted vine, a trained neural copula, …).
+2. Apply the quantile transform componentwise, $X_j = F_j^{-1}(U_j)$ for $j = 1,\dots,d$, using whatever marginal is desired for each component.
+
+**Output:** $\mathbf{X} = (X_1,\dots,X_d)$ with joint CDF $F(x_1,\dots,x_d) = C\big(F_1(x_1),\dots,F_d(x_d)\big)$, exactly as Sklar's theorem prescribes.
+:::
+
+The power of the recipe is that **steps 1 and 2 are fully decoupled**: the dependence structure and the marginals can be specified, estimated, and sampled entirely independently of one another. This is the "separate the margins from the dependence" principle, now realised constructively rather than just diagnostically.
+
+### Worked example: aggregate loss simulation in (re)insurance
+
+A reinsurer models two lines of business, $X_1$ (property) and $X_2$ (casualty), with marginals fitted independently to historical claims — a $\mathrm{Lognormal}(\mu,\sigma^2)$ severity for property and a heavy-tailed $\mathrm{GPD}(\xi,\beta)$ for casualty — and couples them with a **Gumbel copula** $C_\theta$, which captures the joint *upper*-tail clustering seen after large catastrophes. To simulate the aggregate loss $S = X_1 + X_2$ for a Monte Carlo VaR / SCR calculation, repeat $N$ times:
+
+1. Draw $(U_1, U_2) \sim C_\theta$ — e.g. via the Marshall–Olkin algorithm for Archimedean copulas.
+2. Invert each margin: $X_1 = F_1^{-1}(U_1)$, $X_2 = F_2^{-1}(U_2)$, and set $S = X_1 + X_2$.
+
+The $99.5\%$ quantile of the simulated $\{S^{(i)}\}$ is the SCR. The quantile transform is what lets these *separately fitted* severity models attach to a *separately chosen* copula — exactly what makes copulas operationally useful rather than a purely theoretical decomposition.
+
+The construction is easiest to read in three steps that mirror the sampling algorithm: the **marginals** we fit, the **copula** that links them in uniform space, and the **joint distribution** that results in the original observation scale.
+
+First, the two fitted margins. @fig-marginals shows each density alongside its CDF; it is the CDF that is applied pointwise to every observation — $U_i = F_X(X_i)$, $V_i = F_Y(Y_i)$ — turning raw losses into uniform pseudo-observations.
+
+```{python}
+#| label: fig-marginals
 #| fig-cap: "**Marginal distributions and their CDFs.** The CDF (dashed vermillion) is scaled to match the PDF axis for direct visual comparison. Applying these CDFs to each observation — $U_i = F_X(X_i)$, $V_i = F_Y(Y_i)$ — yields pseudo-observations that are marginally uniform, isolating the copula."
 #| layout-ncol: 2
 #| fig-subcap:
 #|   - "$X \\sim \\mathrm{LogNormal}(\\mu\\!=\\!0.3,\\,\\sigma\\!=\\!0.7)$"
-#|   - "$Y \\sim \\mathrm{Gamma}(\\alpha\\!=\\!2.5,\\,\\beta\\!=\\!1.5)$"
+#|   - "$Y \\sim \\mathrm{GPD}(\\xi\\!=\\!0.3,\\,\\beta\\!=\\!1.5)$"
 #| fig-width: 4.5
 #| fig-height: 3.0
 
@@ -439,11 +601,11 @@ p_mx = (
     + _th_marg
 )
 
-# ── Marginal Y : Gamma ─────────────────────────────────────────────────────
-_gam  = stats.gamma(a=2.5, scale=1.5)
-_yv   = np.linspace(_gam.ppf(1e-3), _gam.ppf(0.999), 350)
-_pdy  = _gam.pdf(_yv)
-_cdy  = _gam.cdf(_yv)
+# ── Marginal Y : GPD (generalized Pareto) ───────────────────────────────────
+_gpd  = genpareto(c=0.3, scale=1.5)
+_yv   = np.linspace(0, _gpd.ppf(0.985), 350)
+_pdy  = _gpd.pdf(_yv)
+_cdy  = _gpd.cdf(_yv)
 _scale_y = _pdy.max()
 
 df_my = pd.DataFrame({
@@ -452,8 +614,8 @@ df_my = pd.DataFrame({
     'curve': ['PDF'] * len(_yv) + ['CDF'] * len(_yv),
 })
 
-_ann_y_pdf = _yv[np.argmax(_pdy)] * 0.48
-_ann_y_cdf = _yv[int(len(_yv) * 0.75)]
+_ann_y_pdf = _yv[int(len(_yv) * 0.12)]
+_ann_y_cdf = _yv[int(len(_yv) * 0.60)]
 
 p_my = (
     pn.ggplot(df_my)
@@ -481,12 +643,84 @@ display(p_mx)
 display(p_my)
 ```
 
-### Copula Density and Likelihood Decomposition
+Next, the **dependence** alone. Drawing $(U, V)$ straight from the Gumbel copula gives @fig-copula-uv: the pure dependence structure on $[0,1]^2$, clustered toward the top-right corner — the signature of upper-tail dependence.
+
+```{python}
+#| label: fig-copula-uv
+#| fig-cap: "**The copula in uniform space.** 2,000 draws $(u, v)$ from a Gumbel copula ($\\theta = 2$). The filled density contours expose the dependence on $[0,1]^2$; the concentration toward the top-right corner is the Gumbel's upper-tail dependence."
+#| fig-width: 4.8
+#| fig-height: 4.4
+
+_n   = 2000
+_UV  = GumbelCopula(theta=2.0).rvs(_n, random_state=42)
+_U   = _UV[:, 0]
+_V   = _UV[:, 1]
+df_uv = pd.DataFrame({'u': _U, 'v': _V})
+
+_th_scatter = (
+    theme_academic(base_size=9)
+    + pn.theme(legend_position='none', figure_size=(4.8, 4.4))
+)
+
+p_cop = (
+    pn.ggplot(df_uv, pn.aes('u', 'v'))
+    + pn.stat_density_2d(
+        pn.aes(fill=pn.after_stat('level')),
+        geom='polygon', alpha=0.55
+    )
+    + pn.geom_point(alpha=0.15, size=0.65, color=ACADEMIC_COLORS['teal'])
+    + pn.scale_fill_gradient(low='#EBF7F5', high=ACADEMIC_COLORS['teal'])
+    + pn.coord_cartesian(xlim=(0, 1), ylim=(0, 1))
+    + pn.scale_x_continuous(breaks=[0, 0.25, 0.5, 0.75, 1.0],
+                             labels=['0', '0.25', '0.50', '0.75', '1'])
+    + pn.scale_y_continuous(breaks=[0, 0.25, 0.5, 0.75, 1.0],
+                             labels=['0', '0.25', '0.50', '0.75', '1'])
+    + pn.labs(x='$u = F_X(X)$ — Uniform margin',
+              y='$v = F_Y(Y)$ — Uniform margin')
+    + _th_scatter
+)
+
+from IPython.display import display
+display(p_cop)
+```
+
+Finally, pushing each uniform coordinate through the matching quantile function — $x = F_X^{-1}(u)$, $y = F_Y^{-1}(v)$ — stretches the copula onto the fitted margins, producing the joint loss distribution of @fig-joint-xy in its natural observation scale. The dependence is unchanged; only the axes are re-shaped by the margins.
+
+```{python}
+#| label: fig-joint-xy
+#| fig-cap: "**The resulting joint distribution.** The 2,000 copula draws of @fig-copula-uv after the quantile transform $x = F_X^{-1}(u)$, $y = F_Y^{-1}(v)$, which maps them onto the Log-Normal and GPD margins (axes clipped at the 99th percentile to tame the GPD tail). The upper-tail clustering survives the transform — large property and casualty losses still tend to coincide."
+#| fig-width: 4.8
+#| fig-height: 4.4
+
+_X = stats.lognorm.ppf(_U, s=0.7, scale=np.exp(0.3))
+_Y = genpareto.ppf(_V, c=0.3, scale=1.5)
+df_xy = pd.DataFrame({'x': _X, 'y': _Y})
+_xclip = float(np.quantile(_X, 0.99))
+_yclip = float(np.quantile(_Y, 0.99))
+
+p_joint = (
+    pn.ggplot(df_xy, pn.aes('x', 'y'))
+    + pn.stat_density_2d(
+        pn.aes(fill=pn.after_stat('level')),
+        geom='polygon', alpha=0.55
+    )
+    + pn.geom_point(alpha=0.15, size=0.65, color=ACADEMIC_COLORS['cobalt'])
+    + pn.scale_fill_gradient(low='#EEF4FB', high=ACADEMIC_COLORS['cobalt'])
+    + pn.coord_cartesian(xlim=(0, _xclip), ylim=(0, _yclip))
+    + pn.labs(x='$x$ — Log-Normal margin',
+              y='$y$ — GPD margin')
+    + _th_scatter
+)
+
+display(p_joint)
+```
+
+## Copula Density and Likelihood Decomposition
 
 When $F_X$ and $F_Y$ admit densities $f_X$ and $f_Y$, differentiating @eq-sklar with respect to $x$ and $y$ yields the **joint density decomposition**:
 
 $$
-f(x, y) \;=\; c\!\bigl(F_X(x),\; F_Y(y)\bigr) \cdot f_X(x) \cdot f_Y(y),
+f(x, y) \;=\; c\;\bigl(F_X(x),\; F_Y(y)\bigr) \cdot f_X(x) \cdot f_Y(y),
 $$ {#eq-copula-density}
 
 where $c(u, v) = \frac{\partial^2 C(u,v)}{\partial u\, \partial v}$ is the **copula density**. Equation @eq-copula-density is the density analogue of Sklar's theorem: the joint density factorises into the product of the marginal densities and the copula density, which captures all dependence [@joe1997].
@@ -508,6 +742,8 @@ $$
 $$
 
 where $\theta$ parameterises the copula and $\boldsymbol{\psi} = (\psi_X, \psi_Y)$ the marginals. The **Inference Functions for Margins (IFM)** method [@joe1996] exploits this separation by first estimating $\hat{\boldsymbol{\psi}}$ from the marginal likelihoods and then plugging $\hat{F}_X, \hat{F}_Y$ into the copula likelihood to estimate $\theta$. This reduces a high-dimensional joint optimisation to a sequence of lower-dimensional ones, greatly simplifying computation — at the cost of a modest efficiency loss relative to full maximum likelihood [@genest1993].
+
+In practice, one usually specifies parametric families for the marginals (e.g., lognormal, gamma, generalized Pareto) and the copula (e.g., Gaussian, $t$, Clayton, Gumbel), then first fits the marginals to the data - often using maximum likelihood or method of moments - and then fits the copula to the transformed pseudo-observations obtained via the PIT. This two-step procedure is widely used in finance and (re)insurance applications.
 
 ## Conclusion
 
