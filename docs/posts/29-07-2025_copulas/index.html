@@ -255,12 +255,21 @@ window.Quarto = {
    
   <ul>
   <li><a href="#what-are-copulas" id="toc-what-are-copulas" class="nav-link active" data-scroll-target="#what-are-copulas"><span class="header-section-number">1</span> What are Copulas?</a></li>
-  <li><a href="#sklars-theorem" id="toc-sklars-theorem" class="nav-link" data-scroll-target="#sklars-theorem"><span class="header-section-number">2</span> Sklar’s Theorem</a>
+  <li><a href="#sklars-theorem" id="toc-sklars-theorem" class="nav-link" data-scroll-target="#sklars-theorem"><span class="header-section-number">2</span> Sklar’s Theorem</a></li>
+  <li><a href="#copula-families" id="toc-copula-families" class="nav-link" data-scroll-target="#copula-families"><span class="header-section-number">3</span> Copula Families</a>
   <ul class="collapse">
-  <li><a href="#the-probability-integral-transform" id="toc-the-probability-integral-transform" class="nav-link" data-scroll-target="#the-probability-integral-transform"><span class="header-section-number">2.1</span> The Probability Integral Transform</a></li>
-  <li><a href="#copula-density-and-likelihood-decomposition" id="toc-copula-density-and-likelihood-decomposition" class="nav-link" data-scroll-target="#copula-density-and-likelihood-decomposition"><span class="header-section-number">2.2</span> Copula Density and Likelihood Decomposition</a></li>
+  <li><a href="#elliptical-copulas" id="toc-elliptical-copulas" class="nav-link" data-scroll-target="#elliptical-copulas"><span class="header-section-number">3.1</span> Elliptical copulas</a></li>
+  <li><a href="#archimedean-copulas" id="toc-archimedean-copulas" class="nav-link" data-scroll-target="#archimedean-copulas"><span class="header-section-number">3.2</span> Archimedean copulas</a></li>
   </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">3</span> Conclusion</a></li>
+  <li><a href="#the-probability-integral-transform" id="toc-the-probability-integral-transform" class="nav-link" data-scroll-target="#the-probability-integral-transform"><span class="header-section-number">4</span> The Probability Integral Transform</a></li>
+  <li><a href="#the-quantile-transform" id="toc-the-quantile-transform" class="nav-link" data-scroll-target="#the-quantile-transform"><span class="header-section-number">5</span> The Quantile Transform</a></li>
+  <li><a href="#copula-sampling-algorithm" id="toc-copula-sampling-algorithm" class="nav-link" data-scroll-target="#copula-sampling-algorithm"><span class="header-section-number">6</span> Copula Sampling Algorithm</a>
+  <ul class="collapse">
+  <li><a href="#the-algorithm" id="toc-the-algorithm" class="nav-link" data-scroll-target="#the-algorithm"><span class="header-section-number">6.1</span> The algorithm</a></li>
+  <li><a href="#worked-example-aggregate-loss-simulation-in-reinsurance" id="toc-worked-example-aggregate-loss-simulation-in-reinsurance" class="nav-link" data-scroll-target="#worked-example-aggregate-loss-simulation-in-reinsurance"><span class="header-section-number">6.2</span> Worked example: aggregate loss simulation in (re)insurance</a></li>
+  </ul></li>
+  <li><a href="#copula-density-and-likelihood-decomposition" id="toc-copula-density-and-likelihood-decomposition" class="nav-link" data-scroll-target="#copula-density-and-likelihood-decomposition"><span class="header-section-number">7</span> Copula Density and Likelihood Decomposition</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">8</span> Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -302,11 +311,7 @@ V_C\left(\prod_{k=1}^d [a_k, b_k]\right) = \sum_{v\in\{a_1, b_1\}\times\cdots\ti
 </div>
 </div>
 <p>Note that the third condition is the analogue of non-decreasingness for univariate CDFs and ensures that <span class="math inline">\(C\)</span> assigns non-negative probability mass to every rectangle in <span class="math inline">\([0,1]^d\)</span>. Hence, in plain terms, a copula is simply a joint CDF on <span class="math inline">\([0,1]^d\)</span> whose marginals are all <span class="math inline">\(\mathcal{U}(0,1)\)</span>.</p>
-<p>Three special copulas serve as reference points. The <strong>Fréchet–Hoeffding bounds</strong> define the extreme cases of dependence <span class="citation" data-cites="nelsen2006">(<a href="#ref-nelsen2006" role="doc-biblioref">Nelsen 2006</a>)</span>:</p>
-<p><span class="math display">\[
-W(u, v) = \max(u + v - 1,\, 0) \;\leq\; C(u, v) \;\leq\; \min(u, v) = M(u, v),
-\]</span></p>
-<p>where <span class="math inline">\(W\)</span> represents perfect negative dependence (countermonotonicity) and <span class="math inline">\(M\)</span> perfect positive dependence (comonotonicity). Between the two extremes lies the <strong>independence copula</strong> <span class="math inline">\(\Pi(u, v) = uv\)</span>. With this machinery in place, we are ready for the central result of copula theory.</p>
+<p>With this machinery in place, we are ready for the central result of copula theory.</p>
 <div class="callout callout-style-default callout-tip no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -328,251 +333,493 @@ C(u_1, \ldots, u_d) \;=\; H(F_1^{-1}(u_1), \ldots, F_d^{-1}(u_d)).
 <p>Conversely, for any copula <span class="math inline">\(C\)</span> and any CDFs <span class="math inline">\(F_1, \ldots, F_d\)</span>, the function <span class="math inline">\(H(x_1, \ldots, x_d) = C(F_1(x_1), \ldots, F_d(x_d))\)</span> is a valid joint CDF with marginals <span class="math inline">\(F_1, \ldots, F_d\)</span>.</p>
 </div>
 </div>
-<p>Sklar’s theorem has two profound consequences. First, <em>every</em> distribution — however exotic its marginals or dependence — admits a copula representation. Copulas are not a restricted model class; they provide an exact characterisation of all joint distributions. Second, continuity of the marginals pins down the copula uniquely, making the dependence structure an intrinsic property of the distribution rather than an artefact of parameterisation.</p>
-<section id="the-probability-integral-transform" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="the-probability-integral-transform"><span class="header-section-number">2.1</span> The Probability Integral Transform</h3>
-<p>The bridge between the original variables and the unit square is the <strong>Probability Integral Transform (PIT)</strong>. If <span class="math inline">\(X\)</span> is a continuous random variable with CDF <span class="math inline">\(F_X\)</span>, then</p>
+<p>Sklar’s theorem has two profound consequences. First, <em>every</em> distribution — however exotic its marginals or dependence — admits a copula representation. Copulas are not a restricted model class; they provide an exact characterisation (unique when marginals are continuous) of all joint distributions. Second, continuity of the marginals pins down the copula uniquely, making the dependence structure an intrinsic property of the distribution rather than an artefact of parameterisation.</p>
+</section>
+<section id="copula-families" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="copula-families"><span class="header-section-number">3</span> Copula Families</h2>
+<p>Sklar’s theorem guarantees that a copula <em>exists</em>, but to actually model data we need concrete parametric families. Two reference points bound the whole landscape. The <strong>independence copula</strong> <span class="math inline">\(\Pi(u_1,\dots,u_d)=\prod_k u_k\)</span> describes mutually independent margins, while the <strong>Fréchet–Hoeffding bounds</strong></p>
 <p><span class="math display">\[
-U \;=\; F_X(X) \;\sim\; \mathrm{Uniform}(0, 1).
+W(\mathbf{u}) = \max\!\Big(\textstyle\sum_k u_k - d + 1,\, 0\Big) \;\le\; C(\mathbf{u}) \;\le\; \min(u_1,\dots,u_d) = M(\mathbf{u})
 \]</span></p>
-<p>The proof is immediate: <span class="math inline">\(\mathbb{P}(U \leq u) = \mathbb{P}(F_X(X) \leq u) = \mathbb{P}(X \leq F_X^{-1}(u)) = u\)</span>. The PIT <em>standardises</em> any continuous random variable onto <span class="math inline">\([0,1]\)</span>, removing its marginal distribution while preserving its rank structure.</p>
-<p>Applied to a bivariate pair <span class="math inline">\((X, Y)\)</span>, the PIT yields pseudo-observations</p>
-<p><span class="math display">\[
-U = F_X(X), \qquad V = F_Y(Y),
-\]</span></p>
-<p>both of which are <span class="math inline">\(\mathrm{Uniform}(0,1)\)</span> by construction. Their joint distribution is the copula:</p>
-<p><span class="math display">\[
-\mathbb{P}(U \leq u,\; V \leq v)
-= \mathbb{P}\!\bigl(F_X(X) \leq u,\; F_Y(Y) \leq v\bigr)
-= F\!\bigl(F_X^{-1}(u),\; F_Y^{-1}(v)\bigr)
-= C(u, v).
-\]</span></p>
-<p><a href="#fig-sklar" class="quarto-xref">Figure&nbsp;1</a> illustrates this for a bivariate distribution with Log-Normal and Gamma marginals coupled by a Gaussian copula with <span class="math inline">\(\rho = 0.72\)</span>. The left panel shows the original joint distribution in the natural observation scale; the right panel shows what remains after the PIT — the copula structure, freed from the marginal shapes.</p>
+<p>mark the extremes of perfect negative (<span class="math inline">\(W\)</span>, the lower bound, attainable only for <span class="math inline">\(d=2\)</span>) and perfect positive (<span class="math inline">\(M\)</span>) dependence <span class="citation" data-cites="nelsen2006">(<a href="#ref-nelsen2006" role="doc-biblioref">Nelsen 2006</a>)</span>. Every copula lives between these two surfaces. The parametric families below interpolate within this space, each emphasising a different <em>shape</em> of dependence — in particular <strong>tail dependence</strong>, the tendency of variables to take extreme values jointly.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tail dependence
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <strong>lower</strong> and <strong>upper tail-dependence coefficients</strong> of a bivariate copula are <span class="math display">\[
+\lambda_L = \lim_{u\to 0^+}\frac{C(u,u)}{u}, \qquad
+\lambda_U = \lim_{u\to 1^-}\frac{1 - 2u + C(u,u)}{1-u},
+\]</span> each lying in <span class="math inline">\([0,1]\)</span>. They measure the probability that one variable is extreme <em>given</em> that the other is — for example, the propensity of two assets to crash together (<span class="math inline">\(\lambda_L&gt;0\)</span>). This single quantity is what most sharply distinguishes the families below.</p>
+</div>
+</div>
+<section id="elliptical-copulas" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="elliptical-copulas"><span class="header-section-number">3.1</span> Elliptical copulas</h3>
+<p>Elliptical copulas are extracted (via the PIT) from elliptical distributions such as the multivariate normal and <span class="math inline">\(t\)</span>. They are parameterised by a <span class="math inline">\(d\times d\)</span> correlation matrix <span class="math inline">\(R\)</span>, which makes them natural in high dimensions and easy to calibrate, but they are <strong>radially symmetric</strong> — they treat joint booms and joint crashes identically.</p>
+<ul>
+<li><strong>Gaussian copula</strong> <span class="citation" data-cites="li2000">(<a href="#ref-li2000" role="doc-biblioref">Li 2000</a>)</span>: <span class="math inline">\(C_R^{\mathrm{Ga}}(\mathbf{u}) = \Phi_R\!\big(\Phi^{-1}(u_1),\dots,\Phi^{-1}(u_d)\big)\)</span>, where <span class="math inline">\(\Phi_R\)</span> is the joint CDF of <span class="math inline">\(\mathcal{N}(\mathbf 0, R)\)</span>. It has <strong>no tail dependence</strong> (<span class="math inline">\(\lambda_L=\lambda_U=0\)</span>) whenever <span class="math inline">\(|\rho|&lt;1\)</span>: extremes decouple.</li>
+<li><strong>Student-<span class="math inline">\(t\)</span> copula</strong> <span class="citation" data-cites="embrechts2002">(<a href="#ref-embrechts2002" role="doc-biblioref">Embrechts, McNeil, and Straumann 2002</a>)</span>: adds a degrees-of-freedom parameter <span class="math inline">\(\nu&gt;0\)</span>, giving <strong>symmetric tail dependence</strong> <span class="math inline">\(\lambda_L=\lambda_U = 2\,t_{\nu+1}\!\big(-\sqrt{\nu+1}\,\sqrt{1-\rho}/\sqrt{1+\rho}\big) &gt; 0\)</span>. As <span class="math inline">\(\nu\to\infty\)</span> it converges to the Gaussian copula. The extra parameter lets it capture joint extremes that the Gaussian misses, which is why it is the default workhorse in quantitative risk management <span class="citation" data-cites="mcneil2015quantitative">(<a href="#ref-mcneil2015quantitative" role="doc-biblioref">McNeil, Frey, and Embrechts 2015</a>)</span>.</li>
+</ul>
+</section>
+<section id="archimedean-copulas" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="archimedean-copulas"><span class="header-section-number">3.2</span> Archimedean copulas</h3>
+<p>Archimedean copulas are built from a single <strong>generator</strong> <span class="math inline">\(\psi:[0,1]\to[0,\infty]\)</span>, a convex, decreasing function with <span class="math inline">\(\psi(1)=0\)</span>: <span class="math display">\[
+C(u_1,\dots,u_d) = \psi^{-1}\!\big(\psi(u_1)+\cdots+\psi(u_d)\big).
+\]</span> A whole multivariate dependence structure is thus encoded by one univariate function and, typically, a <strong>single scalar parameter</strong> <span class="math inline">\(\theta\)</span>. This parsimony makes them ideal in low dimensions and allows them to model <em>asymmetric</em> tail behaviour that elliptical copulas cannot <span class="citation" data-cites="joe1997 nelsen2006">(<a href="#ref-joe1997" role="doc-biblioref">Joe 1997</a>; <a href="#ref-nelsen2006" role="doc-biblioref">Nelsen 2006</a>)</span>.</p>
+<ul>
+<li><strong>Clayton</strong> <span class="citation" data-cites="clayton1978">(<a href="#ref-clayton1978" role="doc-biblioref">Clayton 1978</a>)</span>, <span class="math inline">\(\theta\in(0,\infty)\)</span> with <span class="math inline">\(\psi(t)=\tfrac1\theta(t^{-\theta}-1)\)</span>: strong <strong>lower</strong>-tail dependence (<span class="math inline">\(\lambda_L = 2^{-1/\theta}\)</span>, <span class="math inline">\(\lambda_U=0\)</span>). Models variables that crash together but decouple in booms; independence as <span class="math inline">\(\theta\to0\)</span>.</li>
+<li><strong>Gumbel</strong> <span class="citation" data-cites="gumbel1960">(<a href="#ref-gumbel1960" role="doc-biblioref">Gumbel 1960</a>)</span>, <span class="math inline">\(\theta\in[1,\infty)\)</span> with <span class="math inline">\(\psi(t)=(-\ln t)^\theta\)</span>: strong <strong>upper</strong>-tail dependence (<span class="math inline">\(\lambda_U = 2-2^{1/\theta}\)</span>, <span class="math inline">\(\lambda_L=0\)</span>). An extreme-value copula, suited to joint <em>maxima</em> and upside clustering; independence at <span class="math inline">\(\theta=1\)</span>.</li>
+<li><strong>Frank</strong> <span class="citation" data-cites="frank1979">(<a href="#ref-frank1979" role="doc-biblioref">Frank 1979</a>)</span>, <span class="math inline">\(\theta\in\mathbb{R}\setminus\{0\}\)</span>: symmetric and <strong>tail-independent</strong> (<span class="math inline">\(\lambda_L=\lambda_U=0\)</span>), but unlike the Gaussian it permits <em>negative</em> dependence. Useful when dependence is strong in the middle of the distribution but absent in the tails.</li>
+</ul>
+<p><a href="#fig-copula-zoo" class="quarto-xref">Figure&nbsp;1</a> makes these differences concrete. Each panel is the estimated copula density in <span class="math inline">\([0,1]^2\)</span> for a different family, all calibrated to the <em>same</em> Kendall’s <span class="math inline">\(\tau = 0.5\)</span> — so only the <strong>shape</strong> of the dependence differs, not its strength.</p>
+<div id="cell-fig-copula-zoo" class="cell" data-fig-height="2.6" data-fig-width="11" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>_n   <span class="op">=</span> <span class="dv">2000</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>_rho <span class="op">=</span> <span class="fl">0.72</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>_Z   <span class="op">=</span> np.random.multivariate_normal([<span class="dv">0</span>, <span class="dv">0</span>], [[<span class="dv">1</span>, _rho], [_rho, <span class="dv">1</span>]], _n)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>_U   <span class="op">=</span> stats.norm.cdf(_Z[:, <span class="dv">0</span>])</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>_V   <span class="op">=</span> stats.norm.cdf(_Z[:, <span class="dv">1</span>])</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>_X   <span class="op">=</span> stats.lognorm.ppf(_U, s<span class="op">=</span><span class="fl">0.7</span>, scale<span class="op">=</span>np.exp(<span class="fl">0.3</span>))</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>_Y   <span class="op">=</span> stats.gamma.ppf(_V, a<span class="op">=</span><span class="fl">2.5</span>, scale<span class="op">=</span><span class="fl">1.5</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>df_xy <span class="op">=</span> pd.DataFrame({<span class="st">'x'</span>: _X, <span class="st">'y'</span>: _Y})</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>df_uv <span class="op">=</span> pd.DataFrame({<span class="st">'u'</span>: _U, <span class="st">'v'</span>: _V})</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>_th_scatter <span class="op">=</span> (</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    theme_academic(base_size<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.theme(legend_position<span class="op">=</span><span class="st">'none'</span>, figure_size<span class="op">=</span>(<span class="fl">4.5</span>, <span class="fl">4.3</span>))</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>p_joint <span class="op">=</span> (</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    pn.ggplot(df_xy, pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>))</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.stat_density_2d(</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        pn.aes(fill<span class="op">=</span>pn.after_stat(<span class="st">'level'</span>)),</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        geom<span class="op">=</span><span class="st">'polygon'</span>, alpha<span class="op">=</span><span class="fl">0.55</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_point(alpha<span class="op">=</span><span class="fl">0.15</span>, size<span class="op">=</span><span class="fl">0.65</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'cobalt'</span>])</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.scale_fill_gradient(</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        low<span class="op">=</span><span class="st">'#EEF4FB'</span>, high<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'cobalt'</span>]</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.labs(</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        x<span class="op">=</span><span class="st">'$x$ </span><span class="ch">\u2014</span><span class="st"> Log-Normal margin'</span>,</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        y<span class="op">=</span><span class="st">'$y$ </span><span class="ch">\u2014</span><span class="st"> Gamma margin'</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> _th_scatter</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>p_cop <span class="op">=</span> (</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    pn.ggplot(df_uv, pn.aes(<span class="st">'u'</span>, <span class="st">'v'</span>))</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.stat_density_2d(</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        pn.aes(fill<span class="op">=</span>pn.after_stat(<span class="st">'level'</span>)),</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>        geom<span class="op">=</span><span class="st">'polygon'</span>, alpha<span class="op">=</span><span class="fl">0.55</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_point(alpha<span class="op">=</span><span class="fl">0.15</span>, size<span class="op">=</span><span class="fl">0.65</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'teal'</span>])</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.scale_fill_gradient(</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>        low<span class="op">=</span><span class="st">'#EBF7F5'</span>, high<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'teal'</span>]</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.coord_cartesian(xlim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>), ylim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.scale_x_continuous(breaks<span class="op">=</span>[<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">1.0</span>],</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>                             labels<span class="op">=</span>[<span class="st">'0'</span>, <span class="st">'0.25'</span>, <span class="st">'0.50'</span>, <span class="st">'0.75'</span>, <span class="st">'1'</span>])</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.scale_y_continuous(breaks<span class="op">=</span>[<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">1.0</span>],</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>                             labels<span class="op">=</span>[<span class="st">'0'</span>, <span class="st">'0.25'</span>, <span class="st">'0.50'</span>, <span class="st">'0.75'</span>, <span class="st">'1'</span>])</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.labs(</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>        x<span class="op">=</span><span class="st">'$u = F_X(X)$ </span><span class="ch">\u2014</span><span class="st"> Uniform margin'</span>,</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>        y<span class="op">=</span><span class="st">'$v = F_Y(Y)$ </span><span class="ch">\u2014</span><span class="st"> Uniform margin'</span></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> _th_scatter</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>display(p_joint)</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>display(p_cop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> gaussian_kde</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>_tau_zoo  <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>_families <span class="op">=</span> [<span class="st">'Gaussian'</span>, <span class="st">'Student-t'</span>, <span class="st">'Clayton'</span>, <span class="st">'Gumbel'</span>, <span class="st">'Frank'</span>]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>_n_zoo    <span class="op">=</span> <span class="dv">8000</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _make_copula(family, tau):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> tau_to_param(family, tau)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> family <span class="op">==</span> <span class="st">'Gaussian'</span>:  <span class="cf">return</span> GaussianCopula(corr<span class="op">=</span>p)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> family <span class="op">==</span> <span class="st">'Student-t'</span>: <span class="cf">return</span> StudentTCopula(corr<span class="op">=</span>p, df<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> family <span class="op">==</span> <span class="st">'Clayton'</span>:   <span class="cf">return</span> ClaytonCopula(theta<span class="op">=</span>p)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> family <span class="op">==</span> <span class="st">'Gumbel'</span>:    <span class="cf">return</span> GumbelCopula(theta<span class="op">=</span>p)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> FrankCopula(theta<span class="op">=</span>p)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate each copula density on a fixed grid and show as a square viridis heatmap</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>_g  <span class="op">=</span> np.linspace(<span class="fl">0.005</span>, <span class="fl">0.995</span>, <span class="dv">140</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>_GX, _GY <span class="op">=</span> np.meshgrid(_g, _g)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>_pos <span class="op">=</span> np.vstack([_GX.ravel(), _GY.ravel()])</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>fig, _axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">5</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">2.6</span>), constrained_layout<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ax, _fam, _i <span class="kw">in</span> <span class="bu">zip</span>(_axes, _families, <span class="bu">range</span>(<span class="dv">5</span>)):</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    _uv   <span class="op">=</span> _make_copula(_fam, _tau_zoo).rvs(_n_zoo, random_state<span class="op">=</span><span class="dv">100</span> <span class="op">+</span> _i)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    _dens <span class="op">=</span> gaussian_kde(_uv.T, bw_method<span class="op">=</span><span class="fl">0.18</span>)(_pos).reshape(_GX.shape)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    _ax.imshow(_dens, origin<span class="op">=</span><span class="st">'lower'</span>, extent<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>],</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>               cmap<span class="op">=</span><span class="st">'viridis'</span>, aspect<span class="op">=</span><span class="st">'equal'</span>, interpolation<span class="op">=</span><span class="st">'bilinear'</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    _ax.set_title(_fam, fontsize<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'ink'</span>])</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    _ax.set_xticks([<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>])<span class="op">;</span> _ax.set_yticks([<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>])</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    _ax.set_xlabel(<span class="st">'$u$'</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    _ax.tick_params(labelsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    _ax.grid(<span class="va">False</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>_axes[<span class="dv">0</span>].set_ylabel(<span class="st">'$v$'</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ax <span class="kw">in</span> _axes[<span class="dv">1</span>:]:</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    _ax.set_yticklabels([])</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div id="fig-sklar" class="quarto-layout-panel">
+<div class="cell-output cell-output-display">
+<div id="fig-copula-zoo" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-sklar-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="quarto-layout-row">
-<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-sklar" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-sklar-1" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-subfloat-fig figure">
-<div aria-describedby="fig-sklar-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-sklar-output-1.png" data-ref-parent="fig-sklar" width="337" height="322" class="figure-img">
+<div aria-describedby="fig-copula-zoo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-copula-zoo-output-1.png" class="img-fluid figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-sklar-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(a) Joint distribution <span class="math inline">\(F(x,\,y)\)</span> — original space
-</figcaption>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-sklar" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-sklar-2" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-subfloat-fig figure">
-<div aria-describedby="fig-sklar-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-sklar-output-2.png" data-ref-parent="fig-sklar" width="337" height="322" class="figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-sklar-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(b) Gaussian copula <span class="math inline">\(C(u,\,v)\)</span>,&nbsp; <span class="math inline">\(\rho = 0.72\)</span> — copula space
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-copula-zoo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: <strong>Same dependence strength, five different shapes.</strong> Kernel-density estimate of 8,000 simulated <span class="math inline">\((u, v)\)</span> points from each family, all calibrated to Kendall’s <span class="math inline">\(\tau = 0.5\)</span>. Clayton concentrates toward the lower-left corner (lower-tail dependence) and Gumbel toward the upper-right (upper-tail dependence); the Student-<span class="math inline">\(t\)</span> thickens in <em>both</em> corners. The Gaussian and Frank copulas instead taper away from the corners — identical rank correlation, but no tail dependence.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sklar-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: <strong>Sklar’s Theorem in action.</strong> Both panels show 2,000 draws from a distribution with Log-Normal and Gamma marginals linked by a Gaussian copula (<span class="math inline">\(\rho = 0.72\)</span>). Filled density contours and scattered points (coloured to match each space) reveal the distributional shape. (<em>Left</em>) Original joint distribution <span class="math inline">\(F(x,y)\)</span> in the natural observation scale. (<em>Right</em>) After applying the PIT, both variables become uniform and the copula <span class="math inline">\(C(u,v)\)</span> is exposed — the same dependence structure, stripped of marginal effects.
-</figcaption>
-</figure>
-</div>
-<p><a href="#fig-sklar-marginals" class="quarto-xref">Figure&nbsp;2</a> shows the two marginal CDFs that mediate the transformation. The dashed vermillion curve in each panel is the CDF scaled to the PDF axis for visual comparison; it is this curve that is applied pointwise to each observation to produce the pseudo-observations <span class="math inline">\((U_i, V_i)\)</span>.</p>
+<p>All of this generalises beyond two variables: a <span class="math inline">\(d\)</span>-variate copula is simply a distribution on the hypercube <span class="math inline">\([0,1]^d\)</span>, and the classic way to inspect one is the <strong>pairs plot</strong>, which lays out every bivariate projection at once. <a href="#fig-pairs-3d" class="quarto-xref">Figure&nbsp;2</a> shows a 3-dimensional Student-<span class="math inline">\(t\)</span> copula viewed this way — scatter clouds below the diagonal, their rank correlations above it.</p>
+<div id="cell-fig-pairs-3d" class="cell" data-fig-height="5.6" data-fig-width="5.6" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>_th_marg <span class="op">=</span> (</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    theme_academic(base_size<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.theme(legend_position<span class="op">=</span><span class="st">'none'</span>, figure_size<span class="op">=</span>(<span class="fl">4.5</span>, <span class="fl">3.0</span>))</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Marginal X : LogNormal ─────────────────────────────────────────────────</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>_lnorm <span class="op">=</span> stats.lognorm(s<span class="op">=</span><span class="fl">0.7</span>, scale<span class="op">=</span>np.exp(<span class="fl">0.3</span>))</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>_xv    <span class="op">=</span> np.linspace(_lnorm.ppf(<span class="fl">1e-3</span>), _lnorm.ppf(<span class="fl">0.999</span>), <span class="dv">350</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>_pdx   <span class="op">=</span> _lnorm.pdf(_xv)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>_cdx   <span class="op">=</span> _lnorm.cdf(_xv)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>_scale_x <span class="op">=</span> _pdx.<span class="bu">max</span>()</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> spearmanr</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Three deliberately different pairwise correlations: strong +, near-zero, negative</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>_R3 <span class="op">=</span> np.array([</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">1.00</span>,  <span class="fl">0.80</span>,  <span class="fl">0.10</span>],</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.80</span>,  <span class="fl">1.00</span>, <span class="op">-</span><span class="fl">0.50</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.10</span>, <span class="op">-</span><span class="fl">0.50</span>,  <span class="fl">1.00</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>_u3 <span class="op">=</span> StudentTCopula(corr<span class="op">=</span>_R3, df<span class="op">=</span><span class="dv">4</span>, k_dim<span class="op">=</span><span class="dv">3</span>).rvs(<span class="dv">3000</span>, random_state<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>_labels <span class="op">=</span> [<span class="st">'$u_1$'</span>, <span class="st">'$u_2$'</span>, <span class="st">'$u_3$'</span>]</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>_d <span class="op">=</span> _u3.shape[<span class="dv">1</span>]</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>df_mx <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'x'</span>:     np.r_[_xv, _xv],</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'y'</span>:     np.r_[_pdx, _cdx <span class="op">*</span> _scale_x],</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">'curve'</span>: [<span class="st">'PDF'</span>] <span class="op">*</span> <span class="bu">len</span>(_xv) <span class="op">+</span> [<span class="st">'CDF'</span>] <span class="op">*</span> <span class="bu">len</span>(_xv),</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>_ann_x_pdf <span class="op">=</span> _xv[np.argmax(_pdx)] <span class="op">*</span> <span class="fl">0.52</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>_ann_x_cdf <span class="op">=</span> _xv[<span class="bu">int</span>(<span class="bu">len</span>(_xv) <span class="op">*</span> <span class="fl">0.72</span>)]</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>p_mx <span class="op">=</span> (</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    pn.ggplot(df_mx)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_area(</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        df_mx[df_mx.curve <span class="op">==</span> <span class="st">'PDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        fill<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'cobalt'</span>], alpha<span class="op">=</span><span class="fl">0.18</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_line(</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        df_mx[df_mx.curve <span class="op">==</span> <span class="st">'PDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'cobalt'</span>], size<span class="op">=</span><span class="fl">1.35</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_line(</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        df_mx[df_mx.curve <span class="op">==</span> <span class="st">'CDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'vermillion'</span>], size<span class="op">=</span><span class="fl">1.2</span>, linetype<span class="op">=</span><span class="st">'dashed'</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.annotate(<span class="st">'text'</span>, x<span class="op">=</span>_ann_x_pdf, y<span class="op">=</span>_scale_x <span class="op">*</span> <span class="fl">0.88</span>,</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>                  label<span class="op">=</span><span class="st">'$f_X(x)$'</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'cobalt'</span>], size<span class="op">=</span><span class="fl">8.5</span>)</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.annotate(<span class="st">'text'</span>, x<span class="op">=</span>_ann_x_cdf, y<span class="op">=</span>_scale_x <span class="op">*</span> <span class="fl">0.88</span>,</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>                  label<span class="op">=</span><span class="st">'$F_X(x)$'</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'vermillion'</span>], size<span class="op">=</span><span class="fl">8.5</span>)</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.labs(x<span class="op">=</span><span class="st">'$x$'</span>, y<span class="op">=</span><span class="st">'Density'</span>)</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> _th_marg</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Marginal Y : Gamma ─────────────────────────────────────────────────────</span></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>_gam  <span class="op">=</span> stats.gamma(a<span class="op">=</span><span class="fl">2.5</span>, scale<span class="op">=</span><span class="fl">1.5</span>)</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>_yv   <span class="op">=</span> np.linspace(_gam.ppf(<span class="fl">1e-3</span>), _gam.ppf(<span class="fl">0.999</span>), <span class="dv">350</span>)</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>_pdy  <span class="op">=</span> _gam.pdf(_yv)</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>_cdy  <span class="op">=</span> _gam.cdf(_yv)</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>_scale_y <span class="op">=</span> _pdy.<span class="bu">max</span>()</span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>df_my <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    <span class="st">'x'</span>:     np.r_[_yv, _yv],</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="st">'y'</span>:     np.r_[_pdy, _cdy <span class="op">*</span> _scale_y],</span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="st">'curve'</span>: [<span class="st">'PDF'</span>] <span class="op">*</span> <span class="bu">len</span>(_yv) <span class="op">+</span> [<span class="st">'CDF'</span>] <span class="op">*</span> <span class="bu">len</span>(_yv),</span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>_ann_y_pdf <span class="op">=</span> _yv[np.argmax(_pdy)] <span class="op">*</span> <span class="fl">0.48</span></span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>_ann_y_cdf <span class="op">=</span> _yv[<span class="bu">int</span>(<span class="bu">len</span>(_yv) <span class="op">*</span> <span class="fl">0.75</span>)]</span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>p_my <span class="op">=</span> (</span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    pn.ggplot(df_my)</span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_area(</span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>        df_my[df_my.curve <span class="op">==</span> <span class="st">'PDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>        fill<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'teal'</span>], alpha<span class="op">=</span><span class="fl">0.18</span></span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_line(</span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>        df_my[df_my.curve <span class="op">==</span> <span class="st">'PDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
-<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'teal'</span>], size<span class="op">=</span><span class="fl">1.35</span></span>
-<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_line(</span>
-<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        df_my[df_my.curve <span class="op">==</span> <span class="st">'CDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
-<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'vermillion'</span>], size<span class="op">=</span><span class="fl">1.2</span>, linetype<span class="op">=</span><span class="st">'dashed'</span></span>
-<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.annotate(<span class="st">'text'</span>, x<span class="op">=</span>_ann_y_pdf, y<span class="op">=</span>_scale_y <span class="op">*</span> <span class="fl">0.88</span>,</span>
-<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>                  label<span class="op">=</span><span class="st">'$f_Y(y)$'</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'teal'</span>], size<span class="op">=</span><span class="fl">8.5</span>)</span>
-<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.annotate(<span class="st">'text'</span>, x<span class="op">=</span>_ann_y_cdf, y<span class="op">=</span>_scale_y <span class="op">*</span> <span class="fl">0.88</span>,</span>
-<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>                  label<span class="op">=</span><span class="st">'$F_Y(y)$'</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'vermillion'</span>], size<span class="op">=</span><span class="fl">8.5</span>)</span>
-<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.labs(x<span class="op">=</span><span class="st">'$y$'</span>, y<span class="op">=</span><span class="st">'Density'</span>)</span>
-<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> _th_marg</span>
-<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>display(p_mx)</span>
-<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>display(p_my)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>fig, _axes <span class="op">=</span> plt.subplots(_d, _d, figsize<span class="op">=</span>(<span class="fl">5.6</span>, <span class="fl">5.6</span>), constrained_layout<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _i <span class="kw">in</span> <span class="bu">range</span>(_d):</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _j <span class="kw">in</span> <span class="bu">range</span>(_d):</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        _ax <span class="op">=</span> _axes[_i, _j]</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        _ax.grid(<span class="va">False</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> _i <span class="op">==</span> _j:                                   <span class="co"># diagonal: uniform margin</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>            _ax.hist(_u3[:, _i], bins<span class="op">=</span><span class="dv">22</span>, <span class="bu">range</span><span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>                     color<span class="op">=</span><span class="st">'black'</span>, edgecolor<span class="op">=</span><span class="st">'white'</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>            _ax.set_yticks([])<span class="op">;</span> _ax.set_xlim(<span class="dv">0</span>, <span class="dv">1</span>)<span class="op">;</span> _ax.set_xticks([<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>])</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> _i <span class="op">&gt;</span> _j:                                  <span class="co"># lower triangle: scatter</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            _ax.scatter(_u3[:, _j], _u3[:, _i], s<span class="op">=</span><span class="dv">4</span>, alpha<span class="op">=</span><span class="fl">0.12</span>, color<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            _ax.set_xlim(<span class="dv">0</span>, <span class="dv">1</span>)<span class="op">;</span> _ax.set_ylim(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>            _ax.set_xticks([<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>])<span class="op">;</span> _ax.set_yticks([<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>])</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:                                          <span class="co"># upper triangle: rank corr</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>            _r <span class="op">=</span> spearmanr(_u3[:, _i], _u3[:, _j]).correlation</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>            _ax.text(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="ss">f'</span><span class="sc">{</span>_r<span class="sc">:+.2f}</span><span class="ss">'</span>, ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'center'</span>,</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>                     fontsize<span class="op">=</span><span class="dv">13</span>, color<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>            _ax.set_xlim(<span class="dv">0</span>, <span class="dv">1</span>)<span class="op">;</span> _ax.set_ylim(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>            _ax.set_xticks([])<span class="op">;</span> _ax.set_yticks([])</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> _i <span class="op">!=</span> _d <span class="op">-</span> <span class="dv">1</span>:</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>            _ax.set_xticklabels([])</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> _j <span class="op">!=</span> <span class="dv">0</span> <span class="kw">or</span> _i <span class="op">==</span> _j:</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>            _ax.set_yticklabels([])</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> _j <span class="op">==</span> <span class="dv">0</span> <span class="kw">and</span> _i <span class="op">!=</span> <span class="dv">0</span>:</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>            _ax.set_ylabel(_labels[_i])</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> _i <span class="op">==</span> _d <span class="op">-</span> <span class="dv">1</span>:</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>            _ax.set_xlabel(_labels[_j])</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div id="fig-sklar-marginals" class="quarto-layout-panel">
+<div class="cell-output cell-output-display">
+<div id="fig-pairs-3d" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-sklar-marginals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="quarto-layout-row">
-<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-sklar-marginals" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-sklar-marginals-1" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-subfloat-fig figure">
-<div aria-describedby="fig-sklar-marginals-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-sklar-marginals-output-1.png" data-ref-parent="fig-sklar-marginals" width="337" height="225" class="figure-img">
+<div aria-describedby="fig-pairs-3d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-pairs-3d-output-1.png" class="img-fluid figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-sklar-marginals-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pairs-3d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: <strong>A copula in three dimensions.</strong> Pairs plot of 3,000 draws from a 3-D Student-<span class="math inline">\(t\)</span> copula (<span class="math inline">\(\nu = 4\)</span>) with three deliberately different pairwise correlations. <em>Lower triangle</em>: each bivariate margin <span class="math inline">\((u_j, u_i)\)</span>, itself a valid 2-D copula. <em>Diagonal</em>: the uniform univariate margins. <em>Upper triangle</em>: the corresponding Spearman rank correlation (blue positive, red negative, sized by magnitude). The strong-positive, near-zero, and negative pairs give visibly different clouds — yet the <span class="math inline">\(t\)</span>-copula’s tail dependence keeps mass in the corners even when the rank correlation is near zero.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>In higher dimensions, a single Archimedean parameter is often too rigid and a single correlation matrix too symmetric; <strong>vine copulas</strong> <span class="citation" data-cites="bedford2002 aas2009">(<a href="#ref-bedford2002" role="doc-biblioref">Bedford and Cooke 2002</a>; <a href="#ref-aas2009" role="doc-biblioref">Aas et al. 2009</a>)</span> overcome this by decomposing a <span class="math inline">\(d\)</span>-dimensional copula into a cascade of bivariate ones, mixing families pair by pair. The choice of family is ultimately an empirical question, addressed by the estimation and goodness-of-fit tools discussed later.</p>
+</section>
+</section>
+<section id="the-probability-integral-transform" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="the-probability-integral-transform"><span class="header-section-number">4</span> The Probability Integral Transform</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (PIT)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Let <span class="math inline">\(X\)</span> be a real-valued random variable with continuous CDF <span class="math inline">\(F_X\)</span>. The <em>probability integral transform</em> of <span class="math inline">\(X\)</span> is <span class="math display">\[
+U = F_X(X).
+\]</span></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem (PIT)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If <span class="math inline">\(F_X\)</span> is continuous, then <span class="math inline">\(U = F_X(X) \sim \mathrm{Uniform}(0,1)\)</span>.</p>
+<p><em>Proof sketch.</em> For <span class="math inline">\(u\in[0,1]\)</span>, <span class="math display">\[
+\mathbb{P}(U \le u) = \mathbb{P}\big(F_X(X) \le u\big) = \mathbb{P}\big(X \le F_X^{-1}(u)\big) = F_X\big(F_X^{-1}(u)\big) = u,
+\]</span> using that continuity of <span class="math inline">\(F_X\)</span> guarantees a well-defined (generalized) inverse and that <span class="math inline">\(F_X\)</span> is non-decreasing, so <span class="math inline">\(\{F_X(X)\le u\} = \{X \le F_X^{-1}(u)\}\)</span> almost surely. Hence <span class="math inline">\(U\)</span> has the CDF of a Uniform<span class="math inline">\((0,1)\)</span> random variable. <span class="math inline">\(\blacksquare\)</span></p>
+</div>
+</div>
+<p>The converse (sometimes called the <em>inverse PIT</em> or <em>quantile transform</em>) is equally important: if <span class="math inline">\(U\sim\mathrm{Uniform}(0,1)\)</span>, then <span class="math inline">\(F_X^{-1}(U)\)</span> has CDF <span class="math inline">\(F_X\)</span>. This is the basis of inverse-transform sampling that we will cover later.</p>
+<p>This essentially means that the PIT is how the copula is <em>extracted</em> from a joint distribution. Given <span class="math inline">\(\mathbf{X}=(X_1,\dots,X_d)\)</span> with continuous margins <span class="math inline">\(F_1,\dots,F_d\)</span>, applying the PIT componentwise, <span class="math display">\[
+U_j = F_j(X_j), \qquad j=1,\dots,d,
+\]</span> sends each marginal to Uniform<span class="math inline">\((0,1)\)</span> while preserving the <em>rank structure</em> of <span class="math inline">\(\mathbf{X}\)</span>, since each <span class="math inline">\(F_j\)</span> is monotone. The joint law of <span class="math inline">\(\mathbf{U}=(U_1,\dots,U_d)\)</span> is, by definition, the copula <span class="math inline">\(C\)</span> of <span class="math inline">\(\mathbf{X}\)</span>: <span class="math display">\[
+C(u_1,\dots,u_d) = \mathbb{P}(U_1\le u_1,\dots,U_d\le u_d) = F\big(F_1^{-1}(u_1),\dots,F_d^{-1}(u_d)\big).
+\]</span> This is exactly the content of Sklar’s theorem read “backwards”: the PIT is the constructive map that <em>strips away the marginals</em>, leaving only the copula.</p>
+<p>In practice <span class="math inline">\(F_j\)</span> is unknown, so one can either make a distributional assumption or use the empirical PIT, i.e.&nbsp;(rescaled) empirical CDFs: <span class="math display">\[
+\hat U_{ij} = \frac{n}{n+1}\,\hat F_j(X_{ij}), \qquad \hat F_j(x) = \frac{1}{n}\sum_{i=1}^n \mathbb{1}\{X_{ij}\le x\},
+\]</span> producing <em>pseudo-observations</em> <span class="math inline">\(\hat{\mathbf{U}}_i\)</span>.</p>
+</section>
+<section id="the-quantile-transform" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="the-quantile-transform"><span class="header-section-number">5</span> The Quantile Transform</h2>
+<p>The PIT turns a known margin into a uniform; the <strong>quantile transform</strong> runs this in reverse, turning a uniform back into any margin we choose. It rests on the <em>generalized inverse</em> of a CDF.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Definition (Quantile function)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Let <span class="math inline">\(X\)</span> be a real-valued random variable with CDF <span class="math inline">\(F_X\)</span>. The <strong>quantile function</strong> (generalized inverse) of <span class="math inline">\(F_X\)</span> is <span class="math display">\[
+F_X^{-1}(u) = \inf\{x \in \mathbb{R} : F_X(x) \ge u\}, \qquad u \in (0,1).
+\]</span></p>
+</div>
+</div>
+<p>Defining the inverse through an infimum keeps it well-defined even when <span class="math inline">\(F_X\)</span> is flat or has jumps — as for discrete or mixed distributions — where an ordinary functional inverse would not exist.</p>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem (Quantile transform / inverse PIT)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Let <span class="math inline">\(U \sim \mathrm{Uniform}(0,1)\)</span> and let <span class="math inline">\(F\)</span> be any CDF on <span class="math inline">\(\mathbb{R}\)</span>. Then <span class="math inline">\(X := F^{-1}(U)\)</span> has CDF <span class="math inline">\(F\)</span>.</p>
+<p><em>Proof sketch.</em> For any <span class="math inline">\(x\in\mathbb{R}\)</span>, <span class="math display">\[
+\mathbb{P}(X \le x) = \mathbb{P}\big(F^{-1}(U) \le x\big) = \mathbb{P}\big(U \le F(x)\big) = F(x),
+\]</span> where the middle equality uses the defining property of the generalized inverse, <span class="math inline">\(F^{-1}(u) \le x \iff u \le F(x)\)</span> (valid because <span class="math inline">\(F\)</span> is right-continuous and non-decreasing), and the last is the CDF of <span class="math inline">\(U\sim\mathrm{Uniform}(0,1)\)</span> evaluated at <span class="math inline">\(F(x)\)</span>. <span class="math inline">\(\blacksquare\)</span></p>
+</div>
+</div>
+<p>The PIT and the quantile transform are exact converses: the PIT <em>removes</em> a marginal (<span class="math inline">\(X \mapsto F(X)\)</span> is uniform), while the quantile transform <em>imposes</em> one (<span class="math inline">\(U \mapsto F^{-1}(U)\)</span> has law <span class="math inline">\(F\)</span>). When <span class="math inline">\(F\)</span> is continuous and strictly increasing they form an (almost sure) invertible pair — precisely the machinery Sklar’s theorem exploits to move between a joint distribution and its copula-plus-margins representation.</p>
+</section>
+<section id="copula-sampling-algorithm" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="copula-sampling-algorithm"><span class="header-section-number">6</span> Copula Sampling Algorithm</h2>
+<section id="the-algorithm" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="the-algorithm"><span class="header-section-number">6.1</span> The algorithm</h3>
+<p>This is where the quantile transform earns its keep: paired with Sklar’s theorem, it gives the <strong>standard recipe</strong> for simulating from <em>any</em> copula-based model.</p>
+<div class="callout callout-style-default callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm (Copula sampling via the quantile transform)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Input:</strong> a copula <span class="math inline">\(C\)</span> and marginal CDFs <span class="math inline">\(F_1,\dots,F_d\)</span>.</p>
+<ol type="1">
+<li>Draw <span class="math inline">\(\mathbf{U} = (U_1,\dots,U_d) \sim C\)</span> from the chosen copula (Gaussian, <span class="math inline">\(t\)</span>, Clayton, a fitted vine, a trained neural copula, …).</li>
+<li>Apply the quantile transform componentwise, <span class="math inline">\(X_j = F_j^{-1}(U_j)\)</span> for <span class="math inline">\(j = 1,\dots,d\)</span>, using whatever marginal is desired for each component.</li>
+</ol>
+<p><strong>Output:</strong> <span class="math inline">\(\mathbf{X} = (X_1,\dots,X_d)\)</span> with joint CDF <span class="math inline">\(F(x_1,\dots,x_d) = C\big(F_1(x_1),\dots,F_d(x_d)\big)\)</span>, exactly as Sklar’s theorem prescribes.</p>
+</div>
+</div>
+<p>The power of the recipe is that <strong>steps 1 and 2 are fully decoupled</strong>: the dependence structure and the marginals can be specified, estimated, and sampled entirely independently of one another. This is the “separate the margins from the dependence” principle, now realised constructively rather than just diagnostically.</p>
+</section>
+<section id="worked-example-aggregate-loss-simulation-in-reinsurance" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="worked-example-aggregate-loss-simulation-in-reinsurance"><span class="header-section-number">6.2</span> Worked example: aggregate loss simulation in (re)insurance</h3>
+<p>A reinsurer models two lines of business, <span class="math inline">\(X_1\)</span> (property) and <span class="math inline">\(X_2\)</span> (casualty), with marginals fitted independently to historical claims — a <span class="math inline">\(\mathrm{Lognormal}(\mu,\sigma^2)\)</span> severity for property and a heavy-tailed <span class="math inline">\(\mathrm{GPD}(\xi,\beta)\)</span> for casualty — and couples them with a <strong>Gumbel copula</strong> <span class="math inline">\(C_\theta\)</span>, which captures the joint <em>upper</em>-tail clustering seen after large catastrophes. To simulate the aggregate loss <span class="math inline">\(S = X_1 + X_2\)</span> for a Monte Carlo VaR / SCR calculation, repeat <span class="math inline">\(N\)</span> times:</p>
+<ol type="1">
+<li>Draw <span class="math inline">\((U_1, U_2) \sim C_\theta\)</span> — e.g.&nbsp;via the Marshall–Olkin algorithm for Archimedean copulas.</li>
+<li>Invert each margin: <span class="math inline">\(X_1 = F_1^{-1}(U_1)\)</span>, <span class="math inline">\(X_2 = F_2^{-1}(U_2)\)</span>, and set <span class="math inline">\(S = X_1 + X_2\)</span>.</li>
+</ol>
+<p>The <span class="math inline">\(99.5\%\)</span> quantile of the simulated <span class="math inline">\(\{S^{(i)}\}\)</span> is the SCR. The quantile transform is what lets these <em>separately fitted</em> severity models attach to a <em>separately chosen</em> copula — exactly what makes copulas operationally useful rather than a purely theoretical decomposition.</p>
+<p>The construction is easiest to read in three steps that mirror the sampling algorithm: the <strong>marginals</strong> we fit, the <strong>copula</strong> that links them in uniform space, and the <strong>joint distribution</strong> that results in the original observation scale.</p>
+<p>First, the two fitted margins. <a href="#fig-marginals" class="quarto-xref">Figure&nbsp;3</a> shows each density alongside its CDF; it is the CDF that is applied pointwise to every observation — <span class="math inline">\(U_i = F_X(X_i)\)</span>, <span class="math inline">\(V_i = F_Y(Y_i)\)</span> — turning raw losses into uniform pseudo-observations.</p>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>_th_marg <span class="op">=</span> (</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    theme_academic(base_size<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.theme(legend_position<span class="op">=</span><span class="st">'none'</span>, figure_size<span class="op">=</span>(<span class="fl">4.5</span>, <span class="fl">3.0</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Marginal X : LogNormal ─────────────────────────────────────────────────</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>_lnorm <span class="op">=</span> stats.lognorm(s<span class="op">=</span><span class="fl">0.7</span>, scale<span class="op">=</span>np.exp(<span class="fl">0.3</span>))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>_xv    <span class="op">=</span> np.linspace(_lnorm.ppf(<span class="fl">1e-3</span>), _lnorm.ppf(<span class="fl">0.999</span>), <span class="dv">350</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>_pdx   <span class="op">=</span> _lnorm.pdf(_xv)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>_cdx   <span class="op">=</span> _lnorm.cdf(_xv)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>_scale_x <span class="op">=</span> _pdx.<span class="bu">max</span>()</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>df_mx <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'x'</span>:     np.r_[_xv, _xv],</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'y'</span>:     np.r_[_pdx, _cdx <span class="op">*</span> _scale_x],</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">'curve'</span>: [<span class="st">'PDF'</span>] <span class="op">*</span> <span class="bu">len</span>(_xv) <span class="op">+</span> [<span class="st">'CDF'</span>] <span class="op">*</span> <span class="bu">len</span>(_xv),</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>_ann_x_pdf <span class="op">=</span> _xv[np.argmax(_pdx)] <span class="op">*</span> <span class="fl">0.52</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>_ann_x_cdf <span class="op">=</span> _xv[<span class="bu">int</span>(<span class="bu">len</span>(_xv) <span class="op">*</span> <span class="fl">0.72</span>)]</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>p_mx <span class="op">=</span> (</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    pn.ggplot(df_mx)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_area(</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        df_mx[df_mx.curve <span class="op">==</span> <span class="st">'PDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        fill<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'cobalt'</span>], alpha<span class="op">=</span><span class="fl">0.18</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_line(</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        df_mx[df_mx.curve <span class="op">==</span> <span class="st">'PDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'cobalt'</span>], size<span class="op">=</span><span class="fl">1.35</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_line(</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        df_mx[df_mx.curve <span class="op">==</span> <span class="st">'CDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'vermillion'</span>], size<span class="op">=</span><span class="fl">1.2</span>, linetype<span class="op">=</span><span class="st">'dashed'</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.annotate(<span class="st">'text'</span>, x<span class="op">=</span>_ann_x_pdf, y<span class="op">=</span>_scale_x <span class="op">*</span> <span class="fl">0.88</span>,</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>                  label<span class="op">=</span><span class="st">'$f_X(x)$'</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'cobalt'</span>], size<span class="op">=</span><span class="fl">8.5</span>)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.annotate(<span class="st">'text'</span>, x<span class="op">=</span>_ann_x_cdf, y<span class="op">=</span>_scale_x <span class="op">*</span> <span class="fl">0.88</span>,</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>                  label<span class="op">=</span><span class="st">'$F_X(x)$'</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'vermillion'</span>], size<span class="op">=</span><span class="fl">8.5</span>)</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.labs(x<span class="op">=</span><span class="st">'$x$'</span>, y<span class="op">=</span><span class="st">'Density'</span>)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> _th_marg</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Marginal Y : GPD (generalized Pareto) ───────────────────────────────────</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>_gpd  <span class="op">=</span> genpareto(c<span class="op">=</span><span class="fl">0.3</span>, scale<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>_yv   <span class="op">=</span> np.linspace(<span class="dv">0</span>, _gpd.ppf(<span class="fl">0.985</span>), <span class="dv">350</span>)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>_pdy  <span class="op">=</span> _gpd.pdf(_yv)</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>_cdy  <span class="op">=</span> _gpd.cdf(_yv)</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>_scale_y <span class="op">=</span> _pdy.<span class="bu">max</span>()</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>df_my <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    <span class="st">'x'</span>:     np.r_[_yv, _yv],</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    <span class="st">'y'</span>:     np.r_[_pdy, _cdy <span class="op">*</span> _scale_y],</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    <span class="st">'curve'</span>: [<span class="st">'PDF'</span>] <span class="op">*</span> <span class="bu">len</span>(_yv) <span class="op">+</span> [<span class="st">'CDF'</span>] <span class="op">*</span> <span class="bu">len</span>(_yv),</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>_ann_y_pdf <span class="op">=</span> _yv[<span class="bu">int</span>(<span class="bu">len</span>(_yv) <span class="op">*</span> <span class="fl">0.12</span>)]</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>_ann_y_cdf <span class="op">=</span> _yv[<span class="bu">int</span>(<span class="bu">len</span>(_yv) <span class="op">*</span> <span class="fl">0.60</span>)]</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>p_my <span class="op">=</span> (</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    pn.ggplot(df_my)</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_area(</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>        df_my[df_my.curve <span class="op">==</span> <span class="st">'PDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>        fill<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'teal'</span>], alpha<span class="op">=</span><span class="fl">0.18</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_line(</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>        df_my[df_my.curve <span class="op">==</span> <span class="st">'PDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'teal'</span>], size<span class="op">=</span><span class="fl">1.35</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_line(</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>        df_my[df_my.curve <span class="op">==</span> <span class="st">'CDF'</span>], pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>),</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'vermillion'</span>], size<span class="op">=</span><span class="fl">1.2</span>, linetype<span class="op">=</span><span class="st">'dashed'</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.annotate(<span class="st">'text'</span>, x<span class="op">=</span>_ann_y_pdf, y<span class="op">=</span>_scale_y <span class="op">*</span> <span class="fl">0.88</span>,</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>                  label<span class="op">=</span><span class="st">'$f_Y(y)$'</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'teal'</span>], size<span class="op">=</span><span class="fl">8.5</span>)</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.annotate(<span class="st">'text'</span>, x<span class="op">=</span>_ann_y_cdf, y<span class="op">=</span>_scale_y <span class="op">*</span> <span class="fl">0.88</span>,</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>                  label<span class="op">=</span><span class="st">'$F_Y(y)$'</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'vermillion'</span>], size<span class="op">=</span><span class="fl">8.5</span>)</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.labs(x<span class="op">=</span><span class="st">'$y$'</span>, y<span class="op">=</span><span class="st">'Density'</span>)</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> _th_marg</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>display(p_mx)</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>display(p_my)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div id="fig-marginals" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-marginals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-marginals" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-marginals-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-marginals-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-marginals-output-1.png" data-ref-parent="fig-marginals" width="337" height="225" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-marginals-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 (a) <span class="math inline">\(X \sim \mathrm{LogNormal}(\mu\!=\!0.3,\,\sigma\!=\!0.7)\)</span>
 </figcaption>
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-sklar-marginals" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-sklar-marginals-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-marginals" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-marginals-2" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-subfloat-fig figure">
-<div aria-describedby="fig-sklar-marginals-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-sklar-marginals-output-2.png" data-ref-parent="fig-sklar-marginals" width="337" height="225" class="figure-img">
+<div aria-describedby="fig-marginals-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-marginals-output-2.png" data-ref-parent="fig-marginals" width="337" height="225" class="figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-sklar-marginals-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-(b) <span class="math inline">\(Y \sim \mathrm{Gamma}(\alpha\!=\!2.5,\,\beta\!=\!1.5)\)</span>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-marginals-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) <span class="math inline">\(Y \sim \mathrm{GPD}(\xi\!=\!0.3,\,\beta\!=\!1.5)\)</span>
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sklar-marginals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: <strong>Marginal distributions and their CDFs.</strong> The CDF (dashed vermillion) is scaled to match the PDF axis for direct visual comparison. Applying these CDFs to each observation — <span class="math inline">\(U_i = F_X(X_i)\)</span>, <span class="math inline">\(V_i = F_Y(Y_i)\)</span> — yields pseudo-observations that are marginally uniform, isolating the copula.
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-marginals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: <strong>Marginal distributions and their CDFs.</strong> The CDF (dashed vermillion) is scaled to match the PDF axis for direct visual comparison. Applying these CDFs to each observation — <span class="math inline">\(U_i = F_X(X_i)\)</span>, <span class="math inline">\(V_i = F_Y(Y_i)\)</span> — yields pseudo-observations that are marginally uniform, isolating the copula.
 </figcaption>
 </figure>
+</div>
+<p>Next, the <strong>dependence</strong> alone. Drawing <span class="math inline">\((U, V)\)</span> straight from the Gumbel copula gives <a href="#fig-copula-uv" class="quarto-xref">Figure&nbsp;4</a>: the pure dependence structure on <span class="math inline">\([0,1]^2\)</span>, clustered toward the top-right corner — the signature of upper-tail dependence.</p>
+<div id="cell-fig-copula-uv" class="cell" data-fig-height="4.4" data-fig-width="4.8" data-execution_count="5">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>_n   <span class="op">=</span> <span class="dv">2000</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>_UV  <span class="op">=</span> GumbelCopula(theta<span class="op">=</span><span class="fl">2.0</span>).rvs(_n, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>_U   <span class="op">=</span> _UV[:, <span class="dv">0</span>]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>_V   <span class="op">=</span> _UV[:, <span class="dv">1</span>]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>df_uv <span class="op">=</span> pd.DataFrame({<span class="st">'u'</span>: _U, <span class="st">'v'</span>: _V})</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>_th_scatter <span class="op">=</span> (</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    theme_academic(base_size<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.theme(legend_position<span class="op">=</span><span class="st">'none'</span>, figure_size<span class="op">=</span>(<span class="fl">4.8</span>, <span class="fl">4.4</span>))</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>p_cop <span class="op">=</span> (</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    pn.ggplot(df_uv, pn.aes(<span class="st">'u'</span>, <span class="st">'v'</span>))</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.stat_density_2d(</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        pn.aes(fill<span class="op">=</span>pn.after_stat(<span class="st">'level'</span>)),</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        geom<span class="op">=</span><span class="st">'polygon'</span>, alpha<span class="op">=</span><span class="fl">0.55</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_point(alpha<span class="op">=</span><span class="fl">0.15</span>, size<span class="op">=</span><span class="fl">0.65</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'teal'</span>])</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.scale_fill_gradient(low<span class="op">=</span><span class="st">'#EBF7F5'</span>, high<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'teal'</span>])</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.coord_cartesian(xlim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>), ylim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.scale_x_continuous(breaks<span class="op">=</span>[<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">1.0</span>],</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>                             labels<span class="op">=</span>[<span class="st">'0'</span>, <span class="st">'0.25'</span>, <span class="st">'0.50'</span>, <span class="st">'0.75'</span>, <span class="st">'1'</span>])</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.scale_y_continuous(breaks<span class="op">=</span>[<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">1.0</span>],</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>                             labels<span class="op">=</span>[<span class="st">'0'</span>, <span class="st">'0.25'</span>, <span class="st">'0.50'</span>, <span class="st">'0.75'</span>, <span class="st">'1'</span>])</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.labs(x<span class="op">=</span><span class="st">'$u = F_X(X)$ — Uniform margin'</span>,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>              y<span class="op">=</span><span class="st">'$v = F_Y(Y)$ — Uniform margin'</span>)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> _th_scatter</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>display(p_cop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-copula-uv" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-copula-uv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-copula-uv-output-1.png" width="360" height="330" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-copula-uv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: <strong>The copula in uniform space.</strong> 2,000 draws <span class="math inline">\((u, v)\)</span> from a Gumbel copula (<span class="math inline">\(\theta = 2\)</span>). The filled density contours expose the dependence on <span class="math inline">\([0,1]^2\)</span>; the concentration toward the top-right corner is the Gumbel’s upper-tail dependence.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Finally, pushing each uniform coordinate through the matching quantile function — <span class="math inline">\(x = F_X^{-1}(u)\)</span>, <span class="math inline">\(y = F_Y^{-1}(v)\)</span> — stretches the copula onto the fitted margins, producing the joint loss distribution of <a href="#fig-joint-xy" class="quarto-xref">Figure&nbsp;5</a> in its natural observation scale. The dependence is unchanged; only the axes are re-shaped by the margins.</p>
+<div id="cell-fig-joint-xy" class="cell" data-fig-height="4.4" data-fig-width="4.8" data-execution_count="6">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>_X <span class="op">=</span> stats.lognorm.ppf(_U, s<span class="op">=</span><span class="fl">0.7</span>, scale<span class="op">=</span>np.exp(<span class="fl">0.3</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>_Y <span class="op">=</span> genpareto.ppf(_V, c<span class="op">=</span><span class="fl">0.3</span>, scale<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>df_xy <span class="op">=</span> pd.DataFrame({<span class="st">'x'</span>: _X, <span class="st">'y'</span>: _Y})</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>_xclip <span class="op">=</span> <span class="bu">float</span>(np.quantile(_X, <span class="fl">0.99</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>_yclip <span class="op">=</span> <span class="bu">float</span>(np.quantile(_Y, <span class="fl">0.99</span>))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>p_joint <span class="op">=</span> (</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    pn.ggplot(df_xy, pn.aes(<span class="st">'x'</span>, <span class="st">'y'</span>))</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.stat_density_2d(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        pn.aes(fill<span class="op">=</span>pn.after_stat(<span class="st">'level'</span>)),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        geom<span class="op">=</span><span class="st">'polygon'</span>, alpha<span class="op">=</span><span class="fl">0.55</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.geom_point(alpha<span class="op">=</span><span class="fl">0.15</span>, size<span class="op">=</span><span class="fl">0.65</span>, color<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'cobalt'</span>])</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.scale_fill_gradient(low<span class="op">=</span><span class="st">'#EEF4FB'</span>, high<span class="op">=</span>ACADEMIC_COLORS[<span class="st">'cobalt'</span>])</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.coord_cartesian(xlim<span class="op">=</span>(<span class="dv">0</span>, _xclip), ylim<span class="op">=</span>(<span class="dv">0</span>, _yclip))</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> pn.labs(x<span class="op">=</span><span class="st">'$x$ — Log-Normal margin'</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>              y<span class="op">=</span><span class="st">'$y$ — GPD margin'</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> _th_scatter</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>display(p_joint)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-joint-xy" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-joint-xy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-joint-xy-output-1.png" width="360" height="330" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-joint-xy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: <strong>The resulting joint distribution.</strong> The 2,000 copula draws of <a href="#fig-copula-uv" class="quarto-xref">Figure&nbsp;4</a> after the quantile transform <span class="math inline">\(x = F_X^{-1}(u)\)</span>, <span class="math inline">\(y = F_Y^{-1}(v)\)</span>, which maps them onto the Log-Normal and GPD margins (axes clipped at the 99th percentile to tame the GPD tail). The upper-tail clustering survives the transform — large property and casualty losses still tend to coincide.
+</figcaption>
+</figure>
+</div>
+</div>
 </div>
 </section>
-<section id="copula-density-and-likelihood-decomposition" class="level3" data-number="2.2">
-<h3 data-number="2.2" class="anchored" data-anchor-id="copula-density-and-likelihood-decomposition"><span class="header-section-number">2.2</span> Copula Density and Likelihood Decomposition</h3>
+</section>
+<section id="copula-density-and-likelihood-decomposition" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="copula-density-and-likelihood-decomposition"><span class="header-section-number">7</span> Copula Density and Likelihood Decomposition</h2>
 <p>When <span class="math inline">\(F_X\)</span> and <span class="math inline">\(F_Y\)</span> admit densities <span class="math inline">\(f_X\)</span> and <span class="math inline">\(f_Y\)</span>, differentiating <a href="#eq-sklar" class="quarto-xref">Equation&nbsp;1</a> with respect to <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> yields the <strong>joint density decomposition</strong>:</p>
 <p><span id="eq-copula-density"><span class="math display">\[
-f(x, y) \;=\; c\!\bigl(F_X(x),\; F_Y(y)\bigr) \cdot f_X(x) \cdot f_Y(y),
+f(x, y) \;=\; c\;\bigl(F_X(x),\; F_Y(y)\bigr) \cdot f_X(x) \cdot f_Y(y),
 \tag{2}\]</span></span></p>
 <p>where <span class="math inline">\(c(u, v) = \frac{\partial^2 C(u,v)}{\partial u\, \partial v}\)</span> is the <strong>copula density</strong>. Equation <a href="#eq-copula-density" class="quarto-xref">Equation&nbsp;2</a> is the density analogue of Sklar’s theorem: the joint density factorises into the product of the marginal densities and the copula density, which captures all dependence <span class="citation" data-cites="joe1997">(<a href="#ref-joe1997" role="doc-biblioref">Joe 1997</a>)</span>.</p>
 <p>This factorisation is the workhorse of parametric copula estimation. For <span class="math inline">\(n\)</span> i.i.d. observations <span class="math inline">\((x_i, y_i)\)</span>, the log-likelihood separates as</p>
@@ -590,10 +837,10 @@ f(x, y) \;=\; c\!\bigl(F_X(x),\; F_Y(y)\bigr) \cdot f_X(x) \cdot f_Y(y),
 }_{\text{marginal log-likelihoods}},
 \]</span></p>
 <p>where <span class="math inline">\(\theta\)</span> parameterises the copula and <span class="math inline">\(\boldsymbol{\psi} = (\psi_X, \psi_Y)\)</span> the marginals. The <strong>Inference Functions for Margins (IFM)</strong> method <span class="citation" data-cites="joe1996">(<a href="#ref-joe1996" role="doc-biblioref">Joe 1996</a>)</span> exploits this separation by first estimating <span class="math inline">\(\hat{\boldsymbol{\psi}}\)</span> from the marginal likelihoods and then plugging <span class="math inline">\(\hat{F}_X, \hat{F}_Y\)</span> into the copula likelihood to estimate <span class="math inline">\(\theta\)</span>. This reduces a high-dimensional joint optimisation to a sequence of lower-dimensional ones, greatly simplifying computation — at the cost of a modest efficiency loss relative to full maximum likelihood <span class="citation" data-cites="genest1993">(<a href="#ref-genest1993" role="doc-biblioref">Genest and Rivest 1993</a>)</span>.</p>
+<p>In practice, one usually specifies parametric families for the marginals (e.g., lognormal, gamma, generalized Pareto) and the copula (e.g., Gaussian, <span class="math inline">\(t\)</span>, Clayton, Gumbel), then first fits the marginals to the data - often using maximum likelihood or method of moments - and then fits the copula to the transformed pseudo-observations obtained via the PIT. This two-step procedure is widely used in finance and (re)insurance applications.</p>
 </section>
-</section>
-<section id="conclusion" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">3</span> Conclusion</h2>
+<section id="conclusion" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">8</span> Conclusion</h2>
 <p>Copulas are a powerful tool for modeling complex dependencies in data. By separating the dependence structure from the marginal distributions, they provide a flexibility that is missing in many classical statistical models. While the mathematics can get complicated, the core idea is simple and intuitive. They are especially useful in finance and insurance, where they help us build more realistic models of risk.</p>
 
 
@@ -601,14 +848,38 @@ f(x, y) \;=\; c\!\bigl(F_X(x),\; F_Y(y)\bigr) \cdot f_X(x) \cdot f_Y(y),
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-aas2009" class="csl-entry" role="listitem">
+Aas, Kjersti, Claudia Czado, Arnoldo Frigessi, and Henrik Bakken. 2009. <span>“Pair-Copula Constructions of Multiple Dependence.”</span> <em>Insurance: Mathematics and Economics</em> 44 (2): 182–98.
+</div>
+<div id="ref-bedford2002" class="csl-entry" role="listitem">
+Bedford, Tim, and Roger M Cooke. 2002. <span>“Vines–a New Graphical Model for Dependent Random Variables.”</span> <em>The Annals of Statistics</em> 30 (4): 1031–68.
+</div>
+<div id="ref-clayton1978" class="csl-entry" role="listitem">
+Clayton, David G. 1978. <span>“A Model for Association in Bivariate Life Tables and Its Application in Epidemiological Studies of Familial Tendency in Chronic Disease Incidence.”</span> <em>Biometrika</em> 65 (1): 141–51.
+</div>
+<div id="ref-embrechts2002" class="csl-entry" role="listitem">
+Embrechts, Paul, Alexander McNeil, and Daniel Straumann. 2002. <span>“Correlation and Dependence in Risk Management: Properties and Pitfalls.”</span> <em>Risk Management: Value at Risk and Beyond</em>, 176–223.
+</div>
+<div id="ref-frank1979" class="csl-entry" role="listitem">
+Frank, Maurice J. 1979. <span>“On the Simultaneous Associativity of f(x,y) and x+y-f(x,y).”</span> <em>Aequationes Mathematicae</em> 19 (1): 194–226.
+</div>
 <div id="ref-genest1993" class="csl-entry" role="listitem">
 Genest, Christian, and Louis-Paul Rivest. 1993. <span>“Statistical Inference Procedures for Bivariate Archimedean Copulas.”</span> <em>Journal of the American Statistical Association</em> 88 (423): 1034–43.
+</div>
+<div id="ref-gumbel1960" class="csl-entry" role="listitem">
+Gumbel, Emil J. 1960. <span>“Bivariate Exponential Distributions.”</span> <em>Journal of the American Statistical Association</em> 55 (292): 698–707.
 </div>
 <div id="ref-joe1996" class="csl-entry" role="listitem">
 Joe, Harry. 1996. <span>“Families of m-Variate Distributions with Given Margins and m(m-1)/2 Bivariate Dependence Parameters.”</span> <em>Lecture Notes-Monograph Series</em>, 120–41.
 </div>
 <div id="ref-joe1997" class="csl-entry" role="listitem">
 ———. 1997. <em>Multivariate Models and Dependence Concepts</em>. Vol. 73. Chapman; Hall/CRC.
+</div>
+<div id="ref-li2000" class="csl-entry" role="listitem">
+Li, David X. 2000. <span>“On Default Correlation: A Copula Function Approach.”</span> <em>The Journal of Fixed Income</em> 9 (4): 43–54.
+</div>
+<div id="ref-mcneil2015quantitative" class="csl-entry" role="listitem">
+McNeil, Alexander J, Rüdiger Frey, and Paul Embrechts. 2015. <em>Quantitative Risk Management: Concepts, Techniques and Tools</em>. Princeton university press.
 </div>
 <div id="ref-nelsen2006" class="csl-entry" role="listitem">
 Nelsen, Roger B. 2006. <em>An Introduction to Copulas</em>. Vol. 139. Springer.
