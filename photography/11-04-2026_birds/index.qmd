@@ -13,9 +13,9 @@ format:
     lightbox: true
 ---
 
-A spring afternoon along the shores of Lake Zurich --- waterbirds at Stampf, lapwings in the fields around Nuolen.
+A spring afternoon along the shores of Lake Zurich - waterbirds at Stampf, lapwings in the fields around Nuolen.
 
-::: {layout-ncol=3}
+::: {layout-ncol=1}
 
 ![*Mute Swan*](images/swan.jpg){group="birds" fig-alt="Mute swan standing on a pebbly lakeshore"}
 
@@ -23,12 +23,7 @@ A spring afternoon along the shores of Lake Zurich --- waterbirds at Stampf, lap
 
 ![*Black-headed Gulls*](images/black-headed-gull.jpg){group="birds" fig-alt="Black-headed gulls in shallow water, one taking flight"}
 
-:::
-
-::: {layout-ncol=2}
-
 ![*Northern Lapwing*](images/lapwing-1.jpg){group="birds" fig-alt="Northern lapwing standing in green grass"}
 
 ![*Northern Lapwing*](images/lapwing-2.jpg){group="birds" fig-alt="Northern lapwing walking on muddy plowed ground"}
-
 :::
