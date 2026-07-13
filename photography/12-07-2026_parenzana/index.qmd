@@ -1,0 +1,94 @@
+---
+title: "Riding the Parenzana"
+subtitle: "Trieste · Koper · Piran · Motovun · Poreč · July 2026"
+categories:
+  - Travel
+  - Cycling
+  - Istria
+  - Slovenia
+  - Croatia
+date: "2026-07-12"
+image: "images/pirano_sunset2.JPG"
+format:
+  html:
+    toc: false
+    lightbox: true
+---
+
+The Parenzana was once a narrow-gauge railway threading through Austro-Hungarian Istria — 123 km from Trieste to Poreč, completed in 1902 and abandoned in 1935. Now it's a cycling trail crossing three countries, through old stone tunnels, hilltop villages, and down to the Adriatic.
+
+![](images/parenzana.jpg){width=60% fig-align="center"}
+
+### Trieste
+
+::: {layout-ncol=1}
+
+![*Evening Streets*](images/trieste_street.JPG)
+
+![*The Waterfront*](images/trieste_sea.JPG)
+
+:::
+
+### On the Trail
+
+::: {layout-ncol=1}
+
+![*Into the Hillside*](images/trieste_tunnel.JPG)
+
+![*Under the Hill*](images/pirano_tunnel.JPG)
+
+:::
+
+### Koper
+
+::: {layout-ncol=1}
+
+![*Swimming in the Shadow of the Cranes*](images/koper_harbor.JPG)
+
+:::
+
+### Piran
+
+::: {layout-ncol=1}
+
+![*The Old Town from the Walls*](images/pirano.JPG)
+
+![*Golden Hour on the Shore*](images/pirano_coastline.JPG)
+
+:::
+
+### Sunset at Piran
+
+::: {layout-ncol=1}
+
+![*The Cape at Dusk*](images/pirano_sunset1.JPG)
+
+![*Sailboats on a Golden Sea*](images/pirano_sunset2.JPG)
+
+![*Watching Together*](images/pirano_sunset3.JPG)
+
+![*The Last Light*](images/pirano_sunset4.JPG)
+
+![*St. George above the Adriatic*](images/pirano_sunset5.JPG)
+
+:::
+
+### Motovun
+
+::: {layout-ncol=1}
+
+![*Over the Mirna Valley*](images/motuvun1.JPG)
+
+![*The Edge of the Hill Town*](images/motuvun2.JPG)
+
+:::
+
+### Poreč
+
+::: {layout-ncol=1}
+
+![*The Old Town from Across the Water*](images/porec.jpg)
+
+![*Evening at the Harbor*](images/porec2.JPG)
+
+:::
