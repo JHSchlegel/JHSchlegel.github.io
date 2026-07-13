@@ -66,21 +66,14 @@ GPA: 5.87 / 6.00 (Class Rank 1)
 ::: {.timeline-container}
 
 ::: {.education-card}
-### Product Manager
+### Product Manager – Quantitative Modelling
 ::: {.meta-info}
-<i class="ri-building-line"></i> Swiss Re <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Feb 2026 – Present
+<i class="ri-building-line"></i> Swiss Re · Agriculture Product Center (70%) & P&C Re Underwriting Strategy (30%) <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Oct 2025 – Present
 :::
-- Drive robust portfolio optimization initiatives across multiple product lines
-- Transitioned to full-time role following successful quantitative internship
-:::
-
-::: {.education-card}
-### Quantitative Intern
-::: {.meta-info}
-<i class="ri-building-line"></i> Swiss Re <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Oct 2025 – Jan 2026
-:::
-- Developed robust high-dimensional covariance estimation methods applicable to multiple reinsurance contexts
-- Designed robust portfolio optimization techniques tailored to reinsurance, providing actionable steering insights
+- Lead portfolio modelling and optimization across Agriculture, Specialty, and P&C Re, providing quantitative steering insights to underwriters and senior management
+- Develop analytics pipelines and portfolio steering applications supporting P&C Re portfolios exceeding USD 40bn in premium volume
+- Conduct hands-on underwriting across selected markets, including deal pricing, risk assessment, and client negotiations
+- Spearhead innovation projects in causal machine learning and probabilistic forecasting with cross-functional applicability
 :::
 
 ::: {.education-card}
