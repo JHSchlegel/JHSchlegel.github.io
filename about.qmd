@@ -70,7 +70,7 @@ GPA: 5.87 / 6.00 (Class Rank 1)
 ::: {.meta-info}
 <i class="ri-building-line"></i> Swiss Re <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Oct 2025 – Present
 :::
-- Developed robust high-dimensional covariance estimation methods and portfolio optimization techniques applicable to multiple reinsurance contexts
+- Developed robust high-dimensional covariance estimation methods and portfolio optimization techniques for Agriculture reinsurance, with applicability across multiple reinsurance contexts
 - Drive quantitative steering initiatives across product lines, providing portfolio modelling insights to underwriters and senior management
 - Currently on a part-time rotation in P&C Re Underwriting Strategy
 - Spearhead innovation projects in causal machine learning and probabilistic forecasting
