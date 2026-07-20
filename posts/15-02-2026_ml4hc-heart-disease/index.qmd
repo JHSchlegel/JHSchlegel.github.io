@@ -1,15 +1,12 @@
 ---
 title: "Predicting Heart Disease: When Simple Models Rival Deep Learning"
-abstract: "We train a Lasso logistic regression, a multi-layer perceptron, and a neural additive model to predict heart disease from routine clinical data. All three achieve high and comparable accuracy. Using SHAP values, learned shape functions, and coefficient analysis to interpret each model, we find that they independently identify the same clinical features as most important, consistent with established cardiology literature."
 categories:
-  - Python
-  - Data Science
-  - Machine Learning
-  - Deep Learning
-  - Healthcare
+  - Healthcare AI
+image: "image.jpg"
+description: "A Lasso regression, an MLP, and a neural additive model predict heart disease about equally well, and independently agree on which clinical features matter."
+abstract: "We train a Lasso logistic regression, a multi-layer perceptron, and a neural additive model to predict heart disease from routine clinical data. All three achieve high and comparable accuracy. Using SHAP values, learned shape functions, and coefficient analysis to interpret each model, we find that they independently identify the same clinical features as most important, consistent with established cardiology literature."
 author: "Jan Schlegel"
 date: "2026-02-15"
-image: "image.jpg"
 bibliography: references.bib
 format:
   html:

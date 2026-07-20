@@ -1,15 +1,12 @@
 ---
 title: "Data-Driven Tactics: Analyzing Spain's Playing Style in Euro 2024 Qualifiers"
-abstract: "We examine Spain's characteristic 'Tiki-Taka' playing style through multiple analytical lenses: offside patterns, passing networks, set-piece execution, formation dynamics, and defensive line positioning. Our analysis reveals how Spain maintains possession through short passing sequences involving defenders, utilizes full pitch width when in possession, and employs a high defensive line that reflects their controlling philosophy. We also identify tactical vulnerabilities, particularly Spain's susceptibility to offsides and counter-attacks, providing actionable insights for opposition teams."
 categories:
-  - Python
-  - Data Science
-  - Data Analysis
-  - Visualization
   - Sports Analytics
+image: "image.png"
+description: "Passing networks, offside patterns, and defensive lines: what event and tracking data reveal about Spain's Tiki-Taka in the Euro 2024 qualifiers."
+abstract: "We examine Spain's characteristic 'Tiki-Taka' playing style through multiple analytical lenses: offside patterns, passing networks, set-piece execution, formation dynamics, and defensive line positioning. Our analysis reveals how Spain maintains possession through short passing sequences involving defenders, utilizes full pitch width when in possession, and employs a high defensive line that reflects their controlling philosophy. We also identify tactical vulnerabilities, particularly Spain's susceptibility to offsides and counter-attacks, providing actionable insights for opposition teams."
 author: "Jan Schlegel"
 date: "2026-02-14"
-image: "image.png"
 format:
   html:
     code-fold: true

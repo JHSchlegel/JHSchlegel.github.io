@@ -1,11 +1,11 @@
 ---
 draft: true
 title: "An Introduction to Stochastic Differential Equations"
-abstract: "This post provides an intuitive introduction to Stochastic Differential Equations (SDEs), the mathematical tool for modeling systems that evolve randomly over time. We'll cover the basics of Brownian motion, Itô calculus, and how SDEs are used in finance."
 categories:
-  - Mathematics
-  - Finance
-  - Python
+  - Quantitative Finance
+image: "img/sde_thumbnail.png"
+description: "An intuitive tour of Brownian motion, Ito calculus, and how stochastic differential equations model systems that evolve randomly over time."
+abstract: "This post provides an intuitive introduction to Stochastic Differential Equations (SDEs), the mathematical tool for modeling systems that evolve randomly over time. We'll cover the basics of Brownian motion, Itô calculus, and how SDEs are used in finance."
 author: "Jan Schlegel"
 date: "2025-04-03"
 format:

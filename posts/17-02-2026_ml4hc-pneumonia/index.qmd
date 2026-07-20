@@ -1,15 +1,12 @@
 ---
 title: "Detecting Pneumonia from Chest X-Rays: CNNs, Integrated Gradients, and Grad-CAM"
-abstract: "We train a ResNet-50-based convolutional neural network to classify chest X-ray images as healthy or pneumonia. To understand what the model actually learns, we apply two attribution methods, Integrated Gradients and Grad-CAM, and compare the regions they highlight. A data randomization test confirms that both methods produce genuinely model-dependent explanations rather than artifacts. The attribution maps reveal that the CNN focuses on clinically sensible lung regions, with broader activation patterns for pneumonia cases and more localized attention for healthy patients."
 categories:
-  - Python
-  - Data Science
-  - Machine Learning
-  - Deep Learning
-  - Healthcare
+  - Healthcare AI
+image: "image.jpg"
+description: "A ResNet-50 classifies chest X-rays for pneumonia, while Integrated Gradients and Grad-CAM show it attends to clinically sensible lung regions."
+abstract: "We train a ResNet-50-based convolutional neural network to classify chest X-ray images as healthy or pneumonia. To understand what the model actually learns, we apply two attribution methods, Integrated Gradients and Grad-CAM, and compare the regions they highlight. A data randomization test confirms that both methods produce genuinely model-dependent explanations rather than artifacts. The attribution maps reveal that the CNN focuses on clinically sensible lung regions, with broader activation patterns for pneumonia cases and more localized attention for healthy patients."
 author: "Jan Schlegel"
 date: "2026-02-17"
-image: "image.jpg"
 bibliography: references.bib
 format:
   html:

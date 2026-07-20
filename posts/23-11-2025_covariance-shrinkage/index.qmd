@@ -1,14 +1,13 @@
 ---
 draft: true
 title: "Covariance Shrinkage: From Linear Shrinkage to Random Matrix Theory"
-abstract: "In high-dimensional regimes where the number of variables $N$ is comparable to the sample size $T$, the sample covariance matrix is known to be an ill-conditioned and noisy estimator of the population covariance. This post provides a rigorous mathematical treatment of covariance shrinkage, exploring the bias-variance tradeoff inherent in linear shrinkage estimators (Ledoit-Wolf). We further ground these methods in Random Matrix Theory, specifically the Marchenko-Pastur law, to characterize the asymptotic behavior of eigenvalues. Finally, we introduce and implement Nonlinear Shrinkage (Ledoit-Wolf 2020), which applies a non-linear transformation to the sample eigenvalues based on the estimation of the Stieltjes transform. Simulation studies demonstrate the efficacy of these methods in recovering true spectral properties."
 categories:
   - Quantitative Finance
-  - Python
-  - High-Dimensional Statistics
+image: "image.png"
+description: "When the number of variables rivals the sample size, the sample covariance matrix falls apart. Linear shrinkage, Marchenko-Pastur, and nonlinear shrinkage put it back together."
+abstract: "In high-dimensional regimes where the number of variables $N$ is comparable to the sample size $T$, the sample covariance matrix is known to be an ill-conditioned and noisy estimator of the population covariance. This post provides a rigorous mathematical treatment of covariance shrinkage, exploring the bias-variance tradeoff inherent in linear shrinkage estimators (Ledoit-Wolf). We further ground these methods in Random Matrix Theory, specifically the Marchenko-Pastur law, to characterize the asymptotic behavior of eigenvalues. Finally, we introduce and implement Nonlinear Shrinkage (Ledoit-Wolf 2020), which applies a non-linear transformation to the sample eigenvalues based on the estimation of the Stieltjes transform. Simulation studies demonstrate the efficacy of these methods in recovering true spectral properties."
 author: "Jan Schlegel"
 date: "2025-11-23"
-image: "image.png"
 bibliography: references.bib
 format:
   html:

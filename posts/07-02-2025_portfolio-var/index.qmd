@@ -1,10 +1,11 @@
 ---
 title: "Comparing Univariate and Multivariate Models for Value at Risk Forecasting"
+categories:
+  - Quantitative Finance
+image: "img/var_visualization.png"
+description: "Do multivariate GARCH models beat univariate ones at forecasting Value at Risk? Backtests say yes; predictive accuracy says it is complicated."
 abstract: "This post explores the effectiveness of univariate and multivariate GARCH-based models in forecasting Value at Risk (VaR) for a long equity portfolio. While multivariate models generally perform better in backtests, univariate models often fall short. However, neither model type consistently outperforms the other in predictive accuracy, highlighting the trade-offs between simplicity and complexity in risk forecasting."
 
-categories:
-  - Simulation
-  - R
 author: "Jan Schlegel"
 date: "2025-02-07"
 bibliography: references.bib

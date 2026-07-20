@@ -1,10 +1,10 @@
 ---
 title: "A Visual Introduction to Copulas"
-abstract: "This post offers a concise and intuitive introduction to copula theory, explaining what copulas are, why they are useful, and how they are applied in finance. We'll skip the heavy math and focus on the core ideas."
 categories:
-  - Statistics
-  - Finance
-  - Python
+  - Quantitative Finance
+image: "img/copula_theory_thumbnail.png"
+description: "What copulas are, why they matter for modelling dependence, and how they are used in finance, with the heavy math left out."
+abstract: "This post offers a concise and intuitive introduction to copula theory, explaining what copulas are, why they are useful, and how they are applied in finance. We'll skip the heavy math and focus on the core ideas."
 author: "Jan Schlegel"
 date: "2025-07-29"
 format:

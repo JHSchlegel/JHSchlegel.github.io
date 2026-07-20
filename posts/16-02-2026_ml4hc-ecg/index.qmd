@@ -1,15 +1,12 @@
 ---
 title: "Detecting Heart Attacks from ECGs: Classical ML, Deep Learning, and Representation Learning"
-abstract: "We classify electrocardiogram recordings as healthy or indicative of myocardial infarction using a progression of increasingly powerful methods. Starting from logistic regression and gradient boosting on raw signals, we show that feature engineering closes much of the gap to deep learning. We then train LSTMs, CNNs, and a transformer, and use attention maps to visualize which parts of the ECG signal drive predictions. Finally, we explore whether contrastive representation learning can produce embeddings that transfer across datasets and outperform supervised pretraining."
 categories:
-  - Python
-  - Data Science
-  - Machine Learning
-  - Deep Learning
-  - Healthcare
+  - Healthcare AI
+image: "image.jpg"
+description: "From logistic regression to transformers on ECG signals: how far feature engineering closes the gap to deep learning, and whether contrastive embeddings transfer."
+abstract: "We classify electrocardiogram recordings as healthy or indicative of myocardial infarction using a progression of increasingly powerful methods. Starting from logistic regression and gradient boosting on raw signals, we show that feature engineering closes much of the gap to deep learning. We then train LSTMs, CNNs, and a transformer, and use attention maps to visualize which parts of the ECG signal drive predictions. Finally, we explore whether contrastive representation learning can produce embeddings that transfer across datasets and outperform supervised pretraining."
 author: "Jan Schlegel"
 date: "2026-02-16"
-image: "image.jpg"
 bibliography: references.bib
 format:
   html:
