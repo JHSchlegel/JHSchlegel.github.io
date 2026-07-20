@@ -1,12 +1,32 @@
 ---
-title: "Blog"
+pagetitle: "Jan Schlegel – Blog"
 listing:
-  contents: posts
+  contents: posts          # your existing posts/ folder of .qmd files
   sort: "date desc"
-  type: default
+  type: grid               # cover-image cards, like the prototype
   categories: true
-  sort-ui: true
+  sort-ui: false
   filter-ui: true
+  fields: [image, date, title, categories, description]
+  grid-columns: 2
 page-layout: full
-title-block-banner: true
 ---
+
+```{=html}
+<div class="jhs-hero">
+  <img class="jhs-portrait" src="profile.jpg" alt="Jan Schlegel">
+  <div>
+    <h1>Statistics, probabilistic machine learning, and the occasional detour.</h1>
+    <p>I'm Jan — a statistician and product manager based in Zurich. I recently
+    completed my M.Sc. in Statistics at ETH Zurich, working on probabilistic AI,
+    high-dimensional statistics, and causality. This is where I write up methods,
+    results, and the occasional dead end.</p>
+    <div class="jhs-actions">
+      <a class="jhs-btn jhs-btn-primary" href="CV_Academic.pdf" download>Download CV</a>
+      <a class="jhs-btn jhs-btn-ghost" href="about.qmd">More about me</a>
+    </div>
+  </div>
+</div>
+```
+
+## Writing
