@@ -8,40 +8,30 @@ categories:
   - Netherlands
 date: "2026-05-23"
 image: "images/great_crested_grebe.JPG"
-format:
-  html:
-    toc: false
-    lightbox: true
+pagetitle: "Around Amsterdam — Jan Schlegel"
+page-layout: full
 ---
 
-A few days around Amsterdam, Haarlem, Zandvoort, and Utrecht.
+```{=html}
+<div style="max-width:900px;margin:0 auto 1.5rem;">
+  <p style="font-size:1.1rem;line-height:1.6;color:color-mix(in srgb,var(--bs-body-color) 72%,transparent);">
+  A few days around Amsterdam, Haarlem, Zandvoort, and Utrecht.</p>
+</div>
 
-### By Day
+<h2 class="jhs-album-section-title">By day</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/great_crested_grebe.JPG" alt="Great crested grebe with catch" loading="lazy"></div>
+  <div class="tile"><img src="images/canal_flowers.JPG" alt="Canal in bloom" loading="lazy"></div>
+  <div class="tile"><img src="images/windmill.JPG" alt="Windmill on the canal" loading="lazy"></div>
+  <div class="tile"><img src="images/prison_uni_sign.JPG" alt="Sign reading: this prison has the best escape plan" loading="lazy"></div>
+  <div class="tile"><img src="images/prison_uni_stairs.JPG" alt="Stairwell inside the old prison" loading="lazy"></div>
+</div>
 
-::: {layout-ncol=1}
-
-![*Great Crested Grebe with Catch*](images/great_crested_grebe.JPG)
-
-![*Canal in Bloom*](images/canal_flowers.JPG)
-
-![*Windmill on the Canal*](images/windmill.JPG)
-
-![*\"This Prison Has the Best Escape Plan\"*](images/prison_uni_sign.JPG)
-
-![*Inside the Old Prison*](images/prison_uni_stairs.JPG)
-
-:::
-
-### By Night
-
-::: {layout-ncol=1}
-
-![*Illuminated Steps*](images/light_stairs.JPG)
-
-![*A'DAM Tower at Night*](images/night_tower.JPG)
-
-![*Skyline at Dusk*](images/skyline.JPG)
-
-![*The Crew*](images/group_selfie.JPG)
-
-:::
+<h2 class="jhs-album-section-title">By night</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/light_stairs.JPG" alt="Illuminated steps" loading="lazy"></div>
+  <div class="tile"><img src="images/night_tower.JPG" alt="A'DAM Tower at night" loading="lazy"></div>
+  <div class="tile"><img src="images/skyline.JPG" alt="Skyline at dusk" loading="lazy"></div>
+  <div class="tile"><img src="images/group_selfie.JPG" alt="The crew" loading="lazy"></div>
+</div>
+```

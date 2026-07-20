@@ -8,40 +8,31 @@ categories:
   - Uznach
 date: "2026-05-14"
 image: "images/macro_fly_3.JPG"
-format:
-  html:
-    toc: false
-    lightbox: true
+pagetitle: "Macro Wonders of Uznach — Jan Schlegel"
+page-layout: full
 ---
 
-Macro shots from a pond near Uznach: flies, a dragonfly, a dying wasp, and a goose family that wouldn't sit still.
+```{=html}
+<div style="max-width:900px;margin:0 auto 1.5rem;">
+  <p style="font-size:1.1rem;line-height:1.6;color:color-mix(in srgb,var(--bs-body-color) 72%,transparent);">
+  Macro shots from a pond near Uznach: flies, a dragonfly, a dying wasp, and a goose family
+  that wouldn't sit still.</p>
+</div>
 
-### Macro
+<h2 class="jhs-album-section-title">Macro</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/macro_fly_3.JPG" alt="A long-legged fly resting on a green leaf, wings spread" loading="lazy"></div>
+  <div class="tile"><img src="images/fly_macro.JPG" alt="A fly resting on a cluster of small white wayfaring-tree flowers" loading="lazy"></div>
+  <div class="tile"><img src="images/fly_macro_2.JPG" alt="A fly feeding among clusters of white blossom" loading="lazy"></div>
+  <div class="tile"><img src="images/dragonfly.JPG" alt="A slender, long-legged insect perched among small white wildflowers" loading="lazy"></div>
+  <div class="tile"><img src="images/flower_macro.JPG" alt="Close-up of a yellow iris flower with dew drops on its petals" loading="lazy"></div>
+  <div class="tile"><img src="images/macro_dying_wasp.JPG" alt="An insect entangled in a fine thread of spider silk, wings spread, suspended in mid-air" loading="lazy"></div>
+</div>
 
-::: {layout-ncol=1}
-
-![](images/macro_fly_3.JPG){group="uznach" fig-alt="A long-legged fly resting on a green leaf, wings spread"}
-
-![](images/fly_macro.JPG){group="uznach" fig-alt="A fly resting on a cluster of small white wayfaring-tree flowers"}
-
-![](images/fly_macro_2.JPG){group="uznach" fig-alt="A fly feeding among clusters of white blossom"}
-
-![](images/dragonfly.JPG){group="uznach" fig-alt="A slender, long-legged insect perched among small white wildflowers"}
-
-![](images/flower_macro.JPG){group="uznach" fig-alt="Close-up of a yellow iris flower with dew drops on its petals"}
-
-![](images/macro_dying_wasp.JPG){group="uznach" fig-alt="An insect entangled in a fine thread of spider silk, wings spread, suspended in mid-air"}
-
-:::
-
-### Pond Wildlife
-
-::: {layout-ncol=1}
-
-![*Goose Family*](images/duck_family.JPG){group="uznach" fig-alt="A family of geese with several fluffy goslings standing in grass"}
-
-![*Goose Family Swimming*](images/duck_family_swimming.JPG){group="uznach" fig-alt="A goose family swimming together among reeds in a pond"}
-
-![*Frog at the Surface*](images/frog_side.JPG){group="uznach" fig-alt="A green frog floating at the water's surface"}
-
-:::
+<h2 class="jhs-album-section-title">Pond wildlife</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/duck_family.JPG" alt="A family of geese with several fluffy goslings standing in grass" loading="lazy"></div>
+  <div class="tile"><img src="images/duck_family_swimming.JPG" alt="A goose family swimming together among reeds in a pond" loading="lazy"></div>
+  <div class="tile"><img src="images/frog_side.JPG" alt="A green frog floating at the water's surface" loading="lazy"></div>
+</div>
+```

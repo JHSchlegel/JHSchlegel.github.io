@@ -7,23 +7,27 @@ categories:
   - Lake Zurich
 date: "2026-04-11"
 image: "images/swan.jpg"
-format:
-  html:
-    toc: false
-    lightbox: true
+pagetitle: "Birding at Lake Zurich — Jan Schlegel"
+page-layout: full
 ---
 
-A spring afternoon along the shores of Lake Zurich - waterbirds at Stampf, lapwings in the fields around Nuolen.
+```{=html}
+<div style="max-width:900px;margin:0 auto 1.5rem;">
+  <p style="font-size:1.1rem;line-height:1.6;color:color-mix(in srgb,var(--bs-body-color) 72%,transparent);">
+  A spring afternoon along the shores of Lake Zurich — waterbirds at Stampf, lapwings in the
+  fields around Nuolen.</p>
+</div>
 
-::: {layout-ncol=1}
+<h2 class="jhs-album-section-title">Waterbirds at Stampf</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/swan.jpg" alt="Mute swan standing on a pebbly lakeshore" loading="lazy"></div>
+  <div class="tile"><img src="images/egyptian-goose.jpg" alt="A pair of Egyptian geese on a gravel shore" loading="lazy"></div>
+  <div class="tile"><img src="images/black-headed-gull.jpg" alt="Black-headed gulls in shallow water, one taking flight" loading="lazy"></div>
+</div>
 
-![*Mute Swan*](images/swan.jpg){group="birds" fig-alt="Mute swan standing on a pebbly lakeshore"}
-
-![*Egyptian Geese*](images/egyptian-goose.jpg){group="birds" fig-alt="A pair of Egyptian geese on a gravel shore"}
-
-![*Black-headed Gulls*](images/black-headed-gull.jpg){group="birds" fig-alt="Black-headed gulls in shallow water, one taking flight"}
-
-![*Northern Lapwing*](images/lapwing-1.jpg){group="birds" fig-alt="Northern lapwing standing in green grass"}
-
-![*Northern Lapwing*](images/lapwing-2.jpg){group="birds" fig-alt="Northern lapwing walking on muddy plowed ground"}
-:::
+<h2 class="jhs-album-section-title">Fields around Nuolen</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/lapwing-1.jpg" alt="Northern lapwing standing in green grass" loading="lazy"></div>
+  <div class="tile"><img src="images/lapwing-2.jpg" alt="Northern lapwing walking on muddy plowed ground" loading="lazy"></div>
+</div>
+```

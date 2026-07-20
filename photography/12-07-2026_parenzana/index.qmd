@@ -9,86 +9,63 @@ categories:
   - Croatia
 date: "2026-07-12"
 image: "images/pirano_sunset2.JPG"
-format:
-  html:
-    toc: false
-    lightbox: true
+pagetitle: "Riding the Parenzana — Jan Schlegel"
+page-layout: full
 ---
 
-The Parenzana was once a narrow-gauge railway threading through Austro-Hungarian Istria — 123 km from Trieste to Poreč, completed in 1902 and abandoned in 1935. Now it's a cycling trail crossing three countries, through old stone tunnels, hilltop villages, and down to the Adriatic.
+```{=html}
+<div style="max-width:900px;margin:0 auto 1.5rem;">
+  <p style="font-size:1.1rem;line-height:1.6;color:color-mix(in srgb,var(--bs-body-color) 72%,transparent);">
+  The Parenzana was once a narrow-gauge railway threading through Austro-Hungarian Istria —
+  123 km from Trieste to Poreč, completed in 1902 and abandoned in 1935. Now it's a cycling
+  trail crossing three countries, through old stone tunnels, hilltop villages, and down to
+  the Adriatic.</p>
+</div>
 
-![](images/parenzana.jpg){width=60% fig-align="center"}
+<img src="images/parenzana.jpg" alt="Map of the Parenzana route" loading="lazy"
+     style="display:block;width:60%;margin:0 auto 2rem;border-radius:12px;">
 
-### Trieste
+<h2 class="jhs-album-section-title">Trieste</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/trieste_street.JPG" alt="Evening streets, Trieste" loading="lazy"></div>
+  <div class="tile"><img src="images/trieste_sea.JPG" alt="The waterfront at Trieste" loading="lazy"></div>
+</div>
 
-::: {layout-ncol=1}
+<h2 class="jhs-album-section-title">On the trail</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/trieste_tunnel.JPG" alt="Into the hillside" loading="lazy"></div>
+  <div class="tile"><img src="images/pirano_tunnel.JPG" alt="Under the hill" loading="lazy"></div>
+</div>
 
-![*Evening Streets*](images/trieste_street.JPG)
+<h2 class="jhs-album-section-title">Koper</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/koper_harbor.JPG" alt="Swimming in the shadow of the cranes" loading="lazy"></div>
+</div>
 
-![*The Waterfront*](images/trieste_sea.JPG)
+<h2 class="jhs-album-section-title">Piran</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/pirano.JPG" alt="The old town from the walls" loading="lazy"></div>
+  <div class="tile"><img src="images/pirano_coastline.JPG" alt="Golden hour on the shore" loading="lazy"></div>
+</div>
 
-:::
+<h2 class="jhs-album-section-title">Sunset at Piran</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/pirano_sunset1.JPG" alt="The cape at dusk" loading="lazy"></div>
+  <div class="tile"><img src="images/pirano_sunset2.JPG" alt="Sailboats on a golden sea" loading="lazy"></div>
+  <div class="tile"><img src="images/pirano_sunset3.JPG" alt="Watching together" loading="lazy"></div>
+  <div class="tile"><img src="images/pirano_sunset4.JPG" alt="The last light" loading="lazy"></div>
+  <div class="tile"><img src="images/pirano_sunset5.JPG" alt="St. George above the Adriatic" loading="lazy"></div>
+</div>
 
-### On the Trail
+<h2 class="jhs-album-section-title">Motovun</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/motuvun1.JPG" alt="Over the Mirna valley" loading="lazy"></div>
+  <div class="tile"><img src="images/motuvun2.JPG" alt="The edge of the hill town" loading="lazy"></div>
+</div>
 
-::: {layout-ncol=1}
-
-![*Into the Hillside*](images/trieste_tunnel.JPG)
-
-![*Under the Hill*](images/pirano_tunnel.JPG)
-
-:::
-
-### Koper
-
-::: {layout-ncol=1}
-
-![*Swimming in the Shadow of the Cranes*](images/koper_harbor.JPG)
-
-:::
-
-### Piran
-
-::: {layout-ncol=1}
-
-![*The Old Town from the Walls*](images/pirano.JPG)
-
-![*Golden Hour on the Shore*](images/pirano_coastline.JPG)
-
-:::
-
-### Sunset at Piran
-
-::: {layout-ncol=1}
-
-![*The Cape at Dusk*](images/pirano_sunset1.JPG)
-
-![*Sailboats on a Golden Sea*](images/pirano_sunset2.JPG)
-
-![*Watching Together*](images/pirano_sunset3.JPG)
-
-![*The Last Light*](images/pirano_sunset4.JPG)
-
-![*St. George above the Adriatic*](images/pirano_sunset5.JPG)
-
-:::
-
-### Motovun
-
-::: {layout-ncol=1}
-
-![*Over the Mirna Valley*](images/motuvun1.JPG)
-
-![*The Edge of the Hill Town*](images/motuvun2.JPG)
-
-:::
-
-### Poreč
-
-::: {layout-ncol=1}
-
-![*The Old Town from Across the Water*](images/porec.jpg)
-
-![*Evening at the Harbor*](images/porec2.JPG)
-
-:::
+<h2 class="jhs-album-section-title">Poreč</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/porec.jpg" alt="The old town from across the water" loading="lazy"></div>
+  <div class="tile"><img src="images/porec2.JPG" alt="Evening at the harbor" loading="lazy"></div>
+</div>
+```

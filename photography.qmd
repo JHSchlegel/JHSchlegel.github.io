@@ -1,12 +1,26 @@
 ---
-title: "Photography"
+title: ""
+pagetitle: "Photography — Jan Schlegel"
 listing:
-  contents: photography
+  id: albums
+  contents: photography          # each subfolder's index.qmd is one album
   sort: "date desc"
-  type: default
-  categories: true
-  sort-ui: true
-  filter-ui: true
+  type: grid
+  grid-columns: 2
+  fields: [image, title, subtitle, date]
+  sort-ui: false
+  filter-ui: false
 page-layout: full
-title-block-banner: true
 ---
+
+```{=html}
+<div style="max-width:900px;margin:2.4rem auto 0;">
+  <h1>Photography</h1>
+  <p style="font-size:1.02rem;color:color-mix(in srgb,var(--bs-body-color) 70%,transparent);max-width:560px;">
+  Trips and outings, collected as albums. Landscapes, wildlife, and the occasional detour —
+  mostly around Switzerland and wherever the trails lead.</p>
+</div>
+```
+
+::: {#albums}
+:::

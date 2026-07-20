@@ -8,30 +8,35 @@ categories:
   - Architecture
 date: "2026-05-01"
 image: "images/lantern.JPG"
-format:
-  html:
-    toc: false
-    lightbox: true
+pagetitle: "Greifensee in Spring — Jan Schlegel"
+page-layout: full
 ---
 
-Beatiful spring evenings in the city of Uster and along the shores of Greifensee in the Zürich Oberland.
+```{=html}
+<div style="max-width:900px;margin:0 auto 1.5rem;">
+  <p style="font-size:1.1rem;line-height:1.6;color:color-mix(in srgb,var(--bs-body-color) 72%,transparent);">
+  Beautiful spring evenings in the city of Uster and along the shores of Greifensee in the
+  Zürich Oberland.</p>
+</div>
 
-::: {layout-ncol=1}
-![](images/schwan.JPG){group="greifensee"}
+<h2 class="jhs-album-section-title">On the water</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/schwan.JPG" alt="Swan on the Greifensee" loading="lazy"></div>
+  <div class="tile"><img src="images/blässhuhn.JPG" alt="Coot on the Greifensee" loading="lazy"></div>
+  <div class="tile"><img src="images/drachen.JPG" alt="Drachen, Greifensee" loading="lazy"></div>
+</div>
 
-![](images/blässhuhn.JPG){group="greifensee"}
+<h2 class="jhs-album-section-title">Around Uster</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/gasse.JPG" alt="Alley in Uster" loading="lazy"></div>
+  <div class="tile"><img src="images/gemeinde.JPG" alt="Municipal building in Uster" loading="lazy"></div>
+  <div class="tile"><img src="images/towers.JPG" alt="Towers in Uster" loading="lazy"></div>
+  <div class="tile"><img src="images/lantern.JPG" alt="Street lantern at dusk" loading="lazy"></div>
+</div>
 
-![](images/towers.JPG){group="greifensee"}
-
-![](images/drachen.JPG){group="greifensee"}
-
-![](images/skyline.JPG){group="greifensee"}
-
-![](images/gasse.JPG){group="greifensee"}
-
-![](images/lantern.JPG){group="greifensee"}
-
-![](images/gemeinde.JPG){group="greifensee"}
-
-![](images/sunset.JPG){group="greifensee"}
-:::
+<h2 class="jhs-album-section-title">Last light</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/skyline.JPG" alt="Uster skyline in the evening" loading="lazy"></div>
+  <div class="tile"><img src="images/sunset.JPG" alt="Sunset over the Greifensee" loading="lazy"></div>
+</div>
+```
