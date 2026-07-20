@@ -1,105 +1,160 @@
 ---
-title: "Jan Schlegel"
-image: profile.jpg
-format:
-  html:
-    css: styles.scss
-    include-in-header:
-      - text: |
-          <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-about:
-  template: jolla
-  links:
-    - icon: laptop
-      text: Blog
-      href: https://jhschlegel.github.io
-    - icon: linkedin
-      text: LinkedIn
-      href: https://www.linkedin.com/in/jan-heinrich-schlegel/
-    - icon: github
-      text: Github
-      href: https://github.com/JHSchlegel
+title: ""
+pagetitle: "About — Jan Schlegel"
+page-layout: full
 ---
 
-::: {.custom-left}
-Hi there! I'm Jan, a statistician and product manager based in Zurich. I recently completed my Master's in Statistics at ETH Zurich, specializing in probabilistic AI, high-dimensional statistics, and causality. My work focuses on understanding and improving how machine learning systems make decisions—from interpreting generative models to building robust methods for high-stakes applications like climate forecasting and reinsurance.
+```{=html}
+<div class="jhs-hero">
+  <img class="jhs-portrait" src="profile.jpg" alt="Jan Schlegel">
+  <div>
+    <h1>Hi, I'm Jan.</h1>
+    <p>A statistician and product manager based in Zurich. I recently completed my
+    Master's in Statistics at ETH Zurich, specializing in probabilistic AI,
+    high-dimensional statistics, and causality. My work focuses on understanding and
+    improving how machine learning systems make decisions — from interpreting generative
+    models to building robust methods for high-stakes applications like climate
+    forecasting and reinsurance.</p>
+  </div>
+</div>
 
-When I'm not working on difficult (for me) problems, you'll find me running, in the gym, swimming, building PCs, or getting lost (intentionally) in GeoGuessr.
-:::
+<div class="jhs-section">
 
-## Education
+<p style="border-left:3px solid var(--bs-primary); padding:2px 0 2px 20px; font-size:1.02rem; color:color-mix(in srgb,var(--bs-body-color) 72%,transparent);">
+When I'm not working on difficult (for me) problems, you'll find me running, in the gym,
+swimming, building PCs, or getting lost — intentionally — in GeoGuessr.
+</p>
 
-::: {.timeline-container}
+<!-- ===================== EDUCATION ===================== -->
+<h2>Education</h2>
+<div class="jhs-timeline">
+  <div class="jhs-entry">
+    <div class="jhs-period">Sep 2023 – Sep 2025</div>
+    <h3>M.Sc. ETH in Statistics</h3>
+    <div class="jhs-org">ETH Zurich · Zurich, Switzerland</div>
+    <div class="jhs-place">GPA 5.99 / 6.00 · Class Rank 1</div>
+    <ul>
+      <li>Focus: (Probabilistic) Machine Learning, Statistical Learning Theory, Computational Statistics, Causality</li>
+      <li>Thesis: Mechanistic Interpretability in Text-to-Image Diffusion Models (6.00 / 6.00)</li>
+      <li>Semester Paper: Extrapolation and Distributional Robustness for Climate Downscaling</li>
+    </ul>
+  </div>
+  <div class="jhs-entry">
+    <div class="jhs-period">Sep 2019 – Feb 2023</div>
+    <h3>B.A. in Business and Economics</h3>
+    <div class="jhs-org">University of Zurich · Zurich, Switzerland</div>
+    <div class="jhs-place">GPA 5.87 / 6.00 · Class Rank 1</div>
+    <ul>
+      <li>Major: Banking and Finance · Minor: Statistics</li>
+      <li>Thesis: Portfolio Value at Risk Forecasting with Copula-GARCH Models (6.00 / 6.00)</li>
+      <li>Completed 215 ECTS (vs. standard 180), focused on quantitative finance, statistics, and computing</li>
+    </ul>
+  </div>
+</div>
 
-::: {.education-card}
-### Master of Science (M.Sc. ETH) in Statistics
-::: {.meta-info}
-<i class="ri-building-line"></i> ETH Zurich <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Sep 2023 – Sep 2025
-:::
+<!-- ===================== EXPERIENCE ===================== -->
+<h2>Experience</h2>
+<div class="jhs-timeline">
+  <div class="jhs-entry">
+    <div class="jhs-period">Oct 2025 – Present</div>
+    <h3>Product Manager – Quantitative Modelling</h3>
+    <div class="jhs-org">Swiss Re</div>
+    <div class="jhs-place">Zurich, Switzerland</div>
+    <ul>
+      <li>Developed robust high-dimensional covariance estimation methods and portfolio optimization techniques for Agriculture reinsurance, with applicability across multiple reinsurance contexts</li>
+      <li>Drive quantitative steering initiatives across product lines, providing portfolio modelling insights to underwriters and senior management</li>
+      <li>Currently on a part-time rotation in P&amp;C Re Underwriting Strategy</li>
+      <li>Spearhead innovation projects in causal machine learning and probabilistic forecasting</li>
+    </ul>
+  </div>
+  <div class="jhs-entry">
+    <div class="jhs-period">Feb 2023 – Aug 2023</div>
+    <h3>Biostatistics Research Assistant</h3>
+    <div class="jhs-org">University of Zurich (EBPI)</div>
+    <div class="jhs-place">Zurich, Switzerland</div>
+    <ul>
+      <li>Contributed to data and code management and reproducible statistical workflows for a COVID-19 cohort study published in <em>Nature Communications</em></li>
+      <li>Applied statistical modelling techniques to complex longitudinal datasets and presented the results to principal investigators and the research team</li>
+    </ul>
+  </div>
+  <div class="jhs-entry">
+    <div class="jhs-period">Jul 2021 – Nov 2021</div>
+    <h3>Accountant (Military Service)</h3>
+    <div class="jhs-org">Swiss Armed Forces</div>
+    <div class="jhs-place">Kloten, Switzerland</div>
+    <ul>
+      <li>Successfully balanced full-time university studies with mandatory military service obligations</li>
+      <li>Managed the complete accounting for a 150-person military unit</li>
+    </ul>
+  </div>
+  <div class="jhs-entry">
+    <div class="jhs-period">Sep 2020 – Jul 2021</div>
+    <h3>Teaching Assistant Mathematics</h3>
+    <div class="jhs-org">University of Zurich</div>
+    <div class="jhs-place">Zurich, Switzerland</div>
+    <ul>
+      <li>Led twice-weekly tutorials covering Analysis and Linear Algebra for groups of up to 30 students</li>
+    </ul>
+  </div>
+</div>
 
-::: {.gpa-badge}
-GPA: 5.99 / 6.00 (Class Rank 1)
-:::
-- **Focus:** (Probabilistic) Machine Learning, Statistical Learning Theory, Computational Statistics, Causality
-- **Thesis:** Mechanistic Interpretability in Text-to-Image Diffusion Models (Grade: 6.00/6.00)
-- **Semester Paper:** Extrapolation and Distributional Robustness for Climate Downscaling
-:::
+<!-- ===================== AWARDS ===================== -->
+<h2>Awards</h2>
+<div class="jhs-timeline">
+  <div class="jhs-entry">
+    <div class="jhs-period">May 2026</div>
+    <h3>Willi Studer Prize</h3>
+    <div class="jhs-org">ETH Zurich</div>
+    <div style="margin-top:.5rem; color:color-mix(in srgb,var(--bs-body-color) 80%,transparent);">Awarded to the best-graduating student of the M.Sc. Statistics programme at ETH Zurich.</div>
+  </div>
+</div>
 
-::: {.education-card}
-### Bachelor of Arts in Business and Economics
-::: {.meta-info}
-<i class="ri-building-line"></i> University of Zurich <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Sep 2019 – Feb 2023
-:::
+<!-- ===================== RESEARCH INTERESTS ===================== -->
+<h2>Research interests</h2>
+<div class="jhs-interests">
+  <div class="jhs-interest">Probabilistic &amp; Bayesian ML</div>
+  <div class="jhs-interest">High-dimensional statistics</div>
+  <div class="jhs-interest">Causal inference</div>
+  <div class="jhs-interest">Mechanistic interpretability</div>
+  <div class="jhs-interest">Distributional robustness</div>
+  <div class="jhs-interest">Generative models</div>
+  <div class="jhs-interest">Quantitative finance &amp; risk</div>
+  <div class="jhs-interest">Climate downscaling</div>
+</div>
 
-::: {.gpa-badge}
-GPA: 5.87 / 6.00 (Class Rank 1)
-:::
-- **Major:** Banking and Finance; **Minor:** Statistics
-- **Thesis:** Portfolio Value at Risk Forecasting with Copula-GARCH Models (Grade: 6.00/6.00)
-- Completed 215 ECTS (vs. standard 180) with a strong focus on quantitative finance, statistics, and computing
-:::
+<!-- ===================== SKILLS ===================== -->
+<h2>Skills</h2>
+<div class="jhs-skillgroup">
+  <div class="label">Technology</div>
+  <div class="jhs-chips">
+    <span class="jhs-chip">Python</span><span class="jhs-chip">R</span><span class="jhs-chip">C++</span>
+    <span class="jhs-chip">SQL</span><span class="jhs-chip">LaTeX</span><span class="jhs-chip">Unix</span>
+    <span class="jhs-chip">Git</span><span class="jhs-chip">Foundry</span><span class="jhs-chip">Microsoft Office</span>
+  </div>
+</div>
+<div class="jhs-skillgroup">
+  <div class="label">Frameworks</div>
+  <div class="jhs-chips">
+    <span class="jhs-chip">PyTorch</span><span class="jhs-chip">NumPy</span><span class="jhs-chip">Pandas</span>
+    <span class="jhs-chip">Scikit-Learn</span><span class="jhs-chip">PySpark</span><span class="jhs-chip">SciPy</span>
+    <span class="jhs-chip">GeoPandas</span><span class="jhs-chip">Streamlit</span>
+  </div>
+</div>
+<div class="jhs-skillgroup">
+  <div class="label">Languages</div>
+  <div class="jhs-chips">
+    <span class="jhs-chip">German — Native</span><span class="jhs-chip">English — C2</span>
+    <span class="jhs-chip">French — B2</span><span class="jhs-chip">Russian — A1</span>
+  </div>
+</div>
 
-:::
+<!-- ===================== CONTACT ===================== -->
+<h2>Get in touch</h2>
+<p style="color:color-mix(in srgb,var(--bs-body-color) 75%,transparent);">Happy to talk research, reinsurance modelling, or collaboration — reach out by email or connect on LinkedIn / GitHub.</p>
+<div class="jhs-actions">
+  <a class="jhs-btn jhs-btn-primary" href="mailto:janschlegel33@gmail.com">Email me</a>
+  <a class="jhs-btn jhs-btn-ghost" href="CV_Academic.pdf" download>Download CV</a>
+</div>
 
-## Experience
-
-::: {.timeline-container}
-
-::: {.education-card}
-### Product Manager – Quantitative Modelling
-::: {.meta-info}
-<i class="ri-building-line"></i> Swiss Re <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Oct 2025 – Present
-:::
-- Developed robust high-dimensional covariance estimation methods and portfolio optimization techniques for Agriculture reinsurance, with applicability across multiple reinsurance contexts
-- Drive quantitative steering initiatives across product lines, providing portfolio modelling insights to underwriters and senior management
-- Currently on a part-time rotation in P&C Re Underwriting Strategy
-- Spearhead innovation projects in causal machine learning and probabilistic forecasting
-:::
-
-::: {.education-card}
-### Biostatistics Research Assistant
-::: {.meta-info}
-<i class="ri-building-line"></i> University of Zurich (EBPI) <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Feb 2022 – Aug 2023
-:::
-- Contributed to data and code management and reproducible statistical workflows for a COVID-19 cohort study published in *Nature Communications*
-- Applied statistical modelling techniques to complex longitudinal datasets and presented the results to principal investigators and the research team
-:::
-
-::: {.education-card}
-### Accountant (Military Service)
-::: {.meta-info}
-<i class="ri-building-line"></i> Swiss Armed Forces <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Kloten, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Jul 2021 – Nov 2021
-:::
-- Successfully balanced full-time university studies with mandatory military service obligations
-- Managed the complete accounting for a 150-person military unit
-:::
-
-::: {.education-card}
-### Teaching Assistant Mathematics
-::: {.meta-info}
-<i class="ri-building-line"></i> University of Zurich <span class="meta-sep">·</span> <i class="ri-map-pin-line"></i> Zurich, Switzerland <span class="meta-sep">·</span> <i class="ri-calendar-line"></i> Sep 2020 – Jul 2021
-:::
-- Led twice-weekly tutorials covering Analysis and Linear Algebra for groups of up to 30 students
-:::
-
-:::
+</div>
+```
