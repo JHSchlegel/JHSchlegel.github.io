@@ -1,6 +1,9 @@
 project:
-  type: website  
+  type: website
   output-dir: "docs"
+  render:
+    - "**/*.qmd"
+    - "!quarto-handoff/**"
 
 execute:
   freeze: auto
@@ -9,27 +12,46 @@ execute:
 
 website:
   title: "Jan Schlegel"
+  site-url: "https://jhschlegel.github.io"
   favicon: logo.png
   navbar:
+    logo: profile.jpg
+    logo-alt: "Jan Schlegel"
+    title: "Jan Schlegel"
     pinned: true
-    right:
-      - text: About
-        href: about.qmd
-      - text: Blog
+    left:
+      - text: "Blog"
         href: index.qmd
-      - text: Photography
+      - text: "About"
+        href: about.qmd
+      - text: "Photography"
         href: photography.qmd
-      - icon: linkedin
-        href: https://www.linkedin.com/in/jan-heinrich-schlegel/
+    right:
+      - text: "CV"
+        href: CV_Academic.pdf
       - icon: github
         href: https://github.com/JHSchlegel
+      - icon: linkedin
+        href: https://www.linkedin.com/in/jan-heinrich-schlegel/
+  page-footer:
+    left: "© 2026 Jan Schlegel"
+    right:
+      - icon: github
+        href: https://github.com/JHSchlegel
+      - icon: linkedin
+        href: https://www.linkedin.com/in/jan-heinrich-schlegel/
 
 format:
   html:
     theme:
-      light: cosmo
-      dark: cyborg
-    css: styles.css
+      light: [cosmo, theme-light.scss]
+      dark:  [cosmo, theme-dark.scss]
+    css: custom.css
+    toc: false
+    fontsize: 1rem
+    grid:
+      body-width: 900px
+    link-external-newwindow: true
     include-in-header:
       - text: |
           <meta name="color-scheme" content="dark light">
