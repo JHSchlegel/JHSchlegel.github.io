@@ -8,6 +8,7 @@
 
 <meta name="author" content="Jan Schlegel">
 <meta name="dcterms.date" content="2025-07-29">
+<meta name="description" content="What copulas are, why they matter for modelling dependence, and how they are used in finance, with the heavy math left out.">
 
 <title>Jan Schlegel – A Visual Introduction to Copulas</title>
 <style>
@@ -156,7 +157,7 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../../custom.css">
 </head>
 
 <body class="nav-fixed">
@@ -166,6 +167,9 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../profile.jpg" alt="Jan Schlegel" class="navbar-logo">
+    </a>
     <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Jan Schlegel</span>
     </a>
@@ -175,26 +179,32 @@ window.Quarto = {
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../about.html"> 
-<span class="menu-text">About</span></a>
-  </li>  
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
     <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../photography.html"> 
 <span class="menu-text">Photography</span></a>
   </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../CV_Academic.pdf"> 
+<span class="menu-text">CV</span></a>
+  </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/"> <i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://github.com/JHSchlegel"> <i class="bi bi-github" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JHSchlegel"> <i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/"> <i class="bi bi-linkedin" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -211,7 +221,12 @@ window.Quarto = {
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">A Visual Introduction to Copulas</h1>
-                                <div class="quarto-categories">
+                  <div>
+        <div class="description">
+          What copulas are, why they matter for modelling dependence, and how they are used in finance, with the heavy math left out.
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">Statistics</div>
                 <div class="quarto-category">Finance</div>
                 <div class="quarto-category">Python</div>
@@ -1124,7 +1139,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/jhschlegel\.github\.io");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -1138,6 +1153,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         if (link.dataset.originalHref !== undefined) {
           link.href = link.dataset.originalHref;
         }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
       }
     }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
@@ -1453,6 +1473,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Jan Schlegel</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JHSchlegel">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/">
+      <i class="bi bi-linkedin" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
 
 
 

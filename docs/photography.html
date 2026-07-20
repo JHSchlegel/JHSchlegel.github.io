@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Jan Schlegel – Photography</title>
+<title>Jan Schlegel – Photography — Jan Schlegel</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -73,20 +73,20 @@ ul.task-list li input[type="checkbox"] {
 <script>
 
   window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
+    const listingTargetEl = window.document.querySelector('#listing-albums .list');
     if (!listingTargetEl) {
       // No listing discovered, do not attach.
       return; 
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-subtitle','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-image','listing-title','listing-subtitle','listing-date',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-date","listing-title","listing-author","listing-subtitle","listing-image","listing-description","listing-categories"],
+      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
+    window['quarto-listings']['listing-albums'] = new List('listing-albums', options);
 
     if (window['quarto-listing-loaded']) {
       window['quarto-listing-loaded']();
@@ -131,16 +131,19 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="custom.css">
 </head>
 
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+  <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./profile.jpg" alt="Jan Schlegel" class="navbar-logo">
+    </a>
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">Jan Schlegel</span>
     </a>
@@ -150,26 +153,32 @@ window.Quarto = {
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
-<span class="menu-text">About</span></a>
-  </li>  
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
     <a class="nav-link" href="./index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link active" href="./photography.html" aria-current="page"> 
 <span class="menu-text">Photography</span></a>
   </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./CV_Academic.pdf"> 
+<span class="menu-text">CV</span></a>
+  </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/"> <i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://github.com/JHSchlegel"> <i class="bi bi-github" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JHSchlegel"> <i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/"> <i class="bi bi-linkedin" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -182,266 +191,144 @@ window.Quarto = {
     </nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">Photography</h1>
-                      </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta column-page-left">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(5)</span></div><div class="category" data-category="Architecture">Architecture <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Birds">Birds <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Cityscape">Cityscape <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Croatia">Croatia <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Cycling">Cycling <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Greifensee">Greifensee <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Insects">Insects <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Istria">Istria <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Lake Zurich">Lake Zurich <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Macro">Macro <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Nature">Nature <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Netherlands">Netherlands <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Slovenia">Slovenia <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Travel">Travel <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Uznach">Uznach <span class="quarto-category-count">(1)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content column-page" id="quarto-document-content">
 
 
 
 
-
-
-
-
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="listing-actions-group">
-   <div class="input-group input-group-sm quarto-listing-sort">
-     <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
-     <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
-       <option value="" disabled="" selected="" hidden="">Order By</option>
-       <option value="index" data-direction="asc">Default</option>
-         <option value="listing-title" data-direction="asc">
-          Title
-        </option>
-         <option value="listing-date-sort" data-direction="asc">
-          Date - Oldest
-        </option>
-         <option value="listing-date-sort" data-direction="desc">
-          Date - Newest
-        </option>
-         <option value="listing-author" data-direction="asc">
-          Author
-        </option>
-     </select>
-  </div>
-    <div class="input-group input-group-sm quarto-listing-filter">
-      <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input type="text" class="search form-control" placeholder="Filter">
-    </div>
+<div style="max-width:900px;margin:2.4rem auto 0;">
+  <h1>Photography</h1>
+  <p style="font-size:1.02rem;color:color-mix(in srgb,var(--bs-body-color) 70%,transparent);max-width:560px;">
+  Trips and outings, collected as albums. Landscapes, wildlife, and the occasional detour —
+  mostly around Switzerland and wherever the trails lead.</p>
 </div>
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="Travel,Cycling,Istria,Slovenia,Croatia" data-listing-date-sort="1783807200000" data-listing-file-modified-sort="1783979201562" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="114">
-<div class="thumbnail">
-<p><a href="./photography/12-07-2026_parenzana/index.html" class="no-external"></a></p><a href="./photography/12-07-2026_parenzana/index.html" class="no-external">
-<p><img loading="lazy" src="./photography/12-07-2026_parenzana/images/pirano_sunset2.JPG" class="thumbnail-image"></p>
-</a><p><a href="./photography/12-07-2026_parenzana/index.html" class="no-external"></a></p>
+<div id="listing-albums" class="quarto-listing quarto-listing-container-grid">
+<div class="list grid quarto-listing-cols-2">
+<div class="g-col-1" data-index="0" data-categories="Travel,Cycling,Istria,Slovenia,Croatia" data-listing-date-sort="1783807200000" data-listing-file-modified-sort="1784578976810" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="240">
+<a href="./photography/12-07-2026_parenzana/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./photography/12-07-2026_parenzana/images/pirano_sunset2.JPG" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Riding the Parenzana
+</h5>
+<div class="card-subtitle listing-subtitle">
+Trieste · Koper · Piran · Motovun · Poreč · July 2026
 </div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./photography/12-07-2026_parenzana/index.html" class="no-external">Riding the Parenzana</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./photography/12-07-2026_parenzana/index.html" class="no-external">Trieste · Koper · Piran · Motovun · Poreč · July 2026</a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Travel'); return false;">
-Travel
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Cycling'); return false;">
-Cycling
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Istria'); return false;">
-Istria
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Slovenia'); return false;">
-Slovenia
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Croatia'); return false;">
-Croatia
-</div>
-</div>
-<div class="listing-description">
-<a href="./photography/12-07-2026_parenzana/index.html" class="no-external">The Parenzana was once a narrow-gauge railway threading through Austro-Hungarian Istria — 123 km from Trieste to Poreč, completed in 1902 and abandoned in 1935. Now it’s a…</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./photography/12-07-2026_parenzana/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 Jul 12, 2026
 </div>
+</div>
+</div>
+</div>
 </a>
 </div>
+<div class="g-col-1" data-index="1" data-categories="Travel,Architecture,Cityscape,Netherlands" data-listing-date-sort="1779487200000" data-listing-file-modified-sort="1784578948286" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="107">
+<a href="./photography/23-05-2026_amsterdam/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./photography/23-05-2026_amsterdam/images/great_crested_grebe.JPG" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Around Amsterdam: By Day and Night
+</h5>
+<div class="card-subtitle listing-subtitle">
+Amsterdam, Haarlem &amp; Utrecht · May 2026
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="Travel,Architecture,Cityscape,Netherlands" data-listing-date-sort="1779487200000" data-listing-file-modified-sort="1782077885493" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="38">
-<div class="thumbnail">
-<p><a href="./photography/23-05-2026_amsterdam/index.html" class="no-external"></a></p><a href="./photography/23-05-2026_amsterdam/index.html" class="no-external">
-<p><img loading="lazy" src="./photography/23-05-2026_amsterdam/images/great_crested_grebe.JPG" class="thumbnail-image"></p>
-</a><p><a href="./photography/23-05-2026_amsterdam/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./photography/23-05-2026_amsterdam/index.html" class="no-external">Around Amsterdam: By Day and Night</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./photography/23-05-2026_amsterdam/index.html" class="no-external">Amsterdam, Haarlem &amp; Utrecht · May 2026</a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Travel'); return false;">
-Travel
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Architecture'); return false;">
-Architecture
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Cityscape'); return false;">
-Cityscape
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Netherlands'); return false;">
-Netherlands
-</div>
-</div>
-<div class="listing-description">
-<a href="./photography/23-05-2026_amsterdam/index.html" class="no-external">A few days around Amsterdam, Haarlem, Zandvoort, and Utrecht.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./photography/23-05-2026_amsterdam/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 May 23, 2026
 </div>
+</div>
+</div>
+</div>
 </a>
 </div>
+<div class="g-col-1" data-index="2" data-categories="Macro,Insects,Nature,Uznach" data-listing-date-sort="1778709600000" data-listing-file-modified-sort="1784578940314" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="176">
+<a href="./photography/14-05-2026_uznach/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./photography/14-05-2026_uznach/images/macro_fly_3.JPG" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Macro Wonders of Uznach
+</h5>
+<div class="card-subtitle listing-subtitle">
+Uznach · May 2026
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="Macro,Insects,Nature,Uznach" data-listing-date-sort="1778709600000" data-listing-file-modified-sort="1782078999512" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="125">
-<div class="thumbnail">
-<p><a href="./photography/14-05-2026_uznach/index.html" class="no-external"></a></p><a href="./photography/14-05-2026_uznach/index.html" class="no-external">
-<p><img loading="lazy" src="./photography/14-05-2026_uznach/images/macro_fly_3.JPG" class="thumbnail-image"></p>
-</a><p><a href="./photography/14-05-2026_uznach/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./photography/14-05-2026_uznach/index.html" class="no-external">Macro Wonders of Uznach</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./photography/14-05-2026_uznach/index.html" class="no-external">Uznach · May 2026</a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Macro'); return false;">
-Macro
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Insects'); return false;">
-Insects
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Nature'); return false;">
-Nature
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Uznach'); return false;">
-Uznach
-</div>
-</div>
-<div class="listing-description">
-<a href="./photography/14-05-2026_uznach/index.html" class="no-external">Macro shots from a pond near Uznach: flies, a dragonfly, a dying wasp, and a goose family that wouldn’t sit still.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./photography/14-05-2026_uznach/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 May 14, 2026
 </div>
+</div>
+</div>
+</div>
 </a>
 </div>
+<div class="g-col-1" data-index="3" data-categories="Birds,Nature,Greifensee,Architecture" data-listing-date-sort="1777586400000" data-listing-file-modified-sort="1784578961062" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="117">
+<a href="./photography/01-05-2026_greifensee/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./photography/01-05-2026_greifensee/images/lantern.JPG" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Greifensee in Spring
+</h5>
+<div class="card-subtitle listing-subtitle">
+Uster · May 2026
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="Birds,Nature,Greifensee,Architecture" data-listing-date-sort="1777586400000" data-listing-file-modified-sort="1777819335584" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="19">
-<div class="thumbnail">
-<p><a href="./photography/01-05-2026_greifensee/index.html" class="no-external"></a></p><a href="./photography/01-05-2026_greifensee/index.html" class="no-external">
-<p><img loading="lazy" src="./photography/01-05-2026_greifensee/images/lantern.JPG" class="thumbnail-image"></p>
-</a><p><a href="./photography/01-05-2026_greifensee/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./photography/01-05-2026_greifensee/index.html" class="no-external">Greifensee in Spring</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./photography/01-05-2026_greifensee/index.html" class="no-external">Uster · May 2026</a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Birds'); return false;">
-Birds
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Nature'); return false;">
-Nature
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Greifensee'); return false;">
-Greifensee
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Architecture'); return false;">
-Architecture
-</div>
-</div>
-<div class="listing-description">
-<a href="./photography/01-05-2026_greifensee/index.html" class="no-external">Beatiful spring evenings in the city of Uster and along the shores of Greifensee in the Zürich Oberland.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./photography/01-05-2026_greifensee/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 May 1, 2026
 </div>
+</div>
+</div>
+</div>
 </a>
 </div>
+<div class="g-col-1" data-index="4" data-categories="Birds,Nature,Lake Zurich" data-listing-date-sort="1775858400000" data-listing-file-modified-sort="1784578918301" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="100">
+<a href="./photography/11-04-2026_birds/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./photography/11-04-2026_birds/images/swan.jpg" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Birding at Lake Zurich
+</h5>
+<div class="card-subtitle listing-subtitle">
+Stampf &amp; Nuolen · April 2026
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="Birds,Nature,Lake Zurich" data-listing-date-sort="1775858400000" data-listing-file-modified-sort="1782077766519" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="62">
-<div class="thumbnail">
-<p><a href="./photography/11-04-2026_birds/index.html" class="no-external"></a></p><a href="./photography/11-04-2026_birds/index.html" class="no-external">
-<p><img loading="lazy" src="./photography/11-04-2026_birds/images/swan.jpg" class="thumbnail-image"></p>
-</a><p><a href="./photography/11-04-2026_birds/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./photography/11-04-2026_birds/index.html" class="no-external">Birding at Lake Zurich</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./photography/11-04-2026_birds/index.html" class="no-external">Stampf &amp; Nuolen · April 2026</a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Birds'); return false;">
-Birds
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Nature'); return false;">
-Nature
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Lake Zurich'); return false;">
-Lake Zurich
-</div>
-</div>
-<div class="listing-description">
-<a href="./photography/11-04-2026_birds/index.html" class="no-external">A spring afternoon along the shores of Lake Zurich - waterbirds at Stampf, lapwings in the fields around Nuolen.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./photography/11-04-2026_birds/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 Apr 11, 2026
 </div>
-</a>
 </div>
+</div>
+</div>
+</a>
 </div>
 </div>
 <div class="listing-no-matching d-none">
 No matching items
 </div>
-</div></main> <!-- /main -->
+</div>
+
+
+
+
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -678,7 +565,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/jhschlegel\.github\.io");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -692,6 +579,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         if (link.dataset.originalHref !== undefined) {
           link.href = link.dataset.originalHref;
         }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
       }
     }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
@@ -1007,6 +899,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Jan Schlegel</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JHSchlegel">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/">
+      <i class="bi bi-linkedin" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
 
 
 

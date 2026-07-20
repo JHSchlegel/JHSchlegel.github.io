@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Jan Schlegel – Blog</title>
+<title>Jan Schlegel – Jan Schlegel – Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -80,9 +80,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-image','listing-date','listing-title','listing-categories','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
+      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description","listing-categories"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -131,16 +131,19 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="custom.css">
 </head>
 
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+  <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./profile.jpg" alt="Jan Schlegel" class="navbar-logo">
+    </a>
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">Jan Schlegel</span>
     </a>
@@ -150,26 +153,32 @@ window.Quarto = {
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
-<span class="menu-text">About</span></a>
-  </li>  
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
     <a class="nav-link active" href="./index.html" aria-current="page"> 
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./photography.html"> 
 <span class="menu-text">Photography</span></a>
   </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./CV_Academic.pdf"> 
+<span class="menu-text">CV</span></a>
+  </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/"> <i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://github.com/JHSchlegel"> <i class="bi bi-github" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JHSchlegel"> <i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/"> <i class="bi bi-linkedin" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -182,362 +191,234 @@ window.Quarto = {
     </nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">Blog</h1>
-                      </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta column-page-left">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(7)</span></div><div class="category" data-category="Continual Learning">Continual Learning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Data Analysis">Data Analysis <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Data Science">Data Science <span class="quarto-category-count">(4)</span></div><div class="category" data-category="Deep Learning">Deep Learning <span class="quarto-category-count">(4)</span></div><div class="category" data-category="Finance">Finance <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Healthcare">Healthcare <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Machine Learning">Machine Learning <span class="quarto-category-count">(4)</span></div><div class="category" data-category="Python">Python <span class="quarto-category-count">(6)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Simulation">Simulation <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Sports Analytics">Sports Analytics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Statistics">Statistics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Visualization">Visualization <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(7)</span></div><div class="category" data-category="Healthcare AI">Healthcare AI <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Machine Learning">Machine Learning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Quantitative Finance">Quantitative Finance <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Sports Analytics">Sports Analytics <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content column-page-left" id="quarto-document-content">
 
 
 
 
-
-
-
-
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="listing-actions-group">
-   <div class="input-group input-group-sm quarto-listing-sort">
-     <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
-     <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
-       <option value="" disabled="" selected="" hidden="">Order By</option>
-       <option value="index" data-direction="asc">Default</option>
-         <option value="listing-title" data-direction="asc">
-          Title
-        </option>
-         <option value="listing-date-sort" data-direction="asc">
-          Date - Oldest
-        </option>
-         <option value="listing-date-sort" data-direction="desc">
-          Date - Newest
-        </option>
-         <option value="listing-author" data-direction="asc">
-          Author
-        </option>
-     </select>
+<div class="jhs-hero">
+  <img class="jhs-portrait" src="profile.jpg" alt="Jan Schlegel">
+  <div>
+    <h1>Statistics, probabilistic machine learning, and the occasional detour.</h1>
+    <p>I'm Jan — a statistician and product manager based in Zurich. I recently
+    completed my M.Sc. in Statistics at ETH Zurich, working on probabilistic AI,
+    high-dimensional statistics, and causality. This is where I write up methods,
+    results, and the occasional dead end.</p>
+    <div class="jhs-actions">
+      <a class="jhs-btn jhs-btn-primary" href="CV_Academic.pdf" download="">Download CV</a>
+      <a class="jhs-btn jhs-btn-ghost" href="./about.html">More about me</a>
+    </div>
   </div>
+</div>
+<section id="writing" class="level2">
+<h2 class="anchored" data-anchor-id="writing">Writing</h2>
+
+
+
+</section>
+
+<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
+<div class="listing-actions-group">
     <div class="input-group input-group-sm quarto-listing-filter">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
       <input type="text" class="search form-control" placeholder="Filter">
     </div>
 </div>
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="Python,Machine Learning,Deep Learning,Continual Learning" data-listing-date-sort="1773183600000" data-listing-file-modified-sort="1773266931735" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2291">
-<div class="thumbnail">
-<p><a href="./posts/11-03-2026_cf-tiny-subspaces/index.html" class="no-external"></a></p><a href="./posts/11-03-2026_cf-tiny-subspaces/index.html" class="no-external">
-<p><img loading="lazy" src="./posts/11-03-2026_cf-tiny-subspaces/image.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/11-03-2026_cf-tiny-subspaces/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/11-03-2026_cf-tiny-subspaces/index.html" class="no-external">Does Catastrophic Forgetting Happen in Tiny Subspaces?</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/11-03-2026_cf-tiny-subspaces/index.html" class="no-external"></a>
-</div>
+<div class="list grid quarto-listing-cols-2">
+<div class="g-col-1" data-index="0" data-categories="Machine Learning" data-listing-date-sort="1773183600000" data-listing-file-modified-sort="1784578620162" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2291">
+<a href="./posts/11-03-2026_cf-tiny-subspaces/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./posts/11-03-2026_cf-tiny-subspaces/image.jpg" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Does Catastrophic Forgetting Happen in Tiny Subspaces?
+</h5>
 <div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
 <div class="listing-category" onclick="window.quartoListingCategory('Machine Learning'); return false;">
 Machine Learning
 </div>
-<div class="listing-category" onclick="window.quartoListingCategory('Deep Learning'); return false;">
-Deep Learning
 </div>
-<div class="listing-category" onclick="window.quartoListingCategory('Continual Learning'); return false;">
-Continual Learning
+<div class="card-text listing-description">
+Catastrophic forgetting appears to live in the same low-curvature bulk subspace where ordinary learning happens, tested on Permuted MNIST and Split-CIFAR.
 </div>
-</div>
-<div class="listing-description">
-<a href="./posts/11-03-2026_cf-tiny-subspaces/index.html" class="no-external">We investigate whether catastrophic forgetting in continual learning is geometrically similar to ordinary learning: concentrated in the low-curvature bulk subspace of the loss Hessian rather than its high-curvature dominant directions. By projecting gradient updates into either the bulk or dominant subspace and training on Permuted MNIST, Split-CIFAR10, and Split-CIFAR100, we confirm that learning occurs primarily in the bulk. In the Domain-IL setting, forgetting appears to reside there as well. Task-IL results are more ambiguous, motivating larger-scale experiments.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/11-03-2026_cf-tiny-subspaces/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 Mar 11, 2026
 </div>
-<div class="listing-author">
-Jan Schlegel
+</div>
+</div>
 </div>
 </a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="Python,Data Science,Machine Learning,Deep Learning,Healthcare" data-listing-date-sort="1771282800000" data-listing-file-modified-sort="1772399768491" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2139">
-<div class="thumbnail">
-<p><a href="./posts/17-02-2026_ml4hc-pneumonia/index.html" class="no-external"></a></p><a href="./posts/17-02-2026_ml4hc-pneumonia/index.html" class="no-external">
-<p><img loading="lazy" src="./posts/17-02-2026_ml4hc-pneumonia/image.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/17-02-2026_ml4hc-pneumonia/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/17-02-2026_ml4hc-pneumonia/index.html" class="no-external">Detecting Pneumonia from Chest X-Rays: CNNs, Integrated Gradients, and Grad-CAM</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/17-02-2026_ml4hc-pneumonia/index.html" class="no-external"></a>
-</div>
+<div class="g-col-1" data-index="1" data-categories="Healthcare AI" data-listing-date-sort="1771282800000" data-listing-file-modified-sort="1784578620162" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2139">
+<a href="./posts/17-02-2026_ml4hc-pneumonia/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./posts/17-02-2026_ml4hc-pneumonia/image.jpg" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Detecting Pneumonia from Chest X-Rays: CNNs, Integrated Gradients, and Grad-CAM
+</h5>
 <div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data Science'); return false;">
-Data Science
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Machine Learning'); return false;">
-Machine Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Deep Learning'); return false;">
-Deep Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Healthcare'); return false;">
-Healthcare
+<div class="listing-category" onclick="window.quartoListingCategory('Healthcare AI'); return false;">
+Healthcare AI
 </div>
 </div>
-<div class="listing-description">
-<a href="./posts/17-02-2026_ml4hc-pneumonia/index.html" class="no-external">We train a ResNet-50-based convolutional neural network to classify chest X-ray images as healthy or pneumonia. To understand what the model actually learns, we apply two attribution methods, Integrated Gradients and Grad-CAM, and compare the regions they highlight. A data randomization test confirms that both methods produce genuinely model-dependent explanations rather than artifacts. The attribution maps reveal that the CNN focuses on clinically sensible lung regions, with broader activation patterns for pneumonia cases and more localized attention for healthy patients.</a>
+<div class="card-text listing-description">
+A ResNet-50 classifies chest X-rays for pneumonia, while Integrated Gradients and Grad-CAM show it attends to clinically sensible lung regions.
 </div>
-</div>
-<div class="metadata">
-<a href="./posts/17-02-2026_ml4hc-pneumonia/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 Feb 17, 2026
 </div>
-<div class="listing-author">
-Jan Schlegel
+</div>
+</div>
 </div>
 </a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="Python,Data Science,Machine Learning,Deep Learning,Healthcare" data-listing-date-sort="1771196400000" data-listing-file-modified-sort="1771369047049" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2469">
-<div class="thumbnail">
-<p><a href="./posts/16-02-2026_ml4hc-ecg/index.html" class="no-external"></a></p><a href="./posts/16-02-2026_ml4hc-ecg/index.html" class="no-external">
-<p><img loading="lazy" src="./posts/16-02-2026_ml4hc-ecg/image.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/16-02-2026_ml4hc-ecg/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/16-02-2026_ml4hc-ecg/index.html" class="no-external">Detecting Heart Attacks from ECGs: Classical ML, Deep Learning, and Representation Learning</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/16-02-2026_ml4hc-ecg/index.html" class="no-external"></a>
-</div>
+<div class="g-col-1" data-index="2" data-categories="Healthcare AI" data-listing-date-sort="1771196400000" data-listing-file-modified-sort="1784578620162" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2469">
+<a href="./posts/16-02-2026_ml4hc-ecg/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./posts/16-02-2026_ml4hc-ecg/image.jpg" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Detecting Heart Attacks from ECGs: Classical ML, Deep Learning, and Representation Learning
+</h5>
 <div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data Science'); return false;">
-Data Science
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Machine Learning'); return false;">
-Machine Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Deep Learning'); return false;">
-Deep Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Healthcare'); return false;">
-Healthcare
+<div class="listing-category" onclick="window.quartoListingCategory('Healthcare AI'); return false;">
+Healthcare AI
 </div>
 </div>
-<div class="listing-description">
-<a href="./posts/16-02-2026_ml4hc-ecg/index.html" class="no-external">We classify electrocardiogram recordings as healthy or indicative of myocardial infarction using a progression of increasingly powerful methods. Starting from logistic regression and gradient boosting on raw signals, we show that feature engineering closes much of the gap to deep learning. We then train LSTMs, CNNs, and a transformer, and use attention maps to visualize which parts of the ECG signal drive predictions. Finally, we explore whether contrastive representation learning can produce embeddings that transfer across datasets and outperform supervised pretraining.</a>
+<div class="card-text listing-description">
+From logistic regression to transformers on ECG signals: how far feature engineering closes the gap to deep learning, and whether contrastive embeddings transfer.
 </div>
-</div>
-<div class="metadata">
-<a href="./posts/16-02-2026_ml4hc-ecg/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 Feb 16, 2026
 </div>
-<div class="listing-author">
-Jan Schlegel
+</div>
+</div>
 </div>
 </a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="Python,Data Science,Machine Learning,Deep Learning,Healthcare" data-listing-date-sort="1771110000000" data-listing-file-modified-sort="1771367740060" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2350">
-<div class="thumbnail">
-<p><a href="./posts/15-02-2026_ml4hc-heart-disease/index.html" class="no-external"></a></p><a href="./posts/15-02-2026_ml4hc-heart-disease/index.html" class="no-external">
-<p><img loading="lazy" src="./posts/15-02-2026_ml4hc-heart-disease/image.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/15-02-2026_ml4hc-heart-disease/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/15-02-2026_ml4hc-heart-disease/index.html" class="no-external">Predicting Heart Disease: When Simple Models Rival Deep Learning</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/15-02-2026_ml4hc-heart-disease/index.html" class="no-external"></a>
-</div>
+<div class="g-col-1" data-index="3" data-categories="Healthcare AI" data-listing-date-sort="1771110000000" data-listing-file-modified-sort="1784578620162" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2350">
+<a href="./posts/15-02-2026_ml4hc-heart-disease/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./posts/15-02-2026_ml4hc-heart-disease/image.jpg" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Predicting Heart Disease: When Simple Models Rival Deep Learning
+</h5>
 <div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data Science'); return false;">
-Data Science
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Machine Learning'); return false;">
-Machine Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Deep Learning'); return false;">
-Deep Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Healthcare'); return false;">
-Healthcare
+<div class="listing-category" onclick="window.quartoListingCategory('Healthcare AI'); return false;">
+Healthcare AI
 </div>
 </div>
-<div class="listing-description">
-<a href="./posts/15-02-2026_ml4hc-heart-disease/index.html" class="no-external">We train a Lasso logistic regression, a multi-layer perceptron, and a neural additive model to predict heart disease from routine clinical data. All three achieve high and comparable accuracy. Using SHAP values, learned shape functions, and coefficient analysis to interpret each model, we find that they independently identify the same clinical features as most important, consistent with established cardiology literature.</a>
+<div class="card-text listing-description">
+A Lasso regression, an MLP, and a neural additive model predict heart disease about equally well, and independently agree on which clinical features matter.
 </div>
-</div>
-<div class="metadata">
-<a href="./posts/15-02-2026_ml4hc-heart-disease/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 Feb 15, 2026
 </div>
-<div class="listing-author">
-Jan Schlegel
+</div>
+</div>
 </div>
 </a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="Python,Data Science,Data Analysis,Visualization,Sports Analytics" data-listing-date-sort="1771023600000" data-listing-file-modified-sort="1771114545336" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2151">
-<div class="thumbnail">
-<p><a href="./posts/14-02-2026_soccer-analytics/index.html" class="no-external"></a></p><a href="./posts/14-02-2026_soccer-analytics/index.html" class="no-external">
-<p><img loading="lazy" src="./posts/14-02-2026_soccer-analytics/image.png" class="thumbnail-image"></p>
-</a><p><a href="./posts/14-02-2026_soccer-analytics/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/14-02-2026_soccer-analytics/index.html" class="no-external">Data-Driven Tactics: Analyzing Spain’s Playing Style in Euro 2024 Qualifiers</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/14-02-2026_soccer-analytics/index.html" class="no-external"></a>
-</div>
+<div class="g-col-1" data-index="4" data-categories="Sports Analytics" data-listing-date-sort="1771023600000" data-listing-file-modified-sort="1784578620162" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2151">
+<a href="./posts/14-02-2026_soccer-analytics/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./posts/14-02-2026_soccer-analytics/image.png" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Data-Driven Tactics: Analyzing Spain’s Playing Style in Euro 2024 Qualifiers
+</h5>
 <div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data Science'); return false;">
-Data Science
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data Analysis'); return false;">
-Data Analysis
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Visualization'); return false;">
-Visualization
-</div>
 <div class="listing-category" onclick="window.quartoListingCategory('Sports Analytics'); return false;">
 Sports Analytics
 </div>
 </div>
-<div class="listing-description">
-<a href="./posts/14-02-2026_soccer-analytics/index.html" class="no-external">We examine Spain’s characteristic ‘Tiki-Taka’ playing style through multiple analytical lenses: offside patterns, passing networks, set-piece execution, formation dynamics, and defensive line positioning. Our analysis reveals how Spain maintains possession through short passing sequences involving defenders, utilizes full pitch width when in possession, and employs a high defensive line that reflects their controlling philosophy. We also identify tactical vulnerabilities, particularly Spain’s susceptibility to offsides and counter-attacks, providing actionable insights for opposition teams.</a>
+<div class="card-text listing-description">
+Passing networks, offside patterns, and defensive lines: what event and tracking data reveal about Spain’s Tiki-Taka in the Euro 2024 qualifiers.
 </div>
-</div>
-<div class="metadata">
-<a href="./posts/14-02-2026_soccer-analytics/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 Feb 14, 2026
 </div>
-<div class="listing-author">
-Jan Schlegel
+</div>
+</div>
 </div>
 </a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="Statistics,Finance,Python" data-listing-date-sort="1753740000000" data-listing-file-modified-sort="1782078841766" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="31" data-listing-word-count-sort="6195">
-<div class="thumbnail">
-<p><a href="./posts/29-07-2025_copulas/index.html" class="no-external"></a></p><a href="./posts/29-07-2025_copulas/index.html" class="no-external">
-<p class="card-img-top"><img src="posts/29-07-2025_copulas/img/copula_theory_thumbnail.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/29-07-2025_copulas/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/29-07-2025_copulas/index.html" class="no-external">A Visual Introduction to Copulas</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/29-07-2025_copulas/index.html" class="no-external"></a>
-</div>
+<div class="g-col-1" data-index="5" data-categories="Quantitative Finance" data-listing-date-sort="1753740000000" data-listing-file-modified-sort="1784578620162" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="31" data-listing-word-count-sort="6195">
+<a href="./posts/29-07-2025_copulas/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./posts/29-07-2025_copulas/img/copula_theory_thumbnail.png" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+A Visual Introduction to Copulas
+</h5>
 <div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Statistics'); return false;">
-Statistics
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Finance'); return false;">
-Finance
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
+<div class="listing-category" onclick="window.quartoListingCategory('Quantitative Finance'); return false;">
+Quantitative Finance
 </div>
 </div>
-<div class="listing-description">
-<a href="./posts/29-07-2025_copulas/index.html" class="no-external">This post offers a concise and intuitive introduction to copula theory, explaining what copulas are, why they are useful, and how they are applied in finance. We’ll skip the heavy math and focus on the core ideas.</a>
+<div class="card-text listing-description">
+What copulas are, why they matter for modelling dependence, and how they are used in finance, with the heavy math left out.
 </div>
-</div>
-<div class="metadata">
-<a href="./posts/29-07-2025_copulas/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 Jul 29, 2025
 </div>
-<div class="listing-author">
-Jan Schlegel
+</div>
+</div>
 </div>
 </a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="6" data-categories="Simulation,R" data-listing-date-sort="1738882800000" data-listing-file-modified-sort="1771368859655" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2127">
-<div class="thumbnail">
-<p><a href="./posts/07-02-2025_portfolio-var/index.html" class="no-external"></a></p><a href="./posts/07-02-2025_portfolio-var/index.html" class="no-external">
-<p class="card-img-top"><img src="posts/07-02-2025_portfolio-var/img/var_visualization.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/07-02-2025_portfolio-var/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/07-02-2025_portfolio-var/index.html" class="no-external">Comparing Univariate and Multivariate Models for Value at Risk Forecasting</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/07-02-2025_portfolio-var/index.html" class="no-external"></a>
-</div>
+<div class="g-col-1" data-index="6" data-categories="Quantitative Finance" data-listing-date-sort="1738882800000" data-listing-file-modified-sort="1784578620162" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2127">
+<a href="./posts/07-02-2025_portfolio-var/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./posts/07-02-2025_portfolio-var/img/var_visualization.png" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Comparing Univariate and Multivariate Models for Value at Risk Forecasting
+</h5>
 <div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Simulation'); return false;">
-Simulation
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
+<div class="listing-category" onclick="window.quartoListingCategory('Quantitative Finance'); return false;">
+Quantitative Finance
 </div>
 </div>
-<div class="listing-description">
-<a href="./posts/07-02-2025_portfolio-var/index.html" class="no-external">This post explores the effectiveness of univariate and multivariate GARCH-based models in forecasting Value at Risk (VaR) for a long equity portfolio. While multivariate models generally perform better in backtests, univariate models often fall short. However, neither model type consistently outperforms the other in predictive accuracy, highlighting the trade-offs between simplicity and complexity in risk forecasting.</a>
+<div class="card-text listing-description">
+Do multivariate GARCH models beat univariate ones at forecasting Value at Risk? Backtests say yes; predictive accuracy says it is complicated.
 </div>
-</div>
-<div class="metadata">
-<a href="./posts/07-02-2025_portfolio-var/index.html" class="no-external">
+<div class="card-attribution card-text-small end">
 <div class="listing-date">
 Feb 7, 2025
 </div>
-<div class="listing-author">
-Jan Schlegel
+</div>
+</div>
 </div>
 </a>
-</div>
 </div>
 </div>
 <div class="listing-no-matching d-none">
@@ -780,7 +661,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/jhschlegel\.github\.io");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -794,6 +675,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         if (link.dataset.originalHref !== undefined) {
           link.href = link.dataset.originalHref;
         }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
       }
     }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
@@ -1109,6 +995,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Jan Schlegel</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JHSchlegel">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/">
+      <i class="bi bi-linkedin" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
 
 
 
