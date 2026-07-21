@@ -1,9 +1,12 @@
 project:
   type: website
   output-dir: "docs"
+  resources:
+    - research/
   render:
     - "**/*.qmd"
     - "!quarto-handoff/**"
+    - "!quarto-research/**"
 
 execute:
   freeze: auto
@@ -24,6 +27,8 @@ website:
         href: index.qmd
       - text: "About"
         href: about.qmd
+      - text: "Research"
+        href: research.qmd
       - text: "Photography"
         href: photography.qmd
     right:
@@ -55,3 +60,4 @@ format:
     include-in-header:
       - text: |
           <meta name="color-scheme" content="dark light">
+    include-after-body: theme-icon.js

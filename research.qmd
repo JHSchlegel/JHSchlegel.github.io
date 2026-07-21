@@ -1,0 +1,126 @@
+---
+pagetitle: "Jan Schlegel – Research"
+page-layout: full
+toc: false
+---
+
+<!-- ============================================================
+     RESEARCH PAGE
+     To add a publication: copy one <article class="jhs-pub"> block,
+     set data-category to one of: thesis | paper | project, and edit
+     the fields. Filters and the abstract toggle pick it up automatically.
+     ============================================================ -->
+
+```{=html}
+<div class="jhs-research">
+
+<h1>Research</h1>
+
+<p class="jhs-research-intro">Selected work across probabilistic machine learning, high-dimensional statistics, and their applications to climate and health.</p>
+
+<div class="jhs-filters">
+  <button class="jhs-filter active" data-filter="all">All</button>
+  <button class="jhs-filter" data-filter="thesis">Theses</button>
+  <button class="jhs-filter" data-filter="paper">Papers</button>
+  <button class="jhs-filter" data-filter="project">Projects</button>
+</div>
+
+<div class="jhs-publist">
+
+  <article class="jhs-pub" data-category="thesis">
+    <div class="jhs-pub-meta">
+      <span class="jhs-pub-type">Master's Thesis</span>
+      <span class="jhs-pub-year">2025</span>
+    </div>
+    <h3 class="jhs-pub-title">Mechanistic Interpretability in Text-to-Image Diffusion Models</h3>
+    <div class="jhs-pub-authors"><strong>Jan Schlegel</strong></div>
+    <div class="jhs-pub-venue">M.Sc. Thesis · ETH Zurich · Grade 6.00 / 6.00</div>
+    <button class="jhs-abstract-toggle" aria-expanded="false"><span class="label">Show abstract</span> <i class="bi bi-chevron-down"></i></button>
+    <p class="jhs-pub-abstract">Despite the widespread success of text-to-image diffusion models, their internal mechanisms remain largely opaque. In this work, we mechanistically analyze Stable Diffusion v2.1 by applying Sparse Autoencoders (SAEs) to decompose the dense activations of its cross-attention blocks into a sparse, interpretable feature basis. Through time-stratified causal interventions, we reveal a clear temporal hierarchy in the generative process, demonstrating that early timesteps are critical for defining an image's global composition and style, the mid-stage refines the established structure and blends concepts, while later stages perform textural refinement. Moreover, we find that the learned feature dictionary exhibits remarkable cross-resolution generalization, maintaining intervention and reconstruction efficacy across different image sizes, and suggesting that SAEs can be trained more efficiently on lower-resolution data without sacrificing their analytical power. Moving beyond single-feature analysis, we introduce a novel framework for discovering temporal computational subgraphs in diffusion models. By adapting gradient-based attribution techniques, we trace causal dependencies between features across early denoising steps. By identifying these causal computational pathways that link sequences of these interpretable features, our work provides a deeper mechanistic understanding of the generative algorithm, paving the way for more controllable and reliable generative models.</p>
+    <div class="jhs-pub-links">
+      <a href="research/JHSchlegel_Master-Thesis.pdf" target="_blank"><i class="bi bi-file-earmark-pdf"></i><span>PDF</span></a>
+    </div>
+  </article>
+
+  <article class="jhs-pub" data-category="paper">
+    <div class="jhs-pub-meta">
+      <span class="jhs-pub-type">Semester Paper</span>
+      <span class="jhs-pub-year">2025</span>
+    </div>
+    <h3 class="jhs-pub-title">Extrapolation and Distributional Robustness for Climate Downscaling</h3>
+    <div class="jhs-pub-authors">Gianfranco Basile*, <strong>Jan Schlegel*</strong>, Maybritt Schillinger, Nicolai Meinshausen</div>
+    <div class="jhs-pub-venue">* Equal contribution · Seminar for Statistics, ETH Zurich</div>
+    <button class="jhs-abstract-toggle" aria-expanded="false"><span class="label">Show abstract</span> <i class="bi bi-chevron-down"></i></button>
+    <p class="jhs-pub-abstract">Climate downscaling translates coarse global climate model (GCM) outputs into high-resolution predictions that inform local decision-making. This work investigates the robustness and transferability of statistical downscaling methods applied to unseen GCMs. Building on generative frameworks such as Coarse-from-Super and Corrector Diffusion models, we evaluate their performance under cross-GCM extrapolation. Our experiments show that stochastic methods outperform deterministic baselines in energy score while maintaining comparable mean squared error, highlighting the potential of generative downscaling for modeling the variability inherent in climate systems.</p>
+    <div class="jhs-pub-links">
+      <a href="research/JHSchlegel_Semester-Paper.pdf" target="_blank"><i class="bi bi-file-earmark-pdf"></i><span>PDF</span></a>
+    </div>
+  </article>
+
+  <article class="jhs-pub" data-category="project">
+    <div class="jhs-pub-meta">
+      <span class="jhs-pub-type">Course Paper</span>
+      <span class="jhs-pub-year">2026</span>
+    </div>
+    <h3 class="jhs-pub-title">Does Catastrophic Forgetting Happen in Tiny Subspaces?</h3>
+    <div class="jhs-pub-authors">Rufat Asadli, Armin Begic, <strong>Jan Schlegel</strong>, Philemon Thalmann</div>
+    <div class="jhs-pub-venue">Deep Learning course project · ETH Zurich</div>
+    <button class="jhs-abstract-toggle" aria-expanded="false"><span class="label">Show abstract</span> <i class="bi bi-chevron-down"></i></button>
+    <p class="jhs-pub-abstract">Catastrophic forgetting remains a central challenge in continual learning, where adapting to new tasks disrupts previously acquired knowledge. Recent work suggests that non-continual learning occurs primarily within the low-curvature bulk subspace of the loss Hessian. We investigate how constraining gradient updates to either the bulk or dominant subspace affects learning and forgetting. Across Permuted MNIST, Split-CIFAR10, and Split-CIFAR100, we confirm that task-specific learning occurs in the bulk subspace, and find evidence that forgetting may predominantly occur there as well — pointing toward efficient algorithms to counter forgetting.</p>
+    <div class="jhs-pub-links">
+      <a href="research/JHSchlegel_DL-Paper.pdf" target="_blank"><i class="bi bi-file-earmark-pdf"></i><span>PDF</span></a>
+      <a href="https://github.com/JHSchlegel/cf-tiny-subspaces" target="_blank"><i class="bi bi-github"></i><span>Code</span></a>
+      <a href="posts/11-03-2026_cf-tiny-subspaces/index.html"><i class="bi bi-journal-text"></i><span>Blog post</span></a>
+    </div>
+  </article>
+
+  <article class="jhs-pub" data-category="thesis">
+    <div class="jhs-pub-meta">
+      <span class="jhs-pub-type">Bachelor's Thesis</span>
+      <span class="jhs-pub-year">2023</span>
+    </div>
+    <h3 class="jhs-pub-title">Portfolio Value at Risk Forecasting with Copula-GARCH Models</h3>
+    <div class="jhs-pub-authors"><strong>Jan Schlegel</strong></div>
+    <div class="jhs-pub-venue">B.A. Thesis · University of Zurich · Grade 6.00 / 6.00</div>
+    <button class="jhs-abstract-toggle" aria-expanded="false"><span class="label">Show abstract</span> <i class="bi bi-chevron-down"></i></button>
+    <p class="jhs-pub-abstract">This thesis examines the value at risk (VaR) forecasting ability of various univariate and multivariate models for a long equity portfolio. All of the considered models involve a generalized autoregressive conditional heteroskedasticity (GARCH)-type structure. The resulting forecasts are checked for desirable properties using violation-based backtests and compared in terms of predictive ability. We find that the VaR forecasts of almost all univariate models are inadequate, while the multivariate models have few problems passing these backtests. However, we do not find evidence that the multivariate models systematically outperform their univariate counterparts with regards to predictive accuracy, or vice versa.</p>
+    <div class="jhs-pub-links">
+      <a href="research/JHSchlegel_Bachelor-Thesis.pdf" target="_blank"><i class="bi bi-file-earmark-pdf"></i><span>PDF</span></a>
+      <a href="https://github.com/JHSchlegel/BachelorThesis" target="_blank"><i class="bi bi-github"></i><span>Code</span></a>
+      <a href="posts/07-02-2025_portfolio-var/index.html"><i class="bi bi-journal-text"></i><span>Blog post</span></a>
+    </div>
+  </article>
+
+</div>
+</div>
+```
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // ---- Category filters ----
+  document.querySelectorAll(".jhs-filter").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var f = btn.dataset.filter;
+      document.querySelectorAll(".jhs-filter").forEach(function (b) {
+        b.classList.toggle("active", b === btn);
+      });
+      document.querySelectorAll(".jhs-pub").forEach(function (p) {
+        p.style.display = (f === "all" || p.dataset.category === f) ? "" : "none";
+      });
+    });
+  });
+
+  // ---- Abstract show / hide ----
+  document.querySelectorAll(".jhs-abstract-toggle").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var pub = btn.closest(".jhs-pub");
+      var open = pub.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", open);
+      btn.querySelector(".label").textContent = open ? "Hide abstract" : "Show abstract";
+      var chev = btn.querySelector("i");
+      chev.classList.toggle("bi-chevron-up", open);
+      chev.classList.toggle("bi-chevron-down", !open);
+    });
+  });
+});
+</script>
