@@ -14,8 +14,8 @@ page-layout: full
 ---
 
 ```{=html}
-<div style="max-width:900px;margin:0 auto 1.5rem;">
-  <p style="font-size:1.1rem;line-height:1.6;color:color-mix(in srgb,var(--bs-body-color) 72%,transparent);">
+<div class="jhs-album-intro">
+  <p class="jhs-page-intro">
   The Parenzana was once a narrow-gauge railway threading through Austro-Hungarian Istria —
   123 km from Trieste to Poreč, completed in 1902 and abandoned in 1935. Now it's a cycling
   trail crossing three countries, through old stone tunnels, hilltop villages, and down to

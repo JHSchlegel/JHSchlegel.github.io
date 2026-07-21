@@ -60,4 +60,6 @@ format:
     include-in-header:
       - text: |
           <meta name="color-scheme" content="dark light">
-    include-after-body: theme-icon.js
+    include-after-body:
+      - theme-icon.js
+      - lightbox.js

@@ -14,9 +14,9 @@ page-layout: full
 ---
 
 ```{=html}
-<div style="max-width:900px;margin:2.4rem auto 0;">
+<div class="jhs-page-header">
   <h1>Photography</h1>
-  <p style="font-size:1.02rem;color:color-mix(in srgb,var(--bs-body-color) 70%,transparent);max-width:560px;">
+  <p class="jhs-page-intro">
   Trips and outings, collected as albums. Landscapes, wildlife, and the occasional detour —
   mostly around Switzerland and wherever the trails lead.</p>
 </div>

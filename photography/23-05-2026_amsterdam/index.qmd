@@ -13,8 +13,8 @@ page-layout: full
 ---
 
 ```{=html}
-<div style="max-width:900px;margin:0 auto 1.5rem;">
-  <p style="font-size:1.1rem;line-height:1.6;color:color-mix(in srgb,var(--bs-body-color) 72%,transparent);">
+<div class="jhs-album-intro">
+  <p class="jhs-page-intro">
   A few days around Amsterdam, Haarlem, Zandvoort, and Utrecht.</p>
 </div>
 
