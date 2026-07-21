@@ -1,6 +1,6 @@
 ---
 title: ""
-pagetitle: "Photography — Jan Schlegel"
+pagetitle: "Photography"
 listing:
   id: albums
   contents: photography          # each subfolder's index.qmd is one album

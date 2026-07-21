@@ -1,6 +1,6 @@
 ---
 title: ""
-pagetitle: "About — Jan Schlegel"
+pagetitle: "About"
 page-layout: full
 ---
 

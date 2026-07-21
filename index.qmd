@@ -1,5 +1,5 @@
 ---
-pagetitle: "Jan Schlegel – Blog"
+pagetitle: "Blog"
 listing:
   contents: posts          # your existing posts/ folder of .qmd files
   sort: "date desc"

@@ -1,5 +1,5 @@
 ---
-pagetitle: "Jan Schlegel – Research"
+pagetitle: "Research"
 page-layout: full
 toc: false
 ---
