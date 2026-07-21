@@ -28,5 +28,3 @@ page-layout: full
   </div>
 </div>
 ```
-
-## Writing
