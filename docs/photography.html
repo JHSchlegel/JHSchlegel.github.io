@@ -205,15 +205,15 @@ window.Quarto = {
 
 
 
-<div style="max-width:900px;margin:2.4rem auto 0;">
+<div class="jhs-page-header">
   <h1>Photography</h1>
-  <p style="font-size:1.02rem;color:color-mix(in srgb,var(--bs-body-color) 70%,transparent);max-width:560px;">
+  <p class="jhs-page-intro">
   Trips and outings, collected as albums. Landscapes, wildlife, and the occasional detour —
   mostly around Switzerland and wherever the trails lead.</p>
 </div>
 <div id="listing-albums" class="quarto-listing quarto-listing-container-grid">
 <div class="list grid quarto-listing-cols-2">
-<div class="g-col-1" data-index="0" data-categories="Travel,Cycling,Istria,Slovenia,Croatia" data-listing-date-sort="1783807200000" data-listing-file-modified-sort="1784578976810" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="240">
+<div class="g-col-1" data-index="0" data-categories="Travel,Cycling,Istria,Slovenia,Croatia" data-listing-date-sort="1783807200000" data-listing-file-modified-sort="1784668138855" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="236">
 <a href="./photography/12-07-2026_parenzana/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -235,7 +235,7 @@ Jul 12, 2026
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="1" data-categories="Travel,Architecture,Cityscape,Netherlands" data-listing-date-sort="1779487200000" data-listing-file-modified-sort="1784578948286" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="107">
+<div class="g-col-1" data-index="1" data-categories="Travel,Architecture,Cityscape,Netherlands" data-listing-date-sort="1779487200000" data-listing-file-modified-sort="1784668138855" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="103">
 <a href="./photography/23-05-2026_amsterdam/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -257,7 +257,7 @@ May 23, 2026
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="2" data-categories="Macro,Insects,Nature,Uznach" data-listing-date-sort="1778709600000" data-listing-file-modified-sort="1784578940314" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="176">
+<div class="g-col-1" data-index="2" data-categories="Macro,Insects,Nature,Uznach" data-listing-date-sort="1778709600000" data-listing-file-modified-sort="1784668138855" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="172">
 <a href="./photography/14-05-2026_uznach/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -279,7 +279,7 @@ May 14, 2026
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="3" data-categories="Birds,Nature,Greifensee,Architecture" data-listing-date-sort="1777586400000" data-listing-file-modified-sort="1784578961062" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="117">
+<div class="g-col-1" data-index="3" data-categories="Birds,Nature,Greifensee,Architecture" data-listing-date-sort="1777586400000" data-listing-file-modified-sort="1784668138855" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="113">
 <a href="./photography/01-05-2026_greifensee/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -301,7 +301,7 @@ May 1, 2026
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="4" data-categories="Birds,Nature,Lake Zurich" data-listing-date-sort="1775858400000" data-listing-file-modified-sort="1784578918301" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="100">
+<div class="g-col-1" data-index="4" data-categories="Birds,Nature,Lake Zurich" data-listing-date-sort="1775858400000" data-listing-file-modified-sort="1784668138855" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="96">
 <a href="./photography/11-04-2026_birds/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -360,6 +360,109 @@ No matching items
         attributes: true,
         attributeFilter: ["class"]
       });
+    });
+  });
+})();
+</script>
+<script>
+/* ============================================================
+   Lightbox — full-screen image viewer with prev/next navigation.
+   Targets content images (photography albums + blog figures/plots)
+   inside the main document, excluding the portrait, navbar logo,
+   listing thumbnails, and images that are already links.
+   Wired site-wide via include-after-body in _quarto.yml.
+   ============================================================ */
+(function () {
+  document.addEventListener("DOMContentLoaded", function () {
+    function eligible(img) {
+      if (!img.closest("#quarto-document-content")) return false;
+      if (img.closest(".jhs-hero")) return false;
+      if (img.closest(".navbar")) return false;
+      if (img.closest(".quarto-listing")) return false;
+      if (img.closest("a")) return false;
+      return true;
+    }
+
+    var items = Array.prototype.filter.call(
+      document.querySelectorAll("#quarto-document-content img"), eligible
+    );
+    if (!items.length) return;
+
+    var current = 0;
+    var lastFocus = null;
+
+    // ---- Build the overlay once ----
+    var lb = document.createElement("div");
+    lb.className = "jhs-lb";
+    lb.setAttribute("role", "dialog");
+    lb.setAttribute("aria-modal", "true");
+    lb.setAttribute("aria-label", "Image viewer");
+    lb.hidden = true;
+    lb.innerHTML =
+      '<button class="jhs-lb-close" aria-label="Close (Esc)"><i class="bi bi-x-lg"></i></button>' +
+      '<button class="jhs-lb-prev" aria-label="Previous image"><i class="bi bi-chevron-left"></i></button>' +
+      '<figure class="jhs-lb-figure"><img class="jhs-lb-img" alt=""><figcaption class="jhs-lb-caption"></figcaption></figure>' +
+      '<button class="jhs-lb-next" aria-label="Next image"><i class="bi bi-chevron-right"></i></button>' +
+      '<div class="jhs-lb-counter"></div>';
+    document.body.appendChild(lb);
+
+    var imgEl = lb.querySelector(".jhs-lb-img");
+    var capEl = lb.querySelector(".jhs-lb-caption");
+    var counterEl = lb.querySelector(".jhs-lb-counter");
+    var prevBtn = lb.querySelector(".jhs-lb-prev");
+    var nextBtn = lb.querySelector(".jhs-lb-next");
+    var closeBtn = lb.querySelector(".jhs-lb-close");
+    var figEl = lb.querySelector(".jhs-lb-figure");
+
+    var single = items.length < 2;
+    prevBtn.style.display = single ? "none" : "";
+    nextBtn.style.display = single ? "none" : "";
+    counterEl.style.display = single ? "none" : "";
+
+    function show(i) {
+      current = (i + items.length) % items.length;
+      var img = items[current];
+      imgEl.src = img.currentSrc || img.src;
+      var alt = img.getAttribute("alt") || "";
+      imgEl.alt = alt;
+      capEl.textContent = alt;
+      capEl.style.display = alt ? "" : "none";
+      counterEl.textContent = (current + 1) + " / " + items.length;
+    }
+    function open(i) {
+      lastFocus = document.activeElement;
+      show(i);
+      lb.hidden = false;
+      document.body.classList.add("jhs-lb-open");
+      closeBtn.focus();
+    }
+    function close() {
+      lb.hidden = true;
+      document.body.classList.remove("jhs-lb-open");
+      imgEl.removeAttribute("src");
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+    function next() { show(current + 1); }
+    function prev() { show(current - 1); }
+
+    // ---- Make eligible images clickable ----
+    items.forEach(function (img, i) {
+      img.classList.add("jhs-lb-eligible");
+      img.addEventListener("click", function () { open(i); });
+    });
+
+    // ---- Controls ----
+    closeBtn.addEventListener("click", close);
+    nextBtn.addEventListener("click", function (e) { e.stopPropagation(); next(); });
+    prevBtn.addEventListener("click", function (e) { e.stopPropagation(); prev(); });
+    lb.addEventListener("click", function (e) {
+      if (e.target === lb || e.target === figEl) close();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (lb.hidden) return;
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowRight") next();
+      else if (e.key === "ArrowLeft") prev();
     });
   });
 })();
