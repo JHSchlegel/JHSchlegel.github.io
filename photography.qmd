@@ -13,11 +13,5 @@ listing:
 page-layout: full
 ---
 
-```{=html}
-<div class="jhs-page-header">
-  <h1>Photography</h1>
-</div>
-```
-
 ::: {#albums}
 :::
