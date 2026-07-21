@@ -30,7 +30,7 @@ toc: false
   <article class="jhs-pub" data-category="thesis">
     <div class="jhs-pub-meta">
       <span class="jhs-pub-type">Master's Thesis</span>
-      <span class="jhs-pub-year">2025</span>
+      <span class="jhs-pub-year">2026</span>
     </div>
     <h3 class="jhs-pub-title">Mechanistic Interpretability in Text-to-Image Diffusion Models</h3>
     <div class="jhs-pub-authors"><strong>Jan Schlegel</strong></div>
@@ -45,7 +45,7 @@ toc: false
   <article class="jhs-pub" data-category="paper">
     <div class="jhs-pub-meta">
       <span class="jhs-pub-type">Semester Paper</span>
-      <span class="jhs-pub-year">2025</span>
+      <span class="jhs-pub-year">2026</span>
     </div>
     <h3 class="jhs-pub-title">Extrapolation and Distributional Robustness for Climate Downscaling</h3>
     <div class="jhs-pub-authors">Gianfranco Basile*, <strong>Jan Schlegel*</strong>, Maybritt Schillinger, Nicolai Meinshausen</div>
