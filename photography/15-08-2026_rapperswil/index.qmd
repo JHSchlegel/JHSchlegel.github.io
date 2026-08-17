@@ -1,0 +1,44 @@
+---
+title: "Shorebirds at the Holzsteg"
+subtitle: "Rapperswil · August 2026"
+categories:
+  - Birds
+  - Nature
+  - Rapperswil
+  - Lake Zürich
+date: "2026-08-15"
+image: "images/white-wagtail.jpg"
+pagetitle: "Shorebirds at the Holzsteg — Jan Schlegel"
+page-layout: full
+---
+
+```{=html}
+<div class="jhs-album-intro">
+  <p class="jhs-page-intro">
+  Low water at the Holzsteg in Rapperswil — the wooden footbridge across the upper end of
+  Lake Zürich — turned the shallows into a rest stop for migrating waders, with the local
+  wagtails, gulls, ducks, and swans keeping them company.</p>
+</div>
+
+<h2 class="jhs-album-section-title">Waders on migration</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/wood-sandpiper-1.jpg" alt="A wood sandpiper leaning forward to feed in the shallows" loading="lazy"></div>
+  <div class="tile"><img src="images/wood-sandpiper-2.jpg" alt="A wood sandpiper pausing between algae-covered stones" loading="lazy"></div>
+  <div class="tile"><img src="images/spotted-redshank-1.jpg" alt="A spotted redshank stretching its wings while standing on one leg" loading="lazy"></div>
+  <div class="tile"><img src="images/spotted-redshank-2.jpg" alt="A spotted redshank wading with its reflection in calm water" loading="lazy"></div>
+</div>
+
+<h2 class="jhs-album-section-title">Along the shore</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/white-wagtail.jpg" alt="A juvenile white wagtail striding across the wet shore past a stray feather" loading="lazy"></div>
+  <div class="tile"><img src="images/mallard-1.jpg" alt="A female mallard scratching itself while balancing on a rock" loading="lazy"></div>
+  <div class="tile"><img src="images/mallard-2.jpg" alt="A female mallard on the pebbled shore" loading="lazy"></div>
+</div>
+
+<h2 class="jhs-album-section-title">On the lake</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/common-tern.jpg" alt="A common tern perched on a rusty iron bar above the water" loading="lazy"></div>
+  <div class="tile"><img src="images/black-headed-gull.jpg" alt="A black-headed gull in winter plumage mirrored in the shallow water" loading="lazy"></div>
+  <div class="tile"><img src="images/mute-swans.jpg" alt="A flock of mute swans resting among drifts of moulted feathers" loading="lazy"></div>
+</div>
+```
