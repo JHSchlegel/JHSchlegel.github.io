@@ -21,8 +21,7 @@ page-layout: full
 <div class="jhs-section">
 
 <p style="border-left:3px solid var(--bs-primary); padding:2px 0 2px 20px; font-size:1.02rem; color:color-mix(in srgb,var(--bs-body-color) 72%,transparent);">
-When I'm not working on difficult (for me) problems, you'll find me running, in the gym,
-swimming, building PCs, or getting lost — intentionally — in GeoGuessr.
+When I'm not working on difficult (for me) problems, you'll find me cycling, taking pictures of nature's beauty, running, in the gym, building PCs, or getting lost — intentionally — in GeoGuessr.
 </p>
 
 <!-- ===================== EDUCATION ===================== -->
