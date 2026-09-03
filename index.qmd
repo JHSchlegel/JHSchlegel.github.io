@@ -17,10 +17,11 @@ page-layout: full
   <img class="jhs-portrait" src="profile.jpg" alt="Jan Schlegel">
   <div>
     <h1>Statistics, probabilistic machine learning, and the occasional detour.</h1>
-    <p>I'm Jan — a statistician and product manager based in Zurich. I recently
+    <p>I'm Jan — a statistician and technical product manager in agricultural reinsurance based in Zurich. I recently
     completed my M.Sc. in Statistics at ETH Zurich, working on probabilistic AI,
-    high-dimensional statistics, and causality. This is where I write up methods,
-    results, and the occasional dead end.</p>
+    high-dimensional statistics, and causality. 
+    
+    This is where I write about my projects, ideas, and whatever else I find interesting outside of work.</p>
     <div class="jhs-actions">
       <a class="jhs-btn jhs-btn-primary" href="CV_Academic.pdf" download>Download CV</a>
       <a class="jhs-btn jhs-btn-ghost" href="about.qmd">More about me</a>
