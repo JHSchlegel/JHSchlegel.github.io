@@ -15,6 +15,9 @@ execute:
 
 website:
   title: "Jan Schlegel"
+  # Keep drafts renderable while excluding them from listings and navigation.
+  # This also prevents incremental preview renders from becoming blank.
+  draft-mode: unlinked
   site-url: "https://jhschlegel.github.io"
   favicon: logo.png
   navbar:
