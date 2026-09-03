@@ -1,17 +1,5 @@
 [
   {
-    "listing": "/index.html",
-    "items": [
-      "/posts/11-03-2026_cf-tiny-subspaces/index.html",
-      "/posts/17-02-2026_ml4hc-pneumonia/index.html",
-      "/posts/16-02-2026_ml4hc-ecg/index.html",
-      "/posts/15-02-2026_ml4hc-heart-disease/index.html",
-      "/posts/14-02-2026_soccer-analytics/index.html",
-      "/posts/29-07-2025_copulas/index.html",
-      "/posts/07-02-2025_portfolio-var/index.html"
-    ]
-  },
-  {
     "listing": "/photography.html",
     "items": [
       "/photography/15-08-2026_rapperswil/index.html",
@@ -20,6 +8,19 @@
       "/photography/14-05-2026_uznach/index.html",
       "/photography/01-05-2026_greifensee/index.html",
       "/photography/11-04-2026_birds/index.html"
+    ]
+  },
+  {
+    "listing": "/index.html",
+    "items": [
+      "/posts/11-03-2026_cf-tiny-subspaces/index.html",
+      "/posts/17-02-2026_ml4hc-pneumonia/index.html",
+      "/posts/16-02-2026_ml4hc-ecg/index.html",
+      "/posts/15-02-2026_ml4hc-heart-disease/index.html",
+      "/posts/30-01-2026_proper-scoring-rules/index.html",
+      "/posts/16-01-2026_soccer-analytics/index.html",
+      "/posts/29-07-2025_copulas/index.html",
+      "/posts/07-02-2025_portfolio-var/index.html"
     ]
   }
 ]
