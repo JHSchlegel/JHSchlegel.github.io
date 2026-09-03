@@ -1,13 +1,11 @@
 ---
-draft: true
-title: "Proper Scoring Rules: Evaluating Probabilistic Forecasts in Energy Markets"
+title: "A Theoretical Primer on Proper Scoring Rules"
 categories:
   - Machine Learning
 image: "image.png"
-description: "CRPS, Energy Score, and Variogram Score: how proper scoring rules keep probabilistic forecasts honest in electricity and wind power markets."
-abstract: "We examine the application of proper scoring rules in evaluating probabilistic forecasts within energy markets. These rules provide a rigorous framework for assessing the quality of probabilistic predictions, ensuring that forecasters are incentivized to provide accurate and well-calibrated probabilities. Our focus lies on the Continuous Ranked Probability Score (CRPS) and its multivariate generalizations — the Energy Score and Variogram Score — with practical examples from electricity price and wind power forecasting."
+abstract: "We examine the application of proper scoring rules in evaluating probabilistic forecasts. These rules provide a rigorous framework for assessing the quality of probabilistic predictions, ensuring that forecasters are incentivized to provide accurate and well-calibrated probabilities. Our focus lies on the Continuous Ranked Probability Score (CRPS) and its multivariate generalizations."
 author: "Jan Schlegel"
-date: "2026-03-13"
+date: "2026-01-30"
 format:
   html:
     code-fold: true
@@ -163,11 +161,11 @@ def theme_academic(
 
 ## Introduction
 
-In many real-world decision problems — from dispatching power plants to hedging financial positions — what matters is not a single point forecast but a full *probabilistic* forecast that quantifies the uncertainty around future outcomes. A probabilistic forecast issues a predictive distribution $F$ for a future quantity $Y$, and the natural question becomes: *how do we evaluate such forecasts?*
+In many real-world decision problems — from reinsurance loss models to weather predictions — what matters is not a single point forecast but a full *probabilistic* forecast that quantifies the uncertainty around future outcomes. A probabilistic forecast issues a predictive distribution $F$ for a future quantity $Y$, and the natural question becomes: *how do we evaluate such forecasts?*
 
-Point forecasts are commonly assessed by the mean absolute error (MAE) or root mean squared error (RMSE). But these metrics are blind to the shape, spread, and calibration of a predictive distribution. A well-calibrated 90% prediction interval that is too wide is useless for trading; a tight interval that misses 30% of observations is dangerously overconfident. We need evaluation tools that reward the full predictive distribution — and penalize misspecification of any of its features.
+Point forecasts are commonly assessed by the mean absolute error (MAE) or root mean squared error (RMSE). But these metrics are blind to the shape, spread, and calibration of a predictive distribution. A climate model that consistently underestimates extreme rainfall events may have a low RMSE but is clearly unfit for flood risk management. Conversely, a model that issues overly wide prediction intervals may be well-calibrated but uninformative.
 
-**Scoring rules** provide exactly this framework. A scoring rule $S(F, y)$ assigns a numerical penalty (or reward) to a forecast distribution $F$ when the outcome $y$ materializes. The key requirement for a *proper* scoring rule is that it incentivizes honesty: the forecaster's expected score is optimized when the issued forecast $F$ coincides with the true data-generating distribution $G$. This property is fundamental for principled forecast evaluation and comparison [@gneiting2007strictly; @winkler1996scoring].
+**Scoring rules** provide a framework to address these problems. A scoring rule $S(F, y)$ assigns a numerical penalty to a forecast distribution $F$ when the outcome $y$ materializes. The key requirement for a *proper* scoring rule is that it incentivizes honesty: the forecaster's expected score is optimized when the issued forecast $F$ coincides with the true data-generating distribution $G$. This property is fundamental for principled forecast evaluation and comparison [@gneiting2007strictly; @winkler1996scoring].
 
 In this post we develop the theory of proper scoring rules from the ground up, survey the most important examples — Brier Score, Logarithmic Score, CRPS, Energy Score, and Variogram Score — and discuss essential diagnostic tools: PIT histograms for calibration assessment and the Diebold-Mariano test for formal model comparison.
 
@@ -175,42 +173,44 @@ In this post we develop the theory of proper scoring rules from the ground up, s
 
 ### Setup and Core Definitions
 
-Let $\mathcal{F}$ denote a convex class of probability distributions on $\mathbb{R}^d$ and let $y \in \mathbb{R}^d$ be the verifying observation.
+Let $(\Omega, \mathcal{F})$ be a measurable space, where $\Omega$ is the sample space and $\mathcal{F}$ is a $\sigma$-algebra of events. Let $\mathcal{P}$ be a class of probability distributions on this space. We write $F,G \in \mathcal{P}$ for distributions; when $\Omega \subseteq \mathbb{R}$^d, d\geq 1, $F(z)$ also denotes the CDF of $F$, and $f$ denotes its density when one exists.
+
 
 ::: {.callout-note}
 ### Definition (Scoring Rule)
+
 A **scoring rule** is a function
 $$
-S: \mathcal{F} \times \mathbb{R}^d \to \overline{\mathbb{R}},
+S: \mathcal{P} \times \Omega \to \bar{\mathbb{R}}, \quad \bar{\mathbb{R}} := \mathbb{R} \cup \{-\infty, +\infty\},
 $$
-where $S(F, y)$ quantifies the quality of the predictive distribution $F$ when the outcome $y$ is observed. By convention we adopt the *negatively oriented* framework: **lower scores indicate better forecasts**.
+where $S(F, y)$ quantifies the quality of the predictive distribution $F$ when the outcome $y$ is observed.
 :::
 
-The expected score under the true distribution $G$ is
+By convention we adopt the *negatively oriented* framework: **lower scores indicate better forecasts**. The expected score under the true distribution $G$ is
 $$
-S(F, G) = \mathbb{E}_{Y \sim G}[S(F, Y)].
+S(F, G) := \int_{\Omega} S(F,\omega) \text{d}G(\omega) = \mathbb{E}_{Y \sim G}[S(F, Y)].
 $$
 
 ::: {.callout-note}
 ### Definition (Propriety) [@gneiting2007strictly]
-A scoring rule $S$ is **proper** relative to $\mathcal{F}$ if
-$$
-S(G, G) \leq S(F, G), \qquad \forall\, F, G \in \mathcal{F},
-$$
-i.e. the expected score is minimized when the forecast $F$ equals the true distribution $G$.
 
-It is **strictly proper** if equality holds only when $F = G$.
+A scoring rule $S$ is **proper** relative to $\mathcal{P}$ if
+$$
+S(G, G) \leq S(F, G), \qquad \forall\, F,G \in \mathcal{P},
+$$
+i.e. $G \in \arg\min_{F \in \mathcal{P}} S(F,G)$ when $G$ is the data-generating distribution.
+
+It is **strictly proper** if equality holds only when $F = G$, i.e. when the minimizer is unique.
 :::
 
-Propriety guarantees that a forecaster cannot improve their expected score by *hedging* — issuing a distribution different from their true belief. Strict propriety goes further: it ensures that only the true distribution achieves the optimum, making the scoring rule a *faithful* evaluation tool.
+::: {.callout-note .proposition icon="false"}
+### Proposition: Characterization via divergence [@gneiting2007strictly]
 
-::: {.callout-tip icon="false"}
-### Theorem (Characterization via Divergence) [@gneiting2007strictly]
 A scoring rule $S$ is proper if and only if the **divergence function**
 $$
 d(F, G) = S(F, G) - S(G, G)
 $$
-satisfies $d(F, G) \geq 0$ for all $F, G \in \mathcal{F}$, with $d(G, G) = 0$.
+satisfies $d(F, G) \geq 0$ for all $F,G \in \mathcal{P}$, with $d(G, G) = 0$.
 
 For a strictly proper scoring rule, $d(F, G) = 0 \iff F = G$.
 :::
@@ -218,14 +218,13 @@ For a strictly proper scoring rule, $d(F, G) = 0 \iff F = G$.
 The divergence $d(F, G)$ measures the *penalty for misspecification*: the excess expected loss incurred by reporting $F$ when the truth is $G$. For the Logarithmic Score, this divergence is the Kullback–Leibler divergence; for the CRPS, it is related to the integrated squared difference between CDFs.
 
 
-### Univariate Scoring Rules
+### Univariate and Categorical Scoring Rules
 
-We now present the most important scoring rules, starting with the discrete/binary case and building toward continuous and multivariate settings.
-
-#### Brier Score
+The following scores cover binary, categorical, and continuous univariate forecasts.
 
 ::: {.callout-note}
 ### Definition (Brier Score) [@brier1950verification]
+
 For a binary event with forecast probability $p \in [0,1]$ and outcome $y \in \{0, 1\}$, the **Brier Score** is
 $$
 \operatorname{BS}(p, y) = (p - y)^2.
@@ -236,32 +235,24 @@ $$
 $$
 :::
 
-The Brier Score is strictly proper. It can be decomposed into **reliability** (calibration), **resolution** (sharpness), and **uncertainty** components, making it useful for diagnostic analysis of categorical forecasts.
-
-#### Logarithmic Score
+The Brier Score is strictly proper and can be decomposed into reliability, resolution, and uncertainty components.
 
 ::: {.callout-note}
 ### Definition (Logarithmic Score) [@good1952rational]
-For a predictive density $f$ and outcome $y$, the **Logarithmic Score** (negative log-likelihood) is
+
+For a distribution $F$ with predictive density $f$ and outcome $y$, the **Logarithmic Score** (negative log-likelihood) is
 $$
-\operatorname{LogS}(f, y) = -\log f(y).
+\operatorname{LogS}(F, y) = -\log f(y).
 $$
 :::
 
-The Logarithmic Score is strictly proper and is the only *local* proper scoring rule — it depends on $f$ only through the value $f(y)$ at the realized outcome. This makes it extremely sensitive to tail behavior: assigning near-zero probability to an event that occurs yields an arbitrarily large penalty. While this sensitivity is desirable for detecting overconfidence, it can make the LogS less robust in practice than other scores.
+The Logarithmic Score is strictly proper and, up to equivalence, the only proper score that is local: it depends on the forecast only through $f(y)$ [@gneiting2007strictly]. It strongly penalizes forecasts that assign very low density to the realized outcome, making it sensitive to both tail behavior and numerical density estimates.
 
-::: {.callout-tip icon="false"}
-### Theorem (Locality of the LogS) [@gneiting2007strictly]
-The Logarithmic Score is the **unique** proper scoring rule (up to equivalence) that is *local*, i.e. $S(F, y)$ depends on $F$ only through $f(y)$.
-:::
-
-
-#### Continuous Ranked Probability Score (CRPS)
-
-The CRPS is perhaps the most widely used proper scoring rule for continuous univariate forecasts. It generalizes the absolute error to distributional forecasts.
+The **Continuous Ranked Probability Score (CRPS)** generalizes absolute error to continuous distributional forecasts.
 
 ::: {.callout-note}
-### Definition (CRPS) [@matheson1976scoring]
+### Definition (Continuous Ranked Probability Score) [@matheson1976scoring]
+
 For a predictive CDF $F$ and observation $y \in \mathbb{R}$, the **Continuous Ranked Probability Score** is
 $$
 \operatorname{CRPS}(F, y) = \int_{-\infty}^{\infty} \bigl(F(z) - \mathbf{1}\{y \leq z\}\bigr)^2 \, dz.
@@ -273,34 +264,26 @@ $$ {#eq-crps-expectation}
 where $X, X' \stackrel{\text{iid}}{\sim} F$.
 :::
 
-::: {.callout-tip icon="false"}
-### Theorem (Propriety of the CRPS) [@gneiting2007strictly]
-The CRPS is a strictly proper scoring rule. Its associated divergence function is
+The CRPS is strictly proper for distributions with a finite first moment. Its divergence is
 $$
 d(F, G) = \int_{-\infty}^{\infty} \bigl(F(z) - G(z)\bigr)^2 \, dz,
 $$
-the integrated squared CDF distance (Cramér distance).
-:::
+the integrated squared CDF distance [@gneiting2007strictly]. It has the same unit as the observation and reduces to absolute error when $F$ is a point mass: $\operatorname{CRPS}(\delta_{\hat y},y)=|\hat y-y|$.
 
-The CRPS has several attractive properties:
-
-- **Same unit as the observation**: unlike the LogS, the CRPS is measured in the same unit as $y$, making it directly interpretable.
-- **Reduces to MAE**: if $F$ is a point mass at $\hat{y}$, then $\operatorname{CRPS}(\delta_{\hat{y}}, y) = |\hat{y} - y|$.
-- **Closed-form expressions** are available for many parametric families (normal, Student-$t$, logistic, log-normal, etc.) — @jordan2019evaluating catalog around 30 such distributions.
-- **Ensemble estimation**: for an ensemble $\{x_1, \ldots, x_m\}$, the CRPS can be estimated via @eq-crps-expectation as
+For an ensemble $\{x^{(1)},\ldots,x^{(m)}\}$, let $F_m$ denote its empirical distribution. Then
 $$
-\widehat{\operatorname{CRPS}}(\{x_i\}, y) = \frac{1}{m}\sum_{i=1}^{m}|x_i - y| - \frac{1}{2m^2}\sum_{i=1}^{m}\sum_{j=1}^{m}|x_i - x_j|.
+\widehat{\operatorname{CRPS}}(F_m,y)
+= \frac{1}{m}\sum_{k=1}^{m}|x^{(k)}-y|
+- \frac{1}{2m^2}\sum_{k=1}^{m}\sum_{\ell=1}^{m}|x^{(k)}-x^{(\ell)}|.
 $$
 
-The **bias-corrected** (fair) version replaces $\frac{1}{2m^2}$ by $\frac{1}{2m(m-1)}$ and excludes $i = j$ terms.
+The fair version replaces the second term by $\{2m(m-1)\}^{-1}\sum_{k\ne\ell}|x^{(k)}-x^{(\ell)}|$. Closed forms are also available for many parametric families [@jordan2019evaluating].
 
-
-#### Quantile-Weighted CRPS
-
-In many applications — e.g. risk management or trading at extreme quantiles — we care more about specific regions of the distribution. The quantile-weighted CRPS allows emphasizing particular probability levels.
+The **threshold-weighted CRPS** emphasizes selected outcome regions, such as unusually high electricity prices.
 
 ::: {.callout-note}
 ### Definition (Threshold-Weighted CRPS) [@gneiting2011comparing]
+
 For a non-negative weight function $w: \mathbb{R} \to [0, \infty)$, the **threshold-weighted CRPS** is
 $$
 \operatorname{twCRPS}(F, y) = \int_{-\infty}^{\infty} \bigl(F(z) - \mathbf{1}\{y \leq z\}\bigr)^2 \, w(z) \, dz.
@@ -308,17 +291,50 @@ $$
 This is a proper scoring rule for any non-negative weight function $w$.
 :::
 
-By choosing $w$ to emphasize the upper or lower tail (e.g. $w(z) = \mathbf{1}\{z \geq q_{0.9}\}$), one can build scoring rules that focus on the region of economic interest — such as high-price events in electricity markets.
+A convenient sample representation uses a non-decreasing **chaining function** $v$ satisfying
+$$
+v(z)-v(z')=\int_{z'}^z w(t)\,dt
+$$
+(equivalently, $v'(z)=w(z)$ wherever the derivative exists). For the empirical distribution $F_m$,
+$$
+\widehat{\operatorname{twCRPS}}_w(F_m,y)
+=\frac{1}{m}\sum_{k=1}^{m}\left|v\!\left(x^{(k)}\right)-v(y)\right|
+-\frac{1}{2m^2}\sum_{k=1}^{m}\sum_{\ell=1}^{m}
+\left|v\!\left(x^{(k)}\right)-v\!\left(x^{(\ell)}\right)\right|.
+$$
+Thus, the usual ensemble CRPS formula applies after transforming both forecasts and the observation by $v$. The fair version again replaces $2m^2$ by $2m(m-1)$ and sums over $k\ne\ell$.
+
+Common choices are:
+
+| Focus | Weight $w(z)$ | Chaining function $v(z)$ |
+|:---|:---|:---|
+| No weighting | $1$ | $z$ |
+| Upper tail above $c$ | $\mathbf{1}\{z\geq c\}$ | $(z-c)_+$ |
+| Lower tail below $c$ | $\mathbf{1}\{z\leq c\}$ | $\min(z,c)$ |
+| Interval $[a,b]$ | $\mathbf{1}\{a\leq z\leq b\}$ | $\min\{\max(z,a),b\}$ |
+| Smooth upper tail | $\{1+\exp[-(z-c)/s]\}^{-1}$ | $s\log\{1+\exp[(z-c)/s]\}$ |
+
+Here $(u)_+=\max(u,0)$ and $s>0$ controls the smoothness of the transition. Adding a constant to $v$ does not change the score.
 
 
 ### Multivariate Scoring Rules
 
-When forecasting multiple quantities jointly — e.g. electricity prices at several delivery hours, or wind power at multiple sites — we need scoring rules that assess the *joint* predictive distribution. Two prominent choices are the Energy Score and the Variogram Score.
+For a joint forecast $F$ on $\mathbb{R}^d$ and observation $\mathbf{y}=(y_1,\ldots,y_d)$, the Logarithmic, Energy, and Variogram Scores capture different aspects of forecast quality.
 
-#### Energy Score
+::: {.callout-note}
+### Definition (Multivariate Logarithmic Score) [@good1952rational]
+
+If $F$ has joint density $f$, its multivariate Logarithmic Score is
+$$
+\operatorname{LogS}(F,\mathbf{y})=-\log f(\mathbf{y}).
+$$
+:::
+
+It is strictly proper and directly assesses the full joint density, including dependence, but requires that density to be available and can be dominated by a single near-zero value at the observation.
 
 ::: {.callout-note}
 ### Definition (Energy Score) [@gneiting2007strictly]
+
 The **Energy Score** is a multivariate generalization of the CRPS. For a predictive distribution $F$ on $\mathbb{R}^d$ and observation $\mathbf{y} \in \mathbb{R}^d$:
 $$
 \operatorname{ES}(F, \mathbf{y}) = \mathbb{E}_F \|\mathbf{X} - \mathbf{y}\|^\beta - \frac{1}{2} \mathbb{E}_F \|\mathbf{X} - \mathbf{X}'\|^\beta,
@@ -326,29 +342,18 @@ $$
 with $0 < \beta < 2$ (typically $\beta = 1$), where $\mathbf{X}, \mathbf{X}' \stackrel{\text{iid}}{\sim} F$.
 :::
 
-::: {.callout-tip icon="false"}
-### Theorem (Propriety of the Energy Score) [@gneiting2007strictly]
-The Energy Score with $0 < \beta < 2$ is strictly proper. For $d = 1$ and $\beta = 1$, it reduces to the CRPS.
-:::
-
-In practice, for an ensemble of $m$ members $\{\mathbf{x}_1, \ldots, \mathbf{x}_m\}\subset \mathbb{R}^d$ (e.g. obtained from sampling from a diffusion model), the Energy Score can be estimated as
+The Energy Score is strictly proper for $0<\beta<2$ (assuming the required moment exists); for $d=1$ and $\beta=1$, it equals the CRPS. Given an ensemble $\{\mathbf{x}^{(1)},\ldots,\mathbf{x}^{(m)}\}$, let $F_m$ denote its empirical distribution. Then
 $$
-\widehat{\operatorname{ES}}(\{\mathbf{x}_i\}, \mathbf{y}) = \frac{1}{m}\sum_{i=1}^{m} \|\mathbf{x}^{(i)} - \mathbf{y}\| - \frac{1}{2m^2}\sum_{i=1}^{m}\sum_{j=1}^{m} \|\mathbf{x}^{(i)} - \mathbf{x}^{(j)}\|,
+\widehat{\operatorname{ES}}_\beta(F_m,\mathbf{y})
+=\frac{1}{m}\sum_{k=1}^{m}\|\mathbf{x}^{(k)}-\mathbf{y}\|^\beta
+-\frac{1}{2m^2}\sum_{k=1}^{m}\sum_{\ell=1}^{m}\|\mathbf{x}^{(k)}-\mathbf{x}^{(\ell)}\|^\beta.
 $$
 
-and we can obtain its bias-corrected version as
-$$
-\widehat{\operatorname{ES}}_{\text{fair}}(\{\mathbf{x}_i\}, \mathbf{y}) = \frac{1}{m}\sum_{i=1}^{m} \|\mathbf{x}^{(i)} - \mathbf{y}\| - \frac{1}{2m(m-1)}\sum_{i \neq j} \|\mathbf{x}^{(i)} - \mathbf{x}^{(j)}\|.
-$$
-Note that this is $\mathcal{O}(m^2d)$ due to the pairwise distance calculations, which can be computationally expensive for large ensembles and high-dimensional data. However, there are efficient algorithms and approximations that can be used to compute the Energy Score in practice.
-
-A known limitation of the Energy Score is its relatively low sensitivity to misspecification of the *correlation structure* — it is primarily driven by marginal calibration. This motivates the Variogram Score.
-
-
-#### Variogram Score
+Its fair version replaces $2m^2$ by $2m(m-1)$ and restricts the double sum to $k\ne\ell$. Computing all pairwise distances costs $\mathcal{O}(m^2d)$. The score can also be relatively insensitive to misspecified dependence, which motivates the Variogram Score.
 
 ::: {.callout-note}
 ### Definition (Variogram Score) [@scheuerer2015variogram]
+
 The **Variogram Score** of order $p > 0$ for a predictive distribution $F$ on $\mathbb{R}^d$ and observation $\mathbf{y} = (y_1, \ldots, y_d)$ is
 $$
 \operatorname{VS}_p(F, \mathbf{y}) = \sum_{i=1}^{d}\sum_{j=1}^{d} w_{ij}\Bigl(|y_i - y_j|^p - \mathbb{E}_F|X_i - X_j|^p\Bigr)^2,
@@ -356,19 +361,16 @@ $$
 where $w_{ij} \geq 0$ are non-negative weights (typically $w_{ij} = 1$) and $p = 0.5$ or $p = 1$ are common choices.
 :::
 
-::: {.callout-tip icon="false"}
-### Theorem (Propriety of the Variogram Score) [@scheuerer2015variogram]
-The Variogram Score $\operatorname{VS}_p$ is proper for any $p \in (0, 2)$ and non-negative weights $w_{ij}$.
-:::
-
-The Variogram Score is designed to be sensitive to the *dependence structure* of the predictive distribution, as it compares pairwise differences between components. The ensemble estimate is straightforward:
+For $p\in(0,2)$ and non-negative weights, the Variogram Score is proper, though generally not strictly proper. It is sensitive to dependence through component-wise differences. Its ensemble estimate is
 $$
-\widehat{\operatorname{VS}}_p(\{\mathbf{x}_k\}, \mathbf{y}) = \sum_{i=1}^{d}\sum_{j=1}^{d} w_{ij}\Bigl(|y_i - y_j|^p - \frac{1}{m}\sum_{k=1}^{m}|x_i^{(k)} - x_j^{(k)}|^p\Bigr)^2.
+\widehat{\operatorname{VS}}_p(F_m,\mathbf{y})
+=\sum_{i=1}^{d}\sum_{j=1}^{d}w_{ij}\left(|y_i-y_j|^p
+-\frac{1}{m}\sum_{k=1}^{m}|x_i^{(k)}-x_j^{(k)}|^p\right)^2.
 $$
 
-In practice, using both the Energy Score and the Variogram Score together gives a complementary picture: the ES primarily assesses marginal calibration, while the VS probes the dependence structure.
+In practice, the Energy and Variogram Scores are complementary: the former captures overall distributional accuracy, while the latter more directly probes dependence.
 
-
+<!--
 ## Practical Guide: Using Scoring Rules
 
 ### When to Use Which Score
@@ -376,7 +378,7 @@ In practice, using both the Energy Score and the Variogram Score together gives 
 | Scoring Rule | Setting | Strengths | Limitations |
 |:---|:---|:---|:---|
 | **Brier Score** | Binary/categorical | Decomposable (reliability, resolution, uncertainty) | Discrete events only |
-| **Log Score** | Continuous (density) | Uniquely local; maximum sensitivity to misspecification | Requires density; sensitive to tails; not robust |
+| **Log Score** | Univariate or multivariate density | Local; sensitive to the full joint density | Requires a density; highly sensitive to low assigned density |
 | **CRPS** | Continuous univariate | Same unit as data; robust; closed forms available | Univariate only |
 | **tw-CRPS** | Continuous univariate | Emphasizes regions of interest (tails) | Requires weight function choice |
 | **Energy Score** | Multivariate | Generalizes CRPS; simple to compute | Low sensitivity to correlation misspecification |
@@ -639,5 +641,7 @@ The negative mean differential $\bar{\delta} < 0$ and the highly significant $p$
 - **Score choice matters**: the DM test can be applied with *any* scoring rule. Using the CRPS tests for overall distributional superiority; using a tail-weighted CRPS tests for superiority in the region that matters most for your application.
 - **Autocorrelation**: for multi-step forecasts ($h > 1$), the HAC variance estimator is essential. Ignoring autocorrelation in score differentials inflates the DM statistic and produces spuriously small $p$-values.
 - **Sample size**: the DM test is asymptotic. For small test sets ($T < 50$), the Harvey-Leybourne-Newbold correction with $t$-distribution critical values is strongly recommended.
+-->
+
 
 ## References
