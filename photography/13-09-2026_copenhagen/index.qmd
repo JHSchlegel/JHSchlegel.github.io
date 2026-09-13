@@ -1,0 +1,63 @@
+---
+title: "Around Copenhagen: Spires, Steel, and Illusions"
+subtitle: "Copenhagen · September 2026"
+categories:
+  - Travel
+  - Architecture
+  - Cityscape
+  - Denmark
+date: "2026-09-13"
+image: "images/nyhavn.jpg"
+pagetitle: "Around Copenhagen — Jan Schlegel"
+page-layout: full
+---
+
+```{=html}
+<div class="jhs-album-intro">
+  <p class="jhs-page-intro">
+  A few days of walking Copenhagen end to end, where copper spires and painted gables give
+  way to glass, steel, and folded concrete within a couple of blocks, almost every good view
+  turns out to be from a bridge — and one afternoon indoors at the Museum of Illusions, in
+  rooms built to argue with the camera.</p>
+</div>
+
+<h2 class="jhs-album-section-title">Old town</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/nyhavn.jpg" alt="Wooden masts and painted gables lining the Nyhavn canal" loading="lazy"></div>
+  <div class="tile"><img src="images/marble-church.jpg" alt="The green dome of the Marble Church seen from the square at Amalienborg" loading="lazy"></div>
+  <div class="tile"><img src="images/red-brick-corner.jpg" alt="Pedestrians crossing a junction below red-brick gables in the evening light" loading="lazy"></div>
+</div>
+
+<h2 class="jhs-album-section-title">Along the harbour</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/harbour-promenade.jpg" alt="A wooden promenade running along the harbour past a glass office block" loading="lazy"></div>
+  <div class="tile"><img src="images/black-diamond.jpg" alt="The dark glass wedge of the Black Diamond library across the water" loading="lazy"></div>
+  <div class="tile"><img src="images/knippelsbro.jpg" alt="A workboat passing under the red span and green towers of Knippelsbro" loading="lazy"></div>
+  <div class="tile"><img src="images/inner-harbour.jpg" alt="Small boats on the inner harbour with a footbridge and the Playhouse beyond" loading="lazy"></div>
+  <div class="tile"><img src="images/opera-house.jpg" alt="The cantilevered roof of the Opera House seen from the opposite quay" loading="lazy"></div>
+</div>
+
+<h2 class="jhs-album-section-title">New angles</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/cactus-towers.jpg" alt="Cyclists on the bridge below the serrated balconies of the Cactus Towers" loading="lazy"></div>
+  <div class="tile"><img src="images/kalvebod-boardwalk.jpg" alt="An orange steel stair on the boardwalk at Kalvebod Brygge" loading="lazy"></div>
+  <div class="tile"><img src="images/carlsberg-towers.jpg" alt="Round glass towers rising over the railway tracks in the Carlsberg district" loading="lazy"></div>
+</div>
+
+<h2 class="jhs-album-section-title">A green detour</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/poplar-avenue.jpg" alt="A gravel path running between two rows of tall poplars" loading="lazy"></div>
+  <div class="tile"><img src="images/red-squirrel.jpg" alt="A red squirrel sitting up with a nut in the leaf litter" loading="lazy"></div>
+</div>
+
+<h2 class="jhs-album-section-title">Museum of Illusions</h2>
+<div class="jhs-album-grid">
+  <div class="tile"><img src="images/tilted-room.jpg" alt="Sitting on a blue cube in a tilted room, apparently holding a pose against gravity" loading="lazy"></div>
+  <div class="tile"><img src="images/nyhavn-wall.jpg" alt="Leaning on a painted Nyhavn facade beside a yellow bicycle, with the floor standing in for a wall" loading="lazy"></div>
+  <div class="tile"><img src="images/mirror-room.jpg" alt="Endless reflections of a single figure in a mirrored room" loading="lazy"></div>
+  <div class="tile"><img src="images/light-lattice.jpg" alt="A lattice of glowing tubes receding into darkness overhead" loading="lazy"></div>
+  <div class="tile"><img src="images/chevron-vortex.jpg" alt="Chevron-striped panels and strings of lights folding into a tunnel" loading="lazy"></div>
+  <div class="tile"><img src="images/infinity-well.jpg" alt="A ladder dropping into a mirrored shaft with no visible bottom" loading="lazy"></div>
+  <div class="tile"><img src="images/lit-sculpture.jpg" alt="A faceted white sculpture lit in a mirrored vitrine" loading="lazy"></div>
+</div>
+```
