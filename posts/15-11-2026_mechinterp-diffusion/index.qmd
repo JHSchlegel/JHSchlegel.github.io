@@ -2,7 +2,7 @@
 title: "Opening the Black Box of Stable Diffusion: Features, Time, and Circuits"
 categories:
   - Machine Learning
-image: "image.jpg"
+image: "thumbnail.webp"
 description: "A mechanistic look inside Stable Diffusion v2.1: sparse autoencoders, a temporal hierarchy of concepts, and the first temporal feature circuits in a diffusion model."
 abstract: "Text-to-image diffusion models work remarkably well, yet how they turn a prompt and a block of noise into a coherent image is largely unknown. In my master's thesis, I analyse Stable Diffusion v2.1 with sparse autoencoders trained on the residual updates of its cross-attention blocks. Time-stratified interventions reveal a clear temporal hierarchy: early denoising steps fix composition and style, the middle steps refine and blend, and the final steps only touch texture. The learned features transfer from 512×512 to 768×768 images without retraining. Going beyond single features, I adapt gradient-based circuit discovery from language models to the temporal setting of diffusion and trace a small 'cat vs. bird' circuit across the first denoising steps."
 author: "Jan Schlegel"

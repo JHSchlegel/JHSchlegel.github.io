@@ -3,7 +3,7 @@ title: "Generative Climate Downscaling: Do the Mappings Transfer to Unseen Clima
 categories:
   - Machine Learning
   - Climate
-image: "image.png"
+image: "thumbnail.webp"
 description: "Stochastic MLPs trained with the energy score and a slimmed-down CorrDiff diffusion model turn coarse global climate simulations into high-resolution regional fields, and keep working on a climate model they never saw during training."
 abstract: "Global climate models are too coarse for local decisions, and dynamical downscaling with regional climate models is expensive. We study two generative statistical downscaling approaches, a two-stage stochastic MLP called Coarse-from-Super trained with the energy score, and a lightweight version of the Corrector Diffusion (CorrDiff) model, and ask how well their learned mappings transfer to a global climate model held out from training. Across precipitation and temperature, both generative methods clearly beat a deterministic baseline in energy score while matching it in mean squared error. The learned mappings transfer surprisingly well to the unseen GCM and to the end of the century, and the simple stochastic MLP keeps up with the diffusion model at a fraction of the cost."
 author: "Jan Schlegel"
