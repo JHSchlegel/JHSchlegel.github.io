@@ -2,7 +2,7 @@
 title: "Does Catastrophic Forgetting Happen in Tiny Subspaces?"
 categories:
   - Machine Learning
-image: "image.jpg"
+image: "thumbnail.webp"
 description: "Catastrophic forgetting appears to live in the same low-curvature bulk subspace where ordinary learning happens, tested on Permuted MNIST and Split-CIFAR."
 abstract: "We investigate whether catastrophic forgetting in continual learning is geometrically similar to ordinary learning: concentrated in the low-curvature bulk subspace of the loss Hessian rather than its high-curvature dominant directions. By projecting gradient updates into either the bulk or dominant subspace and training on Permuted MNIST, Split-CIFAR10, and Split-CIFAR100, we confirm that learning occurs primarily in the bulk. In the Domain-IL setting, forgetting appears to reside there as well. Task-IL results are more ambiguous, motivating larger-scale experiments."
 author: "Jan Schlegel"

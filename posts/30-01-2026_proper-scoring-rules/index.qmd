@@ -2,7 +2,7 @@
 title: "A Theoretical Primer on Proper Scoring Rules"
 categories:
   - Machine Learning
-image: "image.png"
+image: "thumbnail.webp"
 abstract: "We examine the application of proper scoring rules in evaluating probabilistic forecasts. These rules provide a rigorous framework for assessing the quality of probabilistic predictions, ensuring that forecasters are incentivized to provide accurate and well-calibrated probabilities. Our focus lies on the Continuous Ranked Probability Score (CRPS) and its multivariate generalizations."
 author: "Jan Schlegel"
 date: "2026-01-30"

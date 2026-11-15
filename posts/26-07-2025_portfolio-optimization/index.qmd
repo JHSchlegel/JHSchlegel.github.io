@@ -3,7 +3,7 @@ draft: true
 title: "A Guide to Portfolio Optimization"
 categories:
   - Quantitative Finance
-image: "img/portfolio_optimization_thumbnail.png"
+image: "thumbnail.webp"
 description: "A practical introduction to Markowitz mean-variance optimization: risk, return, the efficient frontier, and how to implement it in Python."
 abstract: "This post provides a practical introduction to portfolio optimization, focusing on the foundational Mean-Variance framework by Harry Markowitz. We'll explore the concepts of risk, return, the efficient frontier, and show how to implement it in Python."
 author: "Jan Schlegel"

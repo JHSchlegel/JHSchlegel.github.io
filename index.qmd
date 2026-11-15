@@ -10,6 +10,7 @@ listing:
   fields: [image, date, title, categories, description]
   grid-columns: 2
 page-layout: full
+html-math-method: plain   # no math on this page; avoids a render-blocking MathJax download
 ---
 
 ```{=html}
