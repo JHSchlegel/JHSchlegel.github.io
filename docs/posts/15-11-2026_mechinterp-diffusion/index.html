@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jan Schlegel">
+<meta name="dcterms.date" content="2026-11-15">
+<meta name="description" content="A mechanistic look inside Stable Diffusion v2.1: sparse autoencoders, a temporal hierarchy of concepts, and the first temporal feature circuits in a diffusion model.">
+
+<title>Opening the Black Box of Stable Diffusion: Features, Time, and Circuits – Jan Schlegel</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../logo.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-8ea72dc5fed832574809a9c94082fbbb.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-eec8b984b70d4136b00313aa3d0f56c3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-9ac850439c7ce24209f8d151cbd4826e.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="color-scheme" content="dark light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../custom.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../profile.jpg" alt="Jan Schlegel" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Jan Schlegel</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../photography.html"> 
+<span class="menu-text">Photography</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../CV_Academic.pdf"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JHSchlegel"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Opening the Black Box of Stable Diffusion: Features, Time, and Circuits</h1>
+                  <div>
+        <div class="description">
+          A mechanistic look inside Stable Diffusion v2.1: sparse autoencoders, a temporal hierarchy of concepts, and the first temporal feature circuits in a diffusion model.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Machine Learning</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jan Schlegel </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 15, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="block-title">Abstract</div>
+      Text-to-image diffusion models work remarkably well, yet how they turn a prompt and a block of noise into a coherent image is largely unknown. In my master’s thesis, I analyse Stable Diffusion v2.1 with sparse autoencoders trained on the residual updates of its cross-attention blocks. Time-stratified interventions reveal a clear temporal hierarchy: early denoising steps fix composition and style, the middle steps refine and blend, and the final steps only touch texture. The learned features transfer from 512×512 to 768×768 images without retraining. Going beyond single features, I adapt gradient-based circuit discovery from language models to the temporal setting of diffusion and trace a small ‘cat vs.&nbsp;bird’ circuit across the first denoising steps.
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background"><span class="header-section-number">2</span> Background</a>
+  <ul class="collapse">
+  <li><a href="#latent-diffusion-in-two-paragraphs" id="toc-latent-diffusion-in-two-paragraphs" class="nav-link" data-scroll-target="#latent-diffusion-in-two-paragraphs"><span class="header-section-number">2.1</span> Latent Diffusion in Two Paragraphs</a></li>
+  <li><a href="#what-exactly-are-we-decomposing" id="toc-what-exactly-are-we-decomposing" class="nav-link" data-scroll-target="#what-exactly-are-we-decomposing"><span class="header-section-number">2.2</span> What Exactly Are We Decomposing?</a></li>
+  <li><a href="#superposition-and-sparse-autoencoders" id="toc-superposition-and-sparse-autoencoders" class="nav-link" data-scroll-target="#superposition-and-sparse-autoencoders"><span class="header-section-number">2.3</span> Superposition and Sparse Autoencoders</a></li>
+  </ul></li>
+  <li><a href="#training-the-sparse-autoencoders" id="toc-training-the-sparse-autoencoders" class="nav-link" data-scroll-target="#training-the-sparse-autoencoders"><span class="header-section-number">3</span> Training the Sparse Autoencoders</a>
+  <ul class="collapse">
+  <li><a href="#how-feature-usage-evolves-over-time" id="toc-how-feature-usage-evolves-over-time" class="nav-link" data-scroll-target="#how-feature-usage-evolves-over-time"><span class="header-section-number">3.1</span> How Feature Usage Evolves over Time</a></li>
+  </ul></li>
+  <li><a href="#what-do-the-features-encode" id="toc-what-do-the-features-encode" class="nav-link" data-scroll-target="#what-do-the-features-encode"><span class="header-section-number">4</span> What Do the Features Encode?</a>
+  <ul class="collapse">
+  <li><a href="#top-activating-images" id="toc-top-activating-images" class="nav-link" data-scroll-target="#top-activating-images"><span class="header-section-number">4.1</span> Top-Activating Images</a></li>
+  <li><a href="#steering-the-generation" id="toc-steering-the-generation" class="nav-link" data-scroll-target="#steering-the-generation"><span class="header-section-number">4.2</span> Steering the Generation</a></li>
+  </ul></li>
+  <li><a href="#a-temporal-hierarchy" id="toc-a-temporal-hierarchy" class="nav-link" data-scroll-target="#a-temporal-hierarchy"><span class="header-section-number">5</span> A Temporal Hierarchy</a>
+  <ul class="collapse">
+  <li><a href="#cross-resolution-generalisation" id="toc-cross-resolution-generalisation" class="nav-link" data-scroll-target="#cross-resolution-generalisation"><span class="header-section-number">5.1</span> Cross-Resolution Generalisation</a></li>
+  </ul></li>
+  <li><a href="#from-features-to-feature-sets-activation-patching" id="toc-from-features-to-feature-sets-activation-patching" class="nav-link" data-scroll-target="#from-features-to-feature-sets-activation-patching"><span class="header-section-number">6</span> From Features to Feature Sets: Activation Patching</a></li>
+  <li><a href="#temporal-circuit-discovery" id="toc-temporal-circuit-discovery" class="nav-link" data-scroll-target="#temporal-circuit-discovery"><span class="header-section-number">7</span> Temporal Circuit Discovery</a>
+  <ul class="collapse">
+  <li><a href="#circuits-as-temporal-dags" id="toc-circuits-as-temporal-dags" class="nav-link" data-scroll-target="#circuits-as-temporal-dags"><span class="header-section-number">7.1</span> Circuits as Temporal DAGs</a></li>
+  <li><a href="#indirect-effects-in-a-recurrent-model" id="toc-indirect-effects-in-a-recurrent-model" class="nav-link" data-scroll-target="#indirect-effects-in-a-recurrent-model"><span class="header-section-number">7.2</span> Indirect Effects in a Recurrent Model</a></li>
+  <li><a href="#a-probe-as-the-metric" id="toc-a-probe-as-the-metric" class="nav-link" data-scroll-target="#a-probe-as-the-metric"><span class="header-section-number">7.3</span> A Probe as the Metric</a></li>
+  </ul></li>
+  <li><a href="#anatomy-of-a-cat-vs.-bird-circuit" id="toc-anatomy-of-a-cat-vs.-bird-circuit" class="nav-link" data-scroll-target="#anatomy-of-a-cat-vs.-bird-circuit"><span class="header-section-number">8</span> Anatomy of a “Cat vs.&nbsp;Bird” Circuit</a>
+  <ul class="collapse">
+  <li><a href="#swapping-the-circuit" id="toc-swapping-the-circuit" class="nav-link" data-scroll-target="#swapping-the-circuit"><span class="header-section-number">8.1</span> Swapping the Circuit</a></li>
+  </ul></li>
+  <li><a href="#reflections" id="toc-reflections" class="nav-link" data-scroll-target="#reflections"><span class="header-section-number">9</span> Reflections</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="image.jpg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:60.0%"></p>
+</figure>
+</div>
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>Type “a portrait of a stoic Roman emperor, profile view” into Stable Diffusion and a few seconds later you get exactly that. What happens in between is much less clear. Somewhere along the 25 or so denoising steps, a block of Gaussian noise is pushed towards an image that has a subject, a composition, a style, and fine texture. When are those decisions made? Which internal components make them? And how do these components talk to each other across time?</p>
+<p>These are the questions of <em>mechanistic interpretability</em>: rather than studying input-output behaviour, we try to reverse-engineer a network’s internal representations into concepts a human can understand <span class="citation" data-cites="bereska2024mechanisticinterpretabilityaisafety">(<a href="#ref-bereska2024mechanisticinterpretabilityaisafety" role="doc-biblioref">Bereska and Gavves 2024</a>)</span>. For large language models this programme has made real progress over the last few years, mostly thanks to <strong>sparse autoencoders (SAEs)</strong> <span class="citation" data-cites="bricken2023monosemanticity templeton2024scaling cunningham2023sparseautoencodershighlyinterpretable">(<a href="#ref-bricken2023monosemanticity" role="doc-biblioref">Bricken et al. 2023</a>; <a href="#ref-templeton2024scaling" role="doc-biblioref">Templeton et al. 2024</a>; <a href="#ref-cunningham2023sparseautoencodershighlyinterpretable" role="doc-biblioref">Cunningham et al. 2023</a>)</span> and, more recently, <strong>sparse feature circuits</strong> <span class="citation" data-cites="marks2025sparsefeaturecircuitsdiscovering">(<a href="#ref-marks2025sparsefeaturecircuitsdiscovering" role="doc-biblioref">Marks et al. 2025</a>)</span>. Diffusion models are a harder target. They are multimodal, high-dimensional, and, most importantly, <em>iterative</em>: the same U-Net is applied over and over, and anything it computes at one step becomes part of the input at the next.</p>
+<p>My master’s thesis at ETH Zurich, supervised by Prof.&nbsp;Julia Vogt and advised by Moritz Vandenhirtz and Alice Bizeul, tries to take this programme to Stable Diffusion v2.1 <span class="citation" data-cites="rombach2022highresolutionimagesynthesislatent">(<a href="#ref-rombach2022highresolutionimagesynthesislatent" role="doc-biblioref">Rombach et al. 2022</a>)</span>. In short, I:</p>
+<ol type="1">
+<li>trained SAEs on two cross-attention blocks of SD v2.1 and used them to show, through <strong>time-stratified interventions</strong>, that the generative process follows a clear temporal hierarchy: composition and style early, refinement and blending in the middle, texture at the end;</li>
+<li>found that features learned on <span class="math inline">\(512\times512\)</span> generations <strong>transfer to <span class="math inline">\(768\times768\)</span></strong> without any retraining, both for reconstruction and for steering;</li>
+<li>built a <strong>temporal circuit discovery framework</strong> for diffusion models, combining integrated-gradient attribution with a small diagnostic probe that plays the role of the “logit difference” from language-model interpretability;</li>
+<li>checked the discovered “cat vs.&nbsp;bird” circuit with a <strong>bidirectional activation patching</strong> method that works for non-distilled models with classifier-free guidance.</li>
+</ol>
+<p>The full code for this project is available on <a href="https://github.com/JHSchlegel/mechinterp-diffusion"><i class="bi bi-github"></i> GitHub</a>, and the thesis itself is on my <a href="../../research.html">research page</a>.</p>
+</section>
+<section id="background" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="background"><span class="header-section-number">2</span> Background</h2>
+<section id="latent-diffusion-in-two-paragraphs" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="latent-diffusion-in-two-paragraphs"><span class="header-section-number">2.1</span> Latent Diffusion in Two Paragraphs</h3>
+<p>A diffusion model learns to undo a gradual noising process. The forward process turns a data point <span class="math inline">\(\boldsymbol{x}_0\)</span> into noise via <span class="math display">\[
+\boldsymbol{x}_t = \sqrt{\bar{\alpha}_t}\,\boldsymbol{x}_0 + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}, \qquad \boldsymbol{\epsilon}\sim\mathcal{N}(\boldsymbol{0},\boldsymbol{I}),
+\]</span> and a network <span class="math inline">\(\boldsymbol{\epsilon}_{\boldsymbol{\theta}}(\boldsymbol{x}_t, t)\)</span> is trained to predict the noise that was added <span class="citation" data-cites="ho2020denoisingdiffusionprobabilisticmodels">(<a href="#ref-ho2020denoisingdiffusionprobabilisticmodels" role="doc-biblioref">Ho, Jain, and Abbeel 2020</a>)</span>: <span class="math display">\[
+\mathcal{L}(\boldsymbol{\theta}) = \mathbb{E}_{t,\boldsymbol{x}_0,\boldsymbol{\epsilon}}\left[\big\|\boldsymbol{\epsilon} - \boldsymbol{\epsilon}_{\boldsymbol{\theta}}(\sqrt{\bar{\alpha}_t}\boldsymbol{x}_0+\sqrt{1-\bar{\alpha}_t}\boldsymbol{\epsilon}, t)\big\|^2\right].
+\]</span> Throughout this post I use the continuous-time convention in which <span class="math inline">\(t=1.0\)</span> is pure noise and <span class="math inline">\(t=0.0\)</span> is a clean image. Sampling therefore runs <em>backwards</em> in <span class="math inline">\(t\)</span>, from 1 to 0. If you want the SDE view of all this, I wrote about it in an earlier post.</p>
+<p>Stable Diffusion is a <em>latent</em> diffusion model: the denoising happens in the compressed latent space of a VAE rather than in pixel space, and the noise predictor is a U-Net conditioned on CLIP text embeddings <span class="citation" data-cites="radford2021learningtransferablevisualmodels">(<a href="#ref-radford2021learningtransferablevisualmodels" role="doc-biblioref">Radford et al. 2021</a>)</span> through <strong>cross-attention</strong>. Queries come from the image features, keys and values from the text, so cross-attention is where the prompt is injected into the image. That makes these blocks the natural place to look for interpretable, prompt-related concepts.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/unet.png" class="img-fluid figure-img" style="width:65.0%"></p>
+<figcaption>The Stable Diffusion v2.1 U-Net. Pink boxes are cross-attention blocks. I study <code>down.2.0</code> (encoder) and <code>up.1.1</code> (decoder), both operating at <span class="math inline">\(16\times16\)</span> spatial resolution with 1,280 channels. Own illustration inspired by <span class="citation" data-cites="surkov2024unpackingsdxlturbointerpreting">Surkov et al. (<a href="#ref-surkov2024unpackingsdxlturbointerpreting" role="doc-biblioref">2025</a>)</span>.</figcaption>
+</figure>
+</div>
+</section>
+<section id="what-exactly-are-we-decomposing" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="what-exactly-are-we-decomposing"><span class="header-section-number">2.2</span> What Exactly Are We Decomposing?</h3>
+<p>Following <span class="citation" data-cites="surkov2024unpackingsdxlturbointerpreting">Surkov et al. (<a href="#ref-surkov2024unpackingsdxlturbointerpreting" role="doc-biblioref">2025</a>)</span>, I study the <em>residual update</em> that a cross-attention block <span class="math inline">\(\ell\)</span> writes into the latent at timestep <span class="math inline">\(t\)</span>: <span class="math display">\[
+\boldsymbol{\Delta D}_{\ell,t} = \boldsymbol{D}^{\text{out}}_{\ell,t} - \boldsymbol{D}^{\text{in}}_{\ell,t} \in \mathbb{R}^{h\times w\times d}.
+\]</span> At each spatial location <span class="math inline">\((i,j)\)</span> this gives a vector <span class="math inline">\(\boldsymbol{\Delta D}_{ij,t}\in\mathbb{R}^d\)</span> that captures exactly how the text conditioning changes the representation at that position and time. The catch: these vectors are dense and 1,280-dimensional, and individual channels are hopelessly <strong>polysemantic</strong>.</p>
+</section>
+<section id="superposition-and-sparse-autoencoders" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="superposition-and-sparse-autoencoders"><span class="header-section-number">2.3</span> Superposition and Sparse Autoencoders</h3>
+<p>The leading explanation for polysemanticity is the <em>superposition hypothesis</em> <span class="citation" data-cites="elhage2022toymodelssuperposition">(<a href="#ref-elhage2022toymodelssuperposition" role="doc-biblioref">Elhage et al. 2022</a>)</span>: a network can store far more (sparse) features than it has neurons by giving each feature an almost-orthogonal direction. The Johnson–Lindenstrauss lemma guarantees there is plenty of room for this, as the number of nearly-orthogonal directions grows exponentially with dimension. The flip side is that any single neuron ends up participating in many unrelated features.</p>
+<p>A sparse autoencoder tries to undo this. It learns an <em>overcomplete</em> dictionary of feature directions <span class="math inline">\(\boldsymbol{f}_\varphi\in\mathbb{R}^d\)</span>, <span class="math inline">\(\varphi = 1,\ldots,n_f\)</span> with <span class="math inline">\(n_f \gg d\)</span>, and re-expresses each activation as a sparse combination of them: <span class="math display">\[
+\boldsymbol{\Delta D}_{ij,t} \approx \sum_{\varphi=1}^{n_f} S^{\varphi}_{ij,t}\,\boldsymbol{f}_\varphi .
+\]</span> I use the <strong>TopK SAE</strong> <span class="citation" data-cites="makhzani2014ksparseautoencoders gao2024scalingevaluatingsparseautoencoders">(<a href="#ref-makhzani2014ksparseautoencoders" role="doc-biblioref">Makhzani and Frey 2014</a>; <a href="#ref-gao2024scalingevaluatingsparseautoencoders" role="doc-biblioref">Gao et al. 2024</a>)</span>, where sparsity is enforced directly by keeping only the <span class="math inline">\(k\)</span> largest pre-activations: <span class="math display">\[
+\boldsymbol{h} = \operatorname{top-k}\!\big(\operatorname{ReLU}(\boldsymbol{W}_{\text{enc}}(\boldsymbol{v}-\boldsymbol{b}_{\text{pre}})+\boldsymbol{b}_{\text{enc}})\big), \qquad
+\widehat{\boldsymbol{v}} = \boldsymbol{W}_{\text{dec}}\boldsymbol{h} + \boldsymbol{b}_{\text{pre}}.
+\]</span> To avoid dead features, an auxiliary loss asks the top-<span class="math inline">\(k_{\text{aux}}\)</span> <em>dead</em> latents to model the reconstruction error <span class="math inline">\(\boldsymbol{e} = \boldsymbol{v}-\widehat{\boldsymbol{v}}\)</span>, giving the objective <span class="math inline">\(\|\boldsymbol{v}-\widehat{\boldsymbol{v}}\|^2 + \lambda\|\boldsymbol{e}-\widehat{\boldsymbol{e}}_{\text{aux}}\|^2\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/sae.png" class="img-fluid figure-img" style="width:75.0%"></p>
+<figcaption>The TopK sparse autoencoder. Each 1,280-dimensional residual update is encoded into a 5,120-dimensional code of which only <span class="math inline">\(k=10\)</span> entries are non-zero, then linearly decoded back.</figcaption>
+</figure>
+</div>
+<p>A single SAE is shared across <em>all</em> spatial positions and <em>all</em> timesteps. This matters later: it means that a feature index refers to the same direction at <span class="math inline">\(t=1.0\)</span> and at <span class="math inline">\(t=0.1\)</span>, which is what allows us to talk about a feature “persisting” through time.</p>
+</section>
+</section>
+<section id="training-the-sparse-autoencoders" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="training-the-sparse-autoencoders"><span class="header-section-number">3</span> Training the Sparse Autoencoders</h2>
+<p>I generated activations from SD v2.1 for 50,000 prompts from LAION-COCO <span class="citation" data-cites="schuhmann2022laioncoco">(<a href="#ref-schuhmann2022laioncoco" role="doc-biblioref">Schuhmann et al. 2022</a>)</span>, using DDIM <span class="citation" data-cites="song2022ddim">(<a href="#ref-song2022ddim" role="doc-biblioref">Song, Meng, and Ermon 2022</a>)</span> with 25 steps and classifier-free guidance at scale 9, and recorded the conditional-pass residual updates of two blocks:</p>
+<ul>
+<li><strong><code>down.2.0</code></strong>, in the encoder, previously identified as important for object and style knowledge <span class="citation" data-cites="basu2024mechanisticknowledgelocalizationtexttoimage">(<a href="#ref-basu2024mechanisticknowledgelocalizationtexttoimage" role="doc-biblioref">Basu et al. 2024</a>)</span>;</li>
+<li><strong><code>up.1.1</code></strong>, in the decoder, to see what the upsampling path does.</li>
+</ul>
+<p>Every prompt yields a <span class="math inline">\(16\times16\times1{,}280\)</span> tensor per step. Treating every spatial location as a sample gives <span class="math inline">\(3.2\times10^8\)</span> training vectors per block. The SAEs use <span class="math inline">\(n_f=5{,}120\)</span> (a <span class="math inline">\(4\times\)</span> expansion), <span class="math inline">\(k=10\)</span>, <span class="math inline">\(k_{\text{aux}}=256\)</span> with <span class="math inline">\(\lambda=1/32\)</span>, unit-norm decoder columns, a geometric-median initialisation of <span class="math inline">\(\boldsymbol{b}_{\text{pre}}\)</span>, and a learning rate taken from the scaling laws of <span class="citation" data-cites="gao2024scalingevaluatingsparseautoencoders">Gao et al. (<a href="#ref-gao2024scalingevaluatingsparseautoencoders" role="doc-biblioref">2024</a>)</span>. Training runs over <span class="math inline">\(2\times10^9\)</span> activations.</p>
+<table class="table-striped table-hover caption-top table">
+<caption>SAE reconstruction quality. <span class="math inline">\(R^2\)</span> is measured on the residual update itself; LPIPS and the pixel-wise <span class="math inline">\(\ell_1\)</span> distances compare final images generated with and without replacing the update by its SAE reconstruction (1,000 prompts × 5 seeds). Both SAEs were trained on 512 × 512 data only.</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 15%">
+<col style="width: 16%">
+<col style="width: 15%">
+<col style="width: 11%">
+<col style="width: 15%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Block</th>
+<th style="text-align: center;">Resolution</th>
+<th style="text-align: center;"><span class="math inline">\(R^2\)</span> (%) ↑</th>
+<th style="text-align: center;">Dead (%) ↓</th>
+<th style="text-align: center;">LPIPS ↓</th>
+<th style="text-align: center;">Mean <span class="math inline">\(\ell_1\)</span> ↓</th>
+<th style="text-align: center;">Median <span class="math inline">\(\ell_1\)</span> ↓</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>down.2.0</code></td>
+<td style="text-align: center;">512 × 512</td>
+<td style="text-align: center;">36.60</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: center;">0.492</td>
+<td style="text-align: center;">0.152</td>
+<td style="text-align: center;">0.100</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>down.2.0</code></td>
+<td style="text-align: center;">768 × 768</td>
+<td style="text-align: center;">36.48</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: center;">0.410</td>
+<td style="text-align: center;">0.104</td>
+<td style="text-align: center;">0.067</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>up.1.1</code></td>
+<td style="text-align: center;">512 × 512</td>
+<td style="text-align: center;">39.43</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: center;">0.444</td>
+<td style="text-align: center;">0.136</td>
+<td style="text-align: center;">0.085</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>up.1.1</code></td>
+<td style="text-align: center;">768 × 768</td>
+<td style="text-align: center;">40.30</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: center;">0.361</td>
+<td style="text-align: center;">0.092</td>
+<td style="text-align: center;">0.055</td>
+</tr>
+</tbody>
+</table>
+<p>An <span class="math inline">\(R^2\)</span> of roughly 37–40 % may not sound like much, but it is in line with prior SAEs on multi-step diffusion models at similar <span class="math inline">\(n_f\)</span> and <span class="math inline">\(k\)</span> <span class="citation" data-cites="shi2025dissectingmitigatingdiffusionbias tinaz2025emergenceevolutioninterpretableconcepts">(<a href="#ref-shi2025dissectingmitigatingdiffusionbias" role="doc-biblioref">Shi et al. 2025</a>; <a href="#ref-tinaz2025emergenceevolutioninterpretableconcepts" role="doc-biblioref">Tinaz, Fabian, and Soltanolkotabi 2025</a>)</span>, and when the reconstruction is spliced back into the model the final images stay perceptually close to the originals. With only ten active features out of 5,120 per location, that is a strong compression. No features are dead.</p>
+<p>The bottom rows of the table are the first surprise. <strong>The SAEs were never shown a <span class="math inline">\(768\times768\)</span> generation</strong>, yet reconstruction quality is the same, and the downstream image metrics are even a bit better. I will come back to this.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/reconstruction_512.jpg" class="img-fluid figure-img" style="width:45.0%"></p>
+<figcaption>Original generations (left), generations where the <code>down.2.0</code> update is replaced by its SAE reconstruction (middle), and their difference (right). Content and composition survive; most of the difference sits in fine detail.</figcaption>
+</figure>
+</div>
+<section id="how-feature-usage-evolves-over-time" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="how-feature-usage-evolves-over-time"><span class="header-section-number">3.1</span> How Feature Usage Evolves over Time</h3>
+<p>A first look at the dictionary through time already shows some structure.</p>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/distinct_feature_activity_vs_time.png" class="img-fluid figure-img"></p>
+<figcaption>Average number of distinct active features</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/spatial_locations_per_active_feature_vs_time.png" class="img-fluid figure-img"></p>
+<figcaption>Average number of active spatial locations per active feature</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>Early on, in the high-noise regime (<span class="math inline">\(t\in[0.6, 1.0]\)</span>), relatively few features are active, but each covers many spatial positions. These are broad, global concepts. As denoising goes on, many more features switch on, each confined to fewer positions, and the count drops again over the last couple of steps. <code>down.2.0</code> consistently uses more features and more localised ones than <code>up.1.1</code>, which fits the idea that the encoder block deals with objects and composition while the decoder block does more diffuse rendering work.</p>
+</section>
+</section>
+<section id="what-do-the-features-encode" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="what-do-the-features-encode"><span class="header-section-number">4</span> What Do the Features Encode?</h2>
+<section id="top-activating-images" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="top-activating-images"><span class="header-section-number">4.1</span> Top-Activating Images</h3>
+<p>To give a feature a “meaning”, I score each generation by the feature’s spatially averaged activation, averaged again over all 25 timesteps: <span class="math display">\[
+\bar{\mu}^\varphi(\boldsymbol{c}, \boldsymbol{z}_{1.0}) = \frac{1}{|\mathcal{T}|}\sum_{t\in\mathcal{T}} \frac{1}{hw}\sum_{i,j} S^{\varphi}_{ij,t}.
+\]</span> I then show the nine highest-scoring images from a test set of 5,000 prompts × 5 seeds, with the activation map at the feature’s peak time overlaid. (Taking the temporal <em>maximum</em> instead of the mean works worse, as it picks up transient spikes rather than consistent behaviour.)</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/top_examples.jpg" class="img-fluid figure-img"></p>
+<figcaption>Top-activating images for six <code>down.2.0</code> features. Warmer colours mean higher activation at the feature’s peak timestep.</figcaption>
+</figure>
+</div>
+<p>A familiar taxonomy shows up, close to what others have found in SD models <span class="citation" data-cites="surkov2024unpackingsdxlturbointerpreting cywinski2025saeuron tinaz2025emergenceevolutioninterpretableconcepts">(<a href="#ref-surkov2024unpackingsdxlturbointerpreting" role="doc-biblioref">Surkov et al. 2025</a>; <a href="#ref-cywinski2025saeuron" role="doc-biblioref">Cywiński and Deja 2025</a>; <a href="#ref-tinaz2025emergenceevolutioninterpretableconcepts" role="doc-biblioref">Tinaz, Fabian, and Soltanolkotabi 2025</a>)</span>. Some features are clearly <strong>objects</strong>: 2165 fires on dog faces, 3094 on roses, 4255 on grassy fields. Others are <strong>styles</strong>: 810 on old group photographs, 1362 on painterly scenes, 2420 on anime. Many other features encode less nameable things such as textures or grid-like layouts.</p>
+</section>
+<section id="steering-the-generation" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="steering-the-generation"><span class="header-section-number">4.2</span> Steering the Generation</h3>
+<p>Top-activating images only show correlation. To test what a feature <em>does</em>, I add its decoder direction to the residual update at every spatial position. Because SD uses classifier-free guidance, the final noise prediction is <span class="math display">\[
+\tilde{\boldsymbol{\epsilon}} = \boldsymbol{\epsilon}_\theta(\boldsymbol{x}_t, \varnothing) + \omega\,\big(\boldsymbol{\epsilon}_\theta(\boldsymbol{x}_t, \boldsymbol{c}) - \boldsymbol{\epsilon}_\theta(\boldsymbol{x}_t, \varnothing)\big),
+\]</span> so whatever we add to the conditional pass gets amplified by <span class="math inline">\(\omega\)</span> <em>relative to</em> the unconditional pass. The most effective intervention turns out to be asymmetric: <strong>add</strong> the feature in the conditional pass and <strong>subtract</strong> it in the unconditional one, <span class="math display">\[
+\boldsymbol{\Delta D}'_t =
+\begin{cases}
+\boldsymbol{\Delta D}_t + \xi\,(\boldsymbol{1}_{h,w}\otimes\boldsymbol{f}_\varphi) &amp; \text{conditional pass},\\
+\boldsymbol{\Delta D}_t - \xi\,(\boldsymbol{1}_{h,w}\otimes\boldsymbol{f}_\varphi) &amp; \text{unconditional pass}.
+\end{cases}
+\]</span></p>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why the asymmetric intervention?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The figure below transfers features from a “rose” prompt into a “dog” prompt in four ways: intervening only on the unconditional pass, only on the conditional pass, adding to both, or adding to the conditional pass while subtracting from the unconditional pass. Only intervening on the unconditional pass does almost nothing useful, and adding to both passes partially cancels out under guidance. The asymmetric version (bottom row) gives the cleanest roses, consistent with what <span class="citation" data-cites="surkov2024unpackingsdxlturbointerpreting">Surkov et al. (<a href="#ref-surkov2024unpackingsdxlturbointerpreting" role="doc-biblioref">2025</a>)</span> found for SDXL.</p>
+<p><img src="img/cfg_patching.jpg" class="img-fluid"></p>
+</div>
+</div>
+</div>
+<p>Here is the result of amplifying each of the six features above on the Roman emperor prompt, with strength <span class="math inline">\(\xi\)</span> increasing from left to right:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/intervention_all.jpg" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>Amplifying single <code>down.2.0</code> features at every timestep. Prompt: “Portrait of a stoic Roman emperor, profile view.”</figcaption>
+</figure>
+</div>
+<p>The interventions match the top-activating images remarkably well. The <strong>object features replace the subject</strong>: the emperor becomes a dog, a rose, or a grass field. The <strong>style features keep the subject but change the aesthetic</strong>: an old photograph, a medieval painting, an anime drawing. The same experiments on <code>up.1.1</code> produce only subtle textural changes, which is again in line with the decoder block’s more diffuse feature usage.</p>
+</section>
+</section>
+<section id="a-temporal-hierarchy" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="a-temporal-hierarchy"><span class="header-section-number">5</span> A Temporal Hierarchy</h2>
+<p>So far every intervention was applied across all 25 steps. The more interesting question is <em>when</em> a feature matters. I split the trajectory into three windows, early (<span class="math inline">\(t\in[0.6,1.0]\)</span>), mid (<span class="math inline">\(t\in[0.2,0.6]\)</span>) and late (<span class="math inline">\(t\in[0.0,0.2]\)</span>), and apply the same interventions only within one window.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Early (<span class="math inline">\(t\in[0.6,1.0]\)</span>)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Mid (<span class="math inline">\(t\in[0.2,0.6]\)</span>)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Late (<span class="math inline">\(t\in[0.0,0.2]\)</span>)</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/intervention_early.jpg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<p>Early interventions are almost as powerful as intervening throughout. The dog feature replaces the emperor with a dog; style features turn the whole image into an old photograph, a medieval painting, or an anime drawing. <strong>Both composition and global style are decided here.</strong> (Feature 4255 is the exception: early intervention alone is not quite enough to turn the emperor into grass.)</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/intervention_mid.jpg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<p>By the middle stage the layout is mostly in place. Instead of replacing the subject, features now <strong>blend</strong> with it: the dog feature produces an emperor with canine features rather than a dog. Style features modify the existing image rather than setting its aesthetic.</p>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/intervention_late.jpg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<p>At the end, the image is essentially fixed. The same interventions only produce <strong>minor textural changes</strong> and small artefacts; the portrait itself stays the same.</p>
+</div>
+</div>
+</div>
+<p>To check that this is not cherry-picked, I ran a “knockout” experiment that removes the <em>entire</em> reconstructed feature contribution within a window (subtracting it in the conditional pass and adding it in the unconditional pass), over 1,000 prompts and 5 seeds:</p>
+<table class="table-striped table-hover caption-top table">
+<caption>Image-level change caused by knocking out all active SAE features within a window. Higher means the window matters more.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Block</th>
+<th style="text-align: left;">Window</th>
+<th style="text-align: center;">LPIPS</th>
+<th style="text-align: center;">Mean <span class="math inline">\(\ell_1\)</span></th>
+<th style="text-align: center;">Median <span class="math inline">\(\ell_1\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>down.2.0</code></td>
+<td style="text-align: left;">Early</td>
+<td style="text-align: center;"><strong>0.580</strong></td>
+<td style="text-align: center;"><strong>0.187</strong></td>
+<td style="text-align: center;"><strong>0.131</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>down.2.0</code></td>
+<td style="text-align: left;">Mid</td>
+<td style="text-align: center;">0.272</td>
+<td style="text-align: center;">0.079</td>
+<td style="text-align: center;">0.044</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>down.2.0</code></td>
+<td style="text-align: left;">Late</td>
+<td style="text-align: center;">0.105</td>
+<td style="text-align: center;">0.038</td>
+<td style="text-align: center;">0.022</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>up.1.1</code></td>
+<td style="text-align: left;">Early</td>
+<td style="text-align: center;"><strong>0.554</strong></td>
+<td style="text-align: center;"><strong>0.171</strong></td>
+<td style="text-align: center;"><strong>0.116</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>up.1.1</code></td>
+<td style="text-align: left;">Mid</td>
+<td style="text-align: center;">0.288</td>
+<td style="text-align: center;">0.082</td>
+<td style="text-align: center;">0.046</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>up.1.1</code></td>
+<td style="text-align: left;">Late</td>
+<td style="text-align: center;">0.101</td>
+<td style="text-align: center;">0.039</td>
+<td style="text-align: center;">0.022</td>
+</tr>
+</tbody>
+</table>
+<p>The effect drops by roughly a factor of two from early to mid and again from mid to late, in both blocks. This matches the frequency-based view of diffusion models as building images coarse-to-fine, low frequencies first <span class="citation" data-cites="dieleman2024spectral">(<a href="#ref-dieleman2024spectral" role="doc-biblioref">Dieleman 2024</a>)</span>. One finding differs from <span class="citation" data-cites="tinaz2025emergenceevolutioninterpretableconcepts">Tinaz, Fabian, and Soltanolkotabi (<a href="#ref-tinaz2025emergenceevolutioninterpretableconcepts" role="doc-biblioref">2025</a>)</span>, who place stylistic control mainly in the middle stage of SD v1.4. In my experiments, <strong>global style is already set early</strong>. I suspect the difference comes mostly from the intervention: they add features with equal strength to both guidance passes, which, as the callout above shows, weakens a feature’s visual effect considerably.</p>
+<section id="cross-resolution-generalisation" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="cross-resolution-generalisation"><span class="header-section-number">5.1</span> Cross-Resolution Generalisation</h3>
+<p>Recall that the SAEs were trained only on <span class="math inline">\(512\times512\)</span> generations. SD v2.1 can also generate at <span class="math inline">\(768\times768\)</span>, which gives a latent with more spatial positions and a somewhat different activation distribution. The reconstruction metrics already showed that the dictionary still fits. The interventions transfer as well:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/intervention_768.jpg" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>The same single-feature interventions as above, now at <span class="math inline">\(768\times768\)</span>, using the SAE trained at <span class="math inline">\(512\times512\)</span>.</figcaption>
+</figure>
+</div>
+<p>Dogs, roses, photographs and anime emperors appear just as before. This suggests that the SAE has learned compositional concepts that are close to resolution-invariant, and it has a practical consequence: <strong>SAEs for diffusion models can be trained on cheaper, low-resolution data</strong> and then used on high-resolution generations. Together with the finding of <span class="citation" data-cites="surkov2024unpackingsdxlturbointerpreting">Surkov et al. (<a href="#ref-surkov2024unpackingsdxlturbointerpreting" role="doc-biblioref">2025</a>)</span> that SAEs transfer from a distilled one-step model to its multi-step parent, it hints that SAE features are more robust to distribution shift than one might fear.</p>
+</section>
+</section>
+<section id="from-features-to-feature-sets-activation-patching" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="from-features-to-feature-sets-activation-patching"><span class="header-section-number">6</span> From Features to Feature Sets: Activation Patching</h2>
+<p>Single features are one thing, but concepts in a real generation are spread over many of them. To move a whole concept from one prompt to another, I adapt the activation patching approach of <span class="citation" data-cites="surkov2024unpackingsdxlturbointerpreting">Surkov et al. (<a href="#ref-surkov2024unpackingsdxlturbointerpreting" role="doc-biblioref">2025</a>)</span> to multi-step models with guidance.</p>
+<p>Given a source prompt <span class="math inline">\(\boldsymbol{c}_{\text{src}}\)</span> (say, “cat”) and a destination prompt <span class="math inline">\(\boldsymbol{c}_{\text{dest}}\)</span> (say, “bird”), I compute a differential score for each feature from its normalised mean activation, <span class="math display">\[
+\gamma_\varphi = \frac{\bar{\mu}_\varphi(\boldsymbol{c}_{\text{src}})}{\sum_{\varphi'}\bar{\mu}_{\varphi'}(\boldsymbol{c}_{\text{src}})} - \frac{\bar{\mu}_\varphi(\boldsymbol{c}_{\text{dest}})}{\sum_{\varphi'}\bar{\mu}_{\varphi'}(\boldsymbol{c}_{\text{dest}})},
+\]</span> and take the top-<span class="math inline">\(m\)</span> features as the source set <span class="math inline">\(\mathcal{K}_{\text{src}}\)</span> and the bottom-<span class="math inline">\(m\)</span> as the destination set <span class="math inline">\(\mathcal{K}_{\text{dest}}\)</span>. With a patch <span class="math inline">\(\boldsymbol{P}_t(\boldsymbol{c},\mathcal{K}) = \sum_{\varphi\in\mathcal{K}} \boldsymbol{S}^\varphi_t(\boldsymbol{c})\otimes\boldsymbol{f}_\varphi\)</span>, the destination generation is modified as <span class="math display">\[
+\boldsymbol{\Delta D}'_t = \boldsymbol{\Delta D}_t(\boldsymbol{c}_{\text{dest}}) \mp \alpha\,\boldsymbol{P}_t(\boldsymbol{c}_{\text{dest}},\mathcal{K}_{\text{dest}}) \pm \beta\,\boldsymbol{P}_t(\boldsymbol{c}_{\text{src}},\mathcal{K}_{\text{src}}),
+\]</span> with the upper signs for the conditional and the lower signs for the unconditional pass, and <span class="math inline">\(\alpha=1\)</span>, <span class="math inline">\(\beta=2\)</span>. In words: remove what is characteristic of the destination concept, then add what is characteristic of the source concept, each with its <strong>full spatial activation map</strong>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/patching.jpg" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>Activation patching in <code>down.2.0</code> across all timesteps for an increasing number <span class="math inline">\(m\)</span> of patched features. Rows, top to bottom: forest → arctic, cat → bird, dog → bird, mountain lake → ocean bay, cathedral → glass skyscraper, calm ocean → rough ocean.</figcaption>
+</figure>
+</div>
+<p>Concepts transfer reliably with as few as <strong>5 to 20 features</strong>. That is far fewer than the spatially masked approach of <span class="citation" data-cites="surkov2024unpackingsdxlturbointerpreting">Surkov et al. (<a href="#ref-surkov2024unpackingsdxlturbointerpreting" role="doc-biblioref">2025</a>)</span> usually needs. My guess is that this is because I keep each feature’s native spatial structure, whereas their method collapses the activation within a semantic mask to a single value and broadcasts it. The same works for <code>up.1.1</code> (which needs somewhat more features) and, again, at <span class="math inline">\(768\times768\)</span>.</p>
+<p>Stratifying the patching by time confirms the hierarchy from before, now for whole feature sets:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/patching_stratified.jpg" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>Time-stratified activation patching: cat → bird and forest → arctic, applied only in the early, mid, or late window.</figcaption>
+</figure>
+</div>
+<p>Early patching rewrites the subject and the background. Mid-stage patching produces hybrids. Late patching does essentially nothing, since the model has already committed.</p>
+</section>
+<section id="temporal-circuit-discovery" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="temporal-circuit-discovery"><span class="header-section-number">7</span> Temporal Circuit Discovery</h2>
+<p>Activation patching tells us <em>which</em> features carry a concept, but not <em>how</em> they interact. In language models, the tool for this is <strong>sparse feature circuits</strong> <span class="citation" data-cites="marks2025sparsefeaturecircuitsdiscovering">(<a href="#ref-marks2025sparsefeaturecircuitsdiscovering" role="doc-biblioref">Marks et al. 2025</a>)</span>: a graph whose nodes are SAE features and whose edges quantify how much one feature causally drives another. The new ingredient for diffusion is time. The U-Net is applied recurrently, so a feature at step <span class="math inline">\(\tau_i\)</span> can affect the latent and therefore every feature at later steps.</p>
+<section id="circuits-as-temporal-dags" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="circuits-as-temporal-dags"><span class="header-section-number">7.1</span> Circuits as Temporal DAGs</h3>
+<p>I define a temporal sparse feature circuit as a weighted DAG <span class="math inline">\(\mathcal{C}=(\mathcal{V},\mathcal{E},W)\)</span> over the discrete timesteps <span class="math inline">\(\mathcal{T}=\{\tau_1=1.0,\ldots,\tau_T\}\)</span>:</p>
+<ul>
+<li><strong>Nodes</strong> <span class="math inline">\(v = (\kappa,\tau_i)\)</span>, where <span class="math inline">\(\kappa\)</span> is either an SAE feature index or the special symbol <code>res</code> for the SAE <strong>error term</strong>;</li>
+<li><strong>Edges</strong> <span class="math inline">\((v_i, v_j)\)</span> only go forward in generation time, <span class="math inline">\(\tau_i &gt; \tau_j\)</span>;</li>
+<li><strong>Weights</strong> <span class="math inline">\(W(v_i,v_j)\in\mathbb{R}\)</span> measure the strength and sign of the causal influence.</li>
+</ul>
+<p>The error node is important. The SAE reconstruction is imperfect, and <span class="citation" data-cites="marks2025sparsefeaturecircuitsdiscovering">Marks et al. (<a href="#ref-marks2025sparsefeaturecircuitsdiscovering" role="doc-biblioref">2025</a>)</span> show that the residual <span class="math inline">\(\boldsymbol{e}_t = \boldsymbol{\Delta D}_t - \widehat{\boldsymbol{\Delta D}}_t\)</span> often carries causally essential information. So instead of treating the SAE as an approximation, I write the update <em>exactly</em> as <span class="math display">\[
+\boldsymbol{\Delta D}_t = \sum_{\varphi=1}^{n_f} \boldsymbol{S}^\varphi_t\otimes\boldsymbol{f}_\varphi + \boldsymbol{b}_{\text{pre}} + \boldsymbol{e}_t,
+\]</span> and keep the error as a node in the graph.</p>
+</section>
+<section id="indirect-effects-in-a-recurrent-model" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="indirect-effects-in-a-recurrent-model"><span class="header-section-number">7.2</span> Indirect Effects in a Recurrent Model</h3>
+<p>The importance of a node is its <em>indirect effect</em> <span class="citation" data-cites="pearl2001direct">(<a href="#ref-pearl2001direct" role="doc-biblioref">Pearl 2001</a>)</span>: how much a downstream metric <span class="math inline">\(\mathcal{M}\)</span> changes when we set the node’s activation to what it would have been under a counterfactual prompt, <span class="math display">\[
+\operatorname{IE}(\mathcal{M}; \boldsymbol{a}_v) = \mathcal{M}\big(\boldsymbol{c}_{\text{dest}} \mid do(\boldsymbol{a}_v = \boldsymbol{a}_v^{\text{src}})\big) - \mathcal{M}(\boldsymbol{c}_{\text{dest}}).
+\]</span> Here <span class="math inline">\(\boldsymbol{a}_v\in\mathbb{R}^{2\times h\times w}\)</span> stacks the node’s spatial activation maps for the unconditional and conditional passes. The effect is “indirect” because it is mediated by everything the model computes afterwards, including every later denoising step.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/indirect_effect.png" class="img-fluid figure-img" style="width:85.0%"></p>
+<figcaption>Measuring the indirect effect of a single SAE feature <span class="math inline">\((\varphi, t)\)</span>. A change at step <span class="math inline">\(t\)</span> alters the next latent and then propagates through every later application of the U-Net until the probe metric is read out at <span class="math inline">\(t_{\text{probe}}\)</span>.</figcaption>
+</figure>
+</div>
+<p>Computing this exactly would take one forward pass per feature per timestep, which is far too expensive. Attribution patching <span class="citation" data-cites="nanda2022attribution kramar2024atp">(<a href="#ref-nanda2022attribution" role="doc-biblioref">Nanda 2022</a>; <a href="#ref-kramar2024atp" role="doc-biblioref">Kramár et al. 2024</a>)</span> replaces it by a first-order Taylor expansion, <span class="math inline">\(\widehat{\operatorname{IE}} = \langle \nabla_{\boldsymbol{a}_v}\mathcal{M},\, \boldsymbol{a}_v^{\text{src}} - \boldsymbol{a}_v^{\text{dest}}\rangle_F\)</span>, which needs only two forward passes and one backward pass for <em>all</em> nodes. Since the linear approximation is known to underestimate effects far upstream, and long-range temporal effects are exactly what I am after, I use <strong>integrated gradients</strong> <span class="citation" data-cites="sundararajan2017axiomaticattributiondeepnetworks">(<a href="#ref-sundararajan2017axiomaticattributiondeepnetworks" role="doc-biblioref">Sundararajan, Taly, and Yan 2017</a>)</span> with <span class="math inline">\(N=10\)</span> interpolation steps instead: <span class="math display">\[
+\widehat{\operatorname{IE}}_{\text{ig}} = \left\langle \frac{1}{N}\sum_{i=0}^{N-1} \nabla_{\boldsymbol{a}_v}\mathcal{M}\Big|_{\boldsymbol{a}_v = \frac{i}{N}\boldsymbol{a}_v^{\text{dest}} + (1-\frac{i}{N})\boldsymbol{a}_v^{\text{src}}},\; \boldsymbol{a}_v^{\text{src}} - \boldsymbol{a}_v^{\text{dest}} \right\rangle_F .
+\]</span></p>
+<p>For edges I make a Markov assumption and only connect consecutive timesteps <span class="math inline">\((\tau_i,\tau_{i+1})\)</span>. The edge weight is then <span class="math display">\[
+W(v_i, v_j) = \left\langle \boldsymbol{g}_{v_j},\, \frac{\partial \boldsymbol{a}_{v_j}}{\partial \boldsymbol{a}_{v_i}}\boldsymbol{\delta}_{v_i} \right\rangle_F = \left\langle \Big(\frac{\partial \boldsymbol{a}_{v_j}}{\partial \boldsymbol{a}_{v_i}}\Big)^{\!\top}\boldsymbol{g}_{v_j},\, \boldsymbol{\delta}_{v_i} \right\rangle_F,
+\]</span> where <span class="math inline">\(\boldsymbol{g}_{v_j}\)</span> is the (integrated) gradient of the metric with respect to the later node and <span class="math inline">\(\boldsymbol{\delta}_{v_i}\)</span> the activation difference of the earlier node. Written in the second form, it is a single vector-Jacobian product per downstream node, which gives the edges into <span class="math inline">\(v_j\)</span> from all upstream nodes at once.</p>
+</section>
+<section id="a-probe-as-the-metric" class="level3" data-number="7.3">
+<h3 data-number="7.3" class="anchored" data-anchor-id="a-probe-as-the-metric"><span class="header-section-number">7.3</span> A Probe as the Metric</h3>
+<p>Gradient-based attribution needs a differentiable scalar metric. In language models this is usually a logit difference between two candidate next tokens. Diffusion models have no output vocabulary, so I built one: a <strong>diagnostic probe</strong>, a small CNN trained to classify the concept of interest (“cat” vs.&nbsp;“bird”) from the output of the cross-attention block at a chosen timestep <span class="math inline">\(t_{\text{probe}}\)</span>. Its raw logit, <span class="math display">\[
+\mathcal{M}(\boldsymbol{c}) = \log\mathbb{P}(\text{src}\mid\boldsymbol{D}^{\text{out}}_{t_\text{probe}}) - \log\mathbb{P}(\text{dest}\mid\boldsymbol{D}^{\text{out}}_{t_\text{probe}}),
+\]</span> measures how strongly the model’s internal state represents one concept over the other. A useful side effect: the backward pass stops at <span class="math inline">\(t_{\text{probe}}\)</span>, so there is no need to backpropagate through the rest of the sampling trajectory.</p>
+</section>
+</section>
+<section id="anatomy-of-a-cat-vs.-bird-circuit" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="anatomy-of-a-cat-vs.-bird-circuit"><span class="header-section-number">8</span> Anatomy of a “Cat vs.&nbsp;Bird” Circuit</h2>
+<p>To test the framework, I picked a simple comparative task. On 50 template prompt pairs such as <em>“A photorealistic image of a black and white [cat / bird] facing the camera”</em>, each with two seeds, I computed node and edge effects in <code>down.2.0</code> over the first five steps (<span class="math inline">\(t\in[0.8, 1.0]\)</span>), where we now know composition is decided. Attribution is computed in both directions (cat → bird and bird → cat) to pick up features whose removal breaks a concept <em>and</em> whose insertion creates it.</p>
+<p>One practical detail turned out to matter. Effect magnitudes vary by orders of magnitude between timesteps:</p>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/node_dist.png" class="img-fluid figure-img"></p>
+<figcaption>Node indirect-effect magnitudes</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/edge_dist.png" class="img-fluid figure-img"></p>
+<figcaption>Edge-effect magnitudes</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>A single global threshold, as used by <span class="citation" data-cites="marks2025sparsefeaturecircuitsdiscovering">Marks et al. (<a href="#ref-marks2025sparsefeaturecircuitsdiscovering" role="doc-biblioref">2025</a>)</span>, would keep almost everything from a couple of high-magnitude steps and nothing from the rest, leaving gaps in the chain. Instead, I keep the <strong>top-7 nodes and top-5 edges per timestep</strong>, which makes sure every step of the Markov chain is represented.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/circuit_cat_bird.png" class="img-fluid figure-img"></p>
+<figcaption>The “cat vs.&nbsp;bird” circuit in <code>down.2.0</code> for <span class="math inline">\(t\in[0.8, 1.0]\)</span>. Circles are SAE features, diamonds the SAE error term. Node colour shows the indirect effect on the probe (red ≈ towards “bird”, blue ≈ towards “cat”); edge colour and thickness show sign and strength of the causal influence.</figcaption>
+</figure>
+</div>
+<p>A few things stand out:</p>
+<ul>
+<li><strong>Temporal persistence.</strong> Features such as F380, F1761, F2093 and F4451 show up at several consecutive steps. Their effect changes over time, though, in intensity and sometimes even in sign, so a feature’s role is not fixed across the trajectory.</li>
+<li><strong>Few self-edges.</strong> Somewhat surprisingly, a feature rarely drives <em>itself</em> at the next step. Information is handed between different features instead.</li>
+<li><strong>The error term is a highway.</strong> The <code>Res</code> node is among the top seven at <em>every</em> step, and many strong edges run through it. Part of the computation is clearly not captured by a 5,120-feature, <span class="math inline">\(k=10\)</span> dictionary.</li>
+</ul>
+<p>What are the persistent features? Their top-activating images and steering effects tell a consistent story:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/circuit_top_examples.jpg" class="img-fluid figure-img"></p>
+<figcaption>Top-activating images for the persistent circuit features.</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/circuit_interventions.jpg" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>Amplifying each circuit feature on “Portrait of a stoic king, profile view.”</figcaption>
+</figure>
+</div>
+<p>Feature 1761 is about small birds, 2093 about owls, and 4451 about domestic cats; 853 responds to lions, squirrels and dogs, and 380 to dogs, squirrels and cats. Amplifying them turns the king into the matching bird- or mammal-like figure. Feature 927 is the odd one out: its top examples are human faces and glass, and steering with it gives abstract results, so I excluded it from the circuit.</p>
+<section id="swapping-the-circuit" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="swapping-the-circuit"><span class="header-section-number">8.1</span> Swapping the Circuit</h3>
+<p>As a final test of whether these nodes really control the concept, I use them for <strong>bidirectional activation patching</strong>: in the bird prompt, remove the bird features and insert the cat features, and vice versa.</p>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/bidirect1.jpg" class="img-fluid figure-img"></p>
+<figcaption>(a) “A close-up image of a brown [concept] in profile.”</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/bidirect2.jpg" class="img-fluid figure-img"></p>
+<figcaption>(b) “An artistic image of a grey [concept] sitting still.”</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/bidirect3.jpg" class="img-fluid figure-img"></p>
+<figcaption>(c) “A highly detailed image of a white [concept] facing the camera.”</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/bidirect4.jpg" class="img-fluid figure-img"></p>
+<figcaption>(d) “A highly detailed image of a brown [concept] sitting still.”</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>On randomly drawn test prompts, swapping only the circuit features reliably turns cats into birds and birds into cats, while keeping colour, pose and setting. This is qualitative evidence that the circuit has found the components that causally control the concept, and not just features that happen to correlate with it.</p>
+</section>
+</section>
+<section id="reflections" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="reflections"><span class="header-section-number">9</span> Reflections</h2>
+<p>The clearest result of the thesis is the <strong>temporal hierarchy</strong>. Using a single SAE shared across all timesteps, the same story shows up for single features, for feature sets, and for whole-dictionary knockouts: diffusion decides <em>what</em> and <em>in which style</em> during the first few steps, <em>refines and blends</em> in the middle, and only <em>polishes texture</em> at the end. If you want to steer, edit, or unlearn something in a diffusion model, the early steps are where the leverage is.</p>
+<p>The <strong>cross-resolution transfer</strong> was more of a surprise, and a convenient one. If SAE features are this robust to resolution, and, as other work suggests, to distillation, then most of the expensive dictionary learning could be done on cheap data. Crosscoders <span class="citation" data-cites="lindsey2024sparsecrosscoder">(<a href="#ref-lindsey2024sparsecrosscoder" role="doc-biblioref">Lindsey et al. 2024</a>)</span> and universal SAEs <span class="citation" data-cites="thasarathan2025universalsparseautoencodersinterpretable">(<a href="#ref-thasarathan2025universalsparseautoencodersinterpretable" role="doc-biblioref">Thasarathan et al. 2025</a>)</span> seem like the right tools to push this further, for example to compare a base model with its LoRA fine-tunes <span class="citation" data-cites="hu2021loralowrankadaptationlarge">(<a href="#ref-hu2021loralowrankadaptationlarge" role="doc-biblioref">Hu et al. 2021</a>)</span> or SD v1.4 with SDXL.</p>
+<p>The <strong>circuit discovery</strong> part is the most exploratory, and it has real limitations:</p>
+<ul>
+<li>It was shown on one simple contrast (cat vs.&nbsp;bird), over five timesteps, and evaluated qualitatively.</li>
+<li>It looks at a single cross-attention block. Other blocks can compensate for ablated computation, which makes standard faithfulness and completeness metrics hard to interpret in this setting.</li>
+<li>The large role of the error term probably reflects the modest SAE size (<span class="math inline">\(n_f=5{,}120\)</span>, <span class="math inline">\(k=10\)</span>). A wider, less sparse dictionary should shrink it, although <span class="citation" data-cites="marks2025sparsefeaturecircuitsdiscovering">Marks et al. (<a href="#ref-marks2025sparsefeaturecircuitsdiscovering" role="doc-biblioref">2025</a>)</span> also find that removing error nodes is disruptive in LLM circuits.</li>
+<li>The integrated-gradient estimates sum over the conditional and unconditional passes. How guidance interacts with these estimates deserves its own study.</li>
+</ul>
+<p>Still, I think the framework is a useful first step: it turns “this feature matters” into “this feature at step <span class="math inline">\(\tau_i\)</span> drives that feature at step <span class="math inline">\(\tau_{i+1}\)</span>, which pushes the model towards <em>bird</em>”, and the bidirectional patching gives a way to check it. Natural next steps are circuits across several blocks, spatially masked circuits, and harder targets than cats and birds, for example datasets designed to surface social biases, where knowing <em>where and when</em> a model makes a decision would be directly useful.</p>
+<p>If you want to dig into the details, the code is on <a href="https://github.com/JHSchlegel/mechinterp-diffusion"><i class="bi bi-github"></i> GitHub</a> and the full thesis is linked on my <a href="../../research.html">research page</a>.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-basu2024mechanisticknowledgelocalizationtexttoimage" class="csl-entry" role="listitem">
+Basu, Samyadeep, Keivan Rezaei, Priyatham Kattakinda, Ryan Rossi, Cherry Zhao, Vlad Morariu, Varun Manjunatha, and Soheil Feizi. 2024. <span>“On Mechanistic Knowledge Localization in Text-to-Image Generative Models.”</span> <a href="https://arxiv.org/abs/2405.01008">https://arxiv.org/abs/2405.01008</a>.
+</div>
+<div id="ref-bereska2024mechanisticinterpretabilityaisafety" class="csl-entry" role="listitem">
+Bereska, Leonard, and Efstratios Gavves. 2024. <span>“Mechanistic Interpretability for AI Safety – a Review.”</span> <a href="https://arxiv.org/abs/2404.14082">https://arxiv.org/abs/2404.14082</a>.
+</div>
+<div id="ref-bricken2023monosemanticity" class="csl-entry" role="listitem">
+Bricken, Trenton, Adly Templeton, Joshua Batson, Brian Chen, Adam Jermyn, Tom Conerly, Nick Turner, et al. 2023. <span>“Towards Monosemanticity: Decomposing Language Models with Dictionary Learning.”</span> <em>Transformer Circuits Thread</em>.
+</div>
+<div id="ref-cunningham2023sparseautoencodershighlyinterpretable" class="csl-entry" role="listitem">
+Cunningham, Hoagy, Aidan Ewart, Logan Riggs, Robert Huben, and Lee Sharkey. 2023. <span>“Sparse Autoencoders Find Highly Interpretable Features in Language Models.”</span> <a href="https://arxiv.org/abs/2309.08600">https://arxiv.org/abs/2309.08600</a>.
+</div>
+<div id="ref-cywinski2025saeuron" class="csl-entry" role="listitem">
+Cywiński, Bartosz, and Kamil Deja. 2025. <span>“SAeUron: Interpretable Concept Unlearning in Diffusion Models with Sparse Autoencoders.”</span> <a href="https://arxiv.org/abs/2501.18052">https://arxiv.org/abs/2501.18052</a>.
+</div>
+<div id="ref-dieleman2024spectral" class="csl-entry" role="listitem">
+Dieleman, Sander. 2024. <span>“Diffusion Is Spectral Autoregression.”</span> <a href="https://sander.ai/2024/09/02/spectral-autoregression.html">https://sander.ai/2024/09/02/spectral-autoregression.html</a>.
+</div>
+<div id="ref-elhage2022toymodelssuperposition" class="csl-entry" role="listitem">
+Elhage, Nelson, Tristan Hume, Catherine Olsson, Nicholas Schiefer, Tom Henighan, Shauna Kravec, Zac Hatfield-Dodds, et al. 2022. <span>“Toy Models of Superposition.”</span> <a href="https://arxiv.org/abs/2209.10652">https://arxiv.org/abs/2209.10652</a>.
+</div>
+<div id="ref-gao2024scalingevaluatingsparseautoencoders" class="csl-entry" role="listitem">
+Gao, Leo, Tom Dupré la Tour, Henk Tillman, Gabriel Goh, Rajan Troll, Alec Radford, Ilya Sutskever, Jan Leike, and Jeffrey Wu. 2024. <span>“Scaling and Evaluating Sparse Autoencoders.”</span> <a href="https://arxiv.org/abs/2406.04093">https://arxiv.org/abs/2406.04093</a>.
+</div>
+<div id="ref-ho2020denoisingdiffusionprobabilisticmodels" class="csl-entry" role="listitem">
+Ho, Jonathan, Ajay Jain, and Pieter Abbeel. 2020. <span>“Denoising Diffusion Probabilistic Models.”</span> <a href="https://arxiv.org/abs/2006.11239">https://arxiv.org/abs/2006.11239</a>.
+</div>
+<div id="ref-hu2021loralowrankadaptationlarge" class="csl-entry" role="listitem">
+Hu, Edward J., Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. 2021. <span>“LoRA: Low-Rank Adaptation of Large Language Models.”</span> <a href="https://arxiv.org/abs/2106.09685">https://arxiv.org/abs/2106.09685</a>.
+</div>
+<div id="ref-kramar2024atp" class="csl-entry" role="listitem">
+Kramár, János, Tom Lieberum, Rohin Shah, and Neel Nanda. 2024. <span>“AtP*: An Efficient and Scalable Method for Localizing LLM Behaviour to Components.”</span> <a href="https://arxiv.org/abs/2403.00745">https://arxiv.org/abs/2403.00745</a>.
+</div>
+<div id="ref-lindsey2024sparsecrosscoder" class="csl-entry" role="listitem">
+Lindsey, Jack, Adly Templeton, Jonathan Marcus, Thomas Conerly, Joshua Batson, and Christopher Olah. 2024. <span>“Sparse Crosscoders for Cross-Layer Features and Model Diffing.”</span> <em>Transformer Circuits Thread</em>. <a href="https://transformer-circuits.pub/2024/crosscoders/index.html">https://transformer-circuits.pub/2024/crosscoders/index.html</a>.
+</div>
+<div id="ref-makhzani2014ksparseautoencoders" class="csl-entry" role="listitem">
+Makhzani, Alireza, and Brendan Frey. 2014. <span>“K-Sparse Autoencoders.”</span> <a href="https://arxiv.org/abs/1312.5663">https://arxiv.org/abs/1312.5663</a>.
+</div>
+<div id="ref-marks2025sparsefeaturecircuitsdiscovering" class="csl-entry" role="listitem">
+Marks, Samuel, Can Rager, Eric J. Michaud, Yonatan Belinkov, David Bau, and Aaron Mueller. 2025. <span>“Sparse Feature Circuits: Discovering and Editing Interpretable Causal Graphs in Language Models.”</span> <a href="https://arxiv.org/abs/2403.19647">https://arxiv.org/abs/2403.19647</a>.
+</div>
+<div id="ref-nanda2022attribution" class="csl-entry" role="listitem">
+Nanda, Neel. 2022. <span>“Attribution Patching: Activation Patching at Industrial Scale.”</span> <a href="https://www.neelnanda.io/mechanistic-interpretability/attribution-patching" class="uri">https://www.neelnanda.io/mechanistic-interpretability/attribution-patching</a>.
+</div>
+<div id="ref-pearl2001direct" class="csl-entry" role="listitem">
+Pearl, Judea. 2001. <span>“Direct and Indirect Effects.”</span> In <em>Proceedings of the Seventeenth Conference on Uncertainty in Artificial Intelligence</em>, 411–20. UAI’01. San Francisco, CA, USA: Morgan Kaufmann Publishers Inc.
+</div>
+<div id="ref-radford2021learningtransferablevisualmodels" class="csl-entry" role="listitem">
+Radford, Alec, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, et al. 2021. <span>“Learning Transferable Visual Models from Natural Language Supervision.”</span> <a href="https://arxiv.org/abs/2103.00020">https://arxiv.org/abs/2103.00020</a>.
+</div>
+<div id="ref-rombach2022highresolutionimagesynthesislatent" class="csl-entry" role="listitem">
+Rombach, Robin, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. 2022. <span>“High-Resolution Image Synthesis with Latent Diffusion Models.”</span> <a href="https://arxiv.org/abs/2112.10752">https://arxiv.org/abs/2112.10752</a>.
+</div>
+<div id="ref-schuhmann2022laioncoco" class="csl-entry" role="listitem">
+Schuhmann, Christoph, Andreas Köpf, Richard Vencu, Theo Coombes, Romain Beaumont, and Benjamin Trom. 2022. <span>“Laion Coco: 600m Synthetic Captions from Laion2b-En.”</span> LAION Blog. <a href="https://laion.ai/blog/laion-coco/">https://laion.ai/blog/laion-coco/</a>.
+</div>
+<div id="ref-shi2025dissectingmitigatingdiffusionbias" class="csl-entry" role="listitem">
+Shi, Yingdong, Changming Li, Yifan Wang, Yongxiang Zhao, Anqi Pang, Sibei Yang, Jingyi Yu, and Kan Ren. 2025. <span>“Dissecting and Mitigating Diffusion Bias via Mechanistic Interpretability.”</span> <a href="https://arxiv.org/abs/2503.20483">https://arxiv.org/abs/2503.20483</a>.
+</div>
+<div id="ref-song2022ddim" class="csl-entry" role="listitem">
+Song, Jiaming, Chenlin Meng, and Stefano Ermon. 2022. <span>“Denoising Diffusion Implicit Models.”</span> <a href="https://arxiv.org/abs/2010.02502">https://arxiv.org/abs/2010.02502</a>.
+</div>
+<div id="ref-sundararajan2017axiomaticattributiondeepnetworks" class="csl-entry" role="listitem">
+Sundararajan, Mukund, Ankur Taly, and Qiqi Yan. 2017. <span>“Axiomatic Attribution for Deep Networks.”</span> <a href="https://arxiv.org/abs/1703.01365">https://arxiv.org/abs/1703.01365</a>.
+</div>
+<div id="ref-surkov2024unpackingsdxlturbointerpreting" class="csl-entry" role="listitem">
+Surkov, Viacheslav, Chris Wendler, Antonio Mari, Mikhail Terekhov, Justin Deschenaux, Robert West, Caglar Gulcehre, and David Bau. 2025. <span>“One-Step Is Enough: Sparse Autoencoders for Text-to-Image Diffusion Models.”</span> <a href="https://arxiv.org/abs/2410.22366">https://arxiv.org/abs/2410.22366</a>.
+</div>
+<div id="ref-templeton2024scaling" class="csl-entry" role="listitem">
+Templeton, Adly, Tom Conerly, Jonathan Marcus, Jack Lindsey, Trenton Bricken, Brian Chen, Adam Pearce, et al. 2024. <span>“Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet.”</span> <em>Transformer Circuits Thread</em>. <a href="https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html">https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html</a>.
+</div>
+<div id="ref-thasarathan2025universalsparseautoencodersinterpretable" class="csl-entry" role="listitem">
+Thasarathan, Harrish, Julian Forsyth, Thomas Fel, Matthew Kowal, and Konstantinos Derpanis. 2025. <span>“Universal Sparse Autoencoders: Interpretable Cross-Model Concept Alignment.”</span> <a href="https://arxiv.org/abs/2502.03714">https://arxiv.org/abs/2502.03714</a>.
+</div>
+<div id="ref-tinaz2025emergenceevolutioninterpretableconcepts" class="csl-entry" role="listitem">
+Tinaz, Berk, Zalan Fabian, and Mahdi Soltanolkotabi. 2025. <span>“Emergence and Evolution of Interpretable Concepts in Diffusion Models.”</span> <a href="https://arxiv.org/abs/2504.15473">https://arxiv.org/abs/2504.15473</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script>
+
+/* ============================================================
+
+   Dark / light mode icon for Quarto's color-scheme toggle.
+
+   Quarto ships the toggle with an empty <i class="bi">; this adds
+
+   a Bootstrap-Icons glyph and swaps it whenever the scheme changes:
+
+       light mode  ->  bi-moon-stars   (click to go dark)
+
+       dark  mode  ->  bi-sun          (click to go light)
+
+   Quarto marks the toggle with the class `alternate` while dark.
+
+   ============================================================ */
+
+(function () {
+
+  function apply() {
+
+    document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
+
+      var icon = toggle.querySelector(".bi");
+
+      if (!icon) return;
+
+      var dark = toggle.classList.contains("alternate");
+
+      icon.classList.remove("bi-sun", "bi-moon-stars");
+
+      icon.classList.add(dark ? "bi-sun" : "bi-moon-stars");
+
+    });
+
+  }
+
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+
+    apply();
+
+    document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
+
+      new MutationObserver(apply).observe(toggle, {
+
+        attributes: true,
+
+        attributeFilter: ["class"]
+
+      });
+
+    });
+
+  });
+
+})();
+
+</script>
+
+<script>
+
+/* ============================================================
+
+   Lightbox — full-screen image viewer with prev/next navigation.
+
+   Targets content images (photography albums + blog figures/plots)
+
+   inside the main document, excluding the portrait, navbar logo,
+
+   listing thumbnails, and images that are already links.
+
+   Wired site-wide via include-after-body in _quarto.yml.
+
+   ============================================================ */
+
+(function () {
+
+  document.addEventListener("DOMContentLoaded", function () {
+
+    function eligible(img) {
+
+      if (!img.closest("#quarto-document-content")) return false;
+
+      if (img.closest(".jhs-hero")) return false;
+
+      if (img.closest(".navbar")) return false;
+
+      if (img.closest(".quarto-listing")) return false;
+
+      if (img.closest("a")) return false;
+
+      return true;
+
+    }
+
+
+
+    var items = Array.prototype.filter.call(
+
+      document.querySelectorAll("#quarto-document-content img"), eligible
+
+    );
+
+    if (!items.length) return;
+
+
+
+    var current = 0;
+
+    var lastFocus = null;
+
+
+
+    // ---- Build the overlay once ----
+
+    var lb = document.createElement("div");
+
+    lb.className = "jhs-lb";
+
+    lb.setAttribute("role", "dialog");
+
+    lb.setAttribute("aria-modal", "true");
+
+    lb.setAttribute("aria-label", "Image viewer");
+
+    lb.hidden = true;
+
+    lb.innerHTML =
+
+      '<button class="jhs-lb-close" aria-label="Close (Esc)"><i class="bi bi-x-lg"></i></button>' +
+
+      '<button class="jhs-lb-prev" aria-label="Previous image"><i class="bi bi-chevron-left"></i></button>' +
+
+      '<figure class="jhs-lb-figure"><img class="jhs-lb-img" alt=""><figcaption class="jhs-lb-caption"></figcaption></figure>' +
+
+      '<button class="jhs-lb-next" aria-label="Next image"><i class="bi bi-chevron-right"></i></button>' +
+
+      '<div class="jhs-lb-counter"></div>';
+
+    document.body.appendChild(lb);
+
+
+
+    var imgEl = lb.querySelector(".jhs-lb-img");
+
+    var capEl = lb.querySelector(".jhs-lb-caption");
+
+    var counterEl = lb.querySelector(".jhs-lb-counter");
+
+    var prevBtn = lb.querySelector(".jhs-lb-prev");
+
+    var nextBtn = lb.querySelector(".jhs-lb-next");
+
+    var closeBtn = lb.querySelector(".jhs-lb-close");
+
+    var figEl = lb.querySelector(".jhs-lb-figure");
+
+
+
+    var single = items.length < 2;
+
+    prevBtn.style.display = single ? "none" : "";
+
+    nextBtn.style.display = single ? "none" : "";
+
+    counterEl.style.display = single ? "none" : "";
+
+
+
+    function show(i) {
+
+      current = (i + items.length) % items.length;
+
+      var img = items[current];
+
+      imgEl.src = img.currentSrc || img.src;
+
+      var alt = img.getAttribute("alt") || "";
+
+      imgEl.alt = alt;
+
+      capEl.textContent = alt;
+
+      capEl.style.display = alt ? "" : "none";
+
+      counterEl.textContent = (current + 1) + " / " + items.length;
+
+    }
+
+    function open(i) {
+
+      lastFocus = document.activeElement;
+
+      show(i);
+
+      lb.hidden = false;
+
+      document.body.classList.add("jhs-lb-open");
+
+      closeBtn.focus();
+
+    }
+
+    function close() {
+
+      lb.hidden = true;
+
+      document.body.classList.remove("jhs-lb-open");
+
+      imgEl.removeAttribute("src");
+
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+
+    }
+
+    function next() { show(current + 1); }
+
+    function prev() { show(current - 1); }
+
+
+
+    // ---- Make eligible images clickable ----
+
+    items.forEach(function (img, i) {
+
+      img.classList.add("jhs-lb-eligible");
+
+      img.addEventListener("click", function () { open(i); });
+
+    });
+
+
+
+    // ---- Controls ----
+
+    closeBtn.addEventListener("click", close);
+
+    nextBtn.addEventListener("click", function (e) { e.stopPropagation(); next(); });
+
+    prevBtn.addEventListener("click", function (e) { e.stopPropagation(); prev(); });
+
+    lb.addEventListener("click", function (e) {
+
+      if (e.target === lb || e.target === figEl) close();
+
+    });
+
+    document.addEventListener("keydown", function (e) {
+
+      if (lb.hidden) return;
+
+      if (e.key === "Escape") close();
+
+      else if (e.key === "ArrowRight") next();
+
+      else if (e.key === "ArrowLeft") prev();
+
+    });
+
+  });
+
+})();
+
+</script>
+
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/jhschlegel\.github\.io");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Jan Schlegel</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JHSchlegel">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/">
+      <i class="bi bi-linkedin" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
