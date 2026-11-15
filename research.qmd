@@ -55,6 +55,7 @@ toc: false
     <p class="jhs-pub-abstract">Climate downscaling translates coarse global climate model (GCM) outputs into high-resolution predictions that inform local decision-making. This work investigates the robustness and transferability of statistical downscaling methods applied to unseen GCMs. Building on generative frameworks such as Coarse-from-Super and Corrector Diffusion models, we evaluate their performance under cross-GCM extrapolation. Our experiments show that stochastic methods outperform deterministic baselines in energy score while maintaining comparable mean squared error, highlighting the potential of generative downscaling for modeling the variability inherent in climate systems.</p>
     <div class="jhs-pub-links">
       <a href="research/JHSchlegel_Semester-Paper.pdf" target="_blank"><i class="bi bi-file-earmark-pdf"></i><span>PDF</span></a>
+      <a href="posts/03-07-2026_climate-downscaling/index.html"><i class="bi bi-journal-text"></i><span>Blog post</span></a>
     </div>
   </article>
 

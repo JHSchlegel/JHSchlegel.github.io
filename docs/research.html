@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.43">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Jan Schlegel – Research</title>
+<title>Research – Jan Schlegel</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -35,12 +35,12 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-8ea72dc5fed832574809a9c94082fbbb.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-eec8b984b70d4136b00313aa3d0f56c3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-9ac850439c7ce24209f8d151cbd4826e.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -140,7 +140,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- margin-sidebar -->
     
 <!-- main -->
-<main class="content column-page" id="quarto-document-content">
+<main class="content column-page" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><h1 class="title display-7">Research</h1></header>
 
 
 
@@ -153,7 +153,7 @@ ul.task-list li input[type="checkbox"] {
      ============================================================ -->
 <div class="jhs-research">
 
-<h1>Research</h1>
+
 
 <p class="jhs-research-intro">Selected work across probabilistic machine learning, high-dimensional statistics, and their applications to climate and health.</p>
 
@@ -194,6 +194,7 @@ ul.task-list li input[type="checkbox"] {
     <p class="jhs-pub-abstract">Climate downscaling translates coarse global climate model (GCM) outputs into high-resolution predictions that inform local decision-making. This work investigates the robustness and transferability of statistical downscaling methods applied to unseen GCMs. Building on generative frameworks such as Coarse-from-Super and Corrector Diffusion models, we evaluate their performance under cross-GCM extrapolation. Our experiments show that stochastic methods outperform deterministic baselines in energy score while maintaining comparable mean squared error, highlighting the potential of generative downscaling for modeling the variability inherent in climate systems.</p>
     <div class="jhs-pub-links">
       <a href="research/JHSchlegel_Semester-Paper.pdf" target="_blank"><i class="bi bi-file-earmark-pdf"></i><span>PDF</span></a>
+      <a href="posts/03-07-2026_climate-downscaling/index.html"><i class="bi bi-journal-text"></i><span>Blog post</span></a>
     </div>
   </article>
 
@@ -267,139 +268,273 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </main> <!-- /main -->
 <script>
+
 /* ============================================================
+
    Dark / light mode icon for Quarto's color-scheme toggle.
+
    Quarto ships the toggle with an empty <i class="bi">; this adds
+
    a Bootstrap-Icons glyph and swaps it whenever the scheme changes:
+
        light mode  ->  bi-moon-stars   (click to go dark)
+
        dark  mode  ->  bi-sun          (click to go light)
+
    Quarto marks the toggle with the class `alternate` while dark.
+
    ============================================================ */
+
 (function () {
+
   function apply() {
+
     document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
+
       var icon = toggle.querySelector(".bi");
+
       if (!icon) return;
+
       var dark = toggle.classList.contains("alternate");
+
       icon.classList.remove("bi-sun", "bi-moon-stars");
+
       icon.classList.add(dark ? "bi-sun" : "bi-moon-stars");
+
     });
+
   }
 
+
+
   document.addEventListener("DOMContentLoaded", function () {
+
     apply();
+
     document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
+
       new MutationObserver(apply).observe(toggle, {
+
         attributes: true,
+
         attributeFilter: ["class"]
+
       });
+
     });
+
   });
+
 })();
+
 </script>
+
 <script>
+
 /* ============================================================
+
    Lightbox — full-screen image viewer with prev/next navigation.
+
    Targets content images (photography albums + blog figures/plots)
+
    inside the main document, excluding the portrait, navbar logo,
+
    listing thumbnails, and images that are already links.
+
    Wired site-wide via include-after-body in _quarto.yml.
+
    ============================================================ */
+
 (function () {
+
   document.addEventListener("DOMContentLoaded", function () {
+
     function eligible(img) {
+
       if (!img.closest("#quarto-document-content")) return false;
+
       if (img.closest(".jhs-hero")) return false;
+
       if (img.closest(".navbar")) return false;
+
       if (img.closest(".quarto-listing")) return false;
+
       if (img.closest("a")) return false;
+
       return true;
+
     }
+
+
 
     var items = Array.prototype.filter.call(
+
       document.querySelectorAll("#quarto-document-content img"), eligible
+
     );
+
     if (!items.length) return;
 
+
+
     var current = 0;
+
     var lastFocus = null;
 
+
+
     // ---- Build the overlay once ----
+
     var lb = document.createElement("div");
+
     lb.className = "jhs-lb";
+
     lb.setAttribute("role", "dialog");
+
     lb.setAttribute("aria-modal", "true");
+
     lb.setAttribute("aria-label", "Image viewer");
+
     lb.hidden = true;
+
     lb.innerHTML =
+
       '<button class="jhs-lb-close" aria-label="Close (Esc)"><i class="bi bi-x-lg"></i></button>' +
+
       '<button class="jhs-lb-prev" aria-label="Previous image"><i class="bi bi-chevron-left"></i></button>' +
+
       '<figure class="jhs-lb-figure"><img class="jhs-lb-img" alt=""><figcaption class="jhs-lb-caption"></figcaption></figure>' +
+
       '<button class="jhs-lb-next" aria-label="Next image"><i class="bi bi-chevron-right"></i></button>' +
+
       '<div class="jhs-lb-counter"></div>';
+
     document.body.appendChild(lb);
 
+
+
     var imgEl = lb.querySelector(".jhs-lb-img");
+
     var capEl = lb.querySelector(".jhs-lb-caption");
+
     var counterEl = lb.querySelector(".jhs-lb-counter");
+
     var prevBtn = lb.querySelector(".jhs-lb-prev");
+
     var nextBtn = lb.querySelector(".jhs-lb-next");
+
     var closeBtn = lb.querySelector(".jhs-lb-close");
+
     var figEl = lb.querySelector(".jhs-lb-figure");
 
+
+
     var single = items.length < 2;
+
     prevBtn.style.display = single ? "none" : "";
+
     nextBtn.style.display = single ? "none" : "";
+
     counterEl.style.display = single ? "none" : "";
 
+
+
     function show(i) {
+
       current = (i + items.length) % items.length;
+
       var img = items[current];
+
       imgEl.src = img.currentSrc || img.src;
+
       var alt = img.getAttribute("alt") || "";
+
       imgEl.alt = alt;
+
       capEl.textContent = alt;
+
       capEl.style.display = alt ? "" : "none";
+
       counterEl.textContent = (current + 1) + " / " + items.length;
+
     }
+
     function open(i) {
+
       lastFocus = document.activeElement;
+
       show(i);
+
       lb.hidden = false;
+
       document.body.classList.add("jhs-lb-open");
+
       closeBtn.focus();
+
     }
+
     function close() {
+
       lb.hidden = true;
+
       document.body.classList.remove("jhs-lb-open");
+
       imgEl.removeAttribute("src");
+
       if (lastFocus && lastFocus.focus) lastFocus.focus();
+
     }
+
     function next() { show(current + 1); }
+
     function prev() { show(current - 1); }
 
+
+
     // ---- Make eligible images clickable ----
+
     items.forEach(function (img, i) {
+
       img.classList.add("jhs-lb-eligible");
+
       img.addEventListener("click", function () { open(i); });
+
     });
 
+
+
     // ---- Controls ----
+
     closeBtn.addEventListener("click", close);
+
     nextBtn.addEventListener("click", function (e) { e.stopPropagation(); next(); });
+
     prevBtn.addEventListener("click", function (e) { e.stopPropagation(); prev(); });
+
     lb.addEventListener("click", function (e) {
+
       if (e.target === lb || e.target === figEl) close();
+
     });
+
     document.addEventListener("keydown", function (e) {
+
       if (lb.hidden) return;
+
       if (e.key === "Escape") close();
+
       else if (e.key === "ArrowRight") next();
+
       else if (e.key === "ArrowLeft") prev();
+
     });
+
   });
+
 })();
+
 </script>
+
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -626,8 +761,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -743,7 +876,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
