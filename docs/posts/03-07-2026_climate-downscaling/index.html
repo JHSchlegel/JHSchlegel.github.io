@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jan Schlegel">
+<meta name="dcterms.date" content="2026-07-03">
+<meta name="description" content="Stochastic MLPs trained with the energy score and a slimmed-down CorrDiff diffusion model turn coarse global climate simulations into high-resolution regional fields, and keep working on a climate model they never saw during training.">
+
+<title>Generative Climate Downscaling: Do the Mappings Transfer to Unseen Climate Models? – Jan Schlegel</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../logo.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-8ea72dc5fed832574809a9c94082fbbb.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-eec8b984b70d4136b00313aa3d0f56c3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-9ac850439c7ce24209f8d151cbd4826e.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="color-scheme" content="dark light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../custom.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../profile.jpg" alt="Jan Schlegel" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Jan Schlegel</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../photography.html"> 
+<span class="menu-text">Photography</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../CV_Academic.pdf"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JHSchlegel"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Generative Climate Downscaling: Do the Mappings Transfer to Unseen Climate Models?</h1>
+                  <div>
+        <div class="description">
+          Stochastic MLPs trained with the energy score and a slimmed-down CorrDiff diffusion model turn coarse global climate simulations into high-resolution regional fields, and keep working on a climate model they never saw during training.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Machine Learning</div>
+                <div class="quarto-category">Climate</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jan Schlegel </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 3, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="block-title">Abstract</div>
+      Global climate models are too coarse for local decisions, and dynamical downscaling with regional climate models is expensive. We study two generative statistical downscaling approaches, a two-stage stochastic MLP called Coarse-from-Super trained with the energy score, and a lightweight version of the Corrector Diffusion (CorrDiff) model, and ask how well their learned mappings transfer to a global climate model held out from training. Across precipitation and temperature, both generative methods clearly beat a deterministic baseline in energy score while matching it in mean squared error. The learned mappings transfer surprisingly well to the unseen GCM and to the end of the century, and the simple stochastic MLP keeps up with the diffusion model at a fraction of the cost.
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#problem-setup" id="toc-problem-setup" class="nav-link" data-scroll-target="#problem-setup"><span class="header-section-number">2</span> Problem Setup</a>
+  <ul class="collapse">
+  <li><a href="#why-squared-error-is-not-enough-the-energy-score" id="toc-why-squared-error-is-not-enough-the-energy-score" class="nav-link" data-scroll-target="#why-squared-error-is-not-enough-the-energy-score"><span class="header-section-number">2.1</span> Why Squared Error Is Not Enough: The Energy Score</a></li>
+  </ul></li>
+  <li><a href="#model-1-coarse-from-super" id="toc-model-1-coarse-from-super" class="nav-link" data-scroll-target="#model-1-coarse-from-super"><span class="header-section-number">3</span> Model 1: Coarse-from-Super</a></li>
+  <li><a href="#model-2-corrector-diffusion-corrdiff" id="toc-model-2-corrector-diffusion-corrdiff" class="nav-link" data-scroll-target="#model-2-corrector-diffusion-corrdiff"><span class="header-section-number">4</span> Model 2: Corrector Diffusion (CorrDiff)</a>
+  <ul class="collapse">
+  <li><a href="#step-1-deterministic-regression" id="toc-step-1-deterministic-regression" class="nav-link" data-scroll-target="#step-1-deterministic-regression"><span class="header-section-number">4.1</span> Step 1: Deterministic Regression</a></li>
+  <li><a href="#step-2-an-elucidated-diffusion-model-for-the-residual" id="toc-step-2-an-elucidated-diffusion-model-for-the-residual" class="nav-link" data-scroll-target="#step-2-an-elucidated-diffusion-model-for-the-residual"><span class="header-section-number">4.2</span> Step 2: An Elucidated Diffusion Model for the Residual</a></li>
+  <li><a href="#sampling" id="toc-sampling" class="nav-link" data-scroll-target="#sampling"><span class="header-section-number">4.3</span> Sampling</a></li>
+  </ul></li>
+  <li><a href="#experimental-design" id="toc-experimental-design" class="nav-link" data-scroll-target="#experimental-design"><span class="header-section-number">5</span> Experimental Design</a>
+  <ul class="collapse">
+  <li><a href="#cross-gcm-extrapolation" id="toc-cross-gcm-extrapolation" class="nav-link" data-scroll-target="#cross-gcm-extrapolation"><span class="header-section-number">5.1</span> Cross-GCM Extrapolation</a></li>
+  <li><a href="#temporal-extrapolation" id="toc-temporal-extrapolation" class="nav-link" data-scroll-target="#temporal-extrapolation"><span class="header-section-number">5.2</span> Temporal Extrapolation</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">6</span> Results</a>
+  <ul class="collapse">
+  <li><a href="#precipitation" id="toc-precipitation" class="nav-link" data-scroll-target="#precipitation"><span class="header-section-number">6.1</span> Precipitation</a></li>
+  <li><a href="#temperature" id="toc-temperature" class="nav-link" data-scroll-target="#temperature"><span class="header-section-number">6.2</span> Temperature</a></li>
+  </ul></li>
+  <li><a href="#reflections" id="toc-reflections" class="nav-link" data-scroll-target="#reflections"><span class="header-section-number">7</span> Reflections</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p><img src="image.png" class="img-fluid"></p>
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>Global climate models (GCMs) are huge physics simulations of the atmosphere, oceans, land, and ice, and they are our main tool for asking what the climate will look like in 2050 or 2100. They are also coarse. A typical GCM grid cell is about 100 km wide, so a whole Alpine valley, a coastline, or a city sits inside a single pixel. That is fine for global mean temperature. It is not enough for a hydrologist planning a reservoir, or a city planning for heavy rainfall, because precipitation and temperature are shaped by terrain and other features far smaller than the grid. On top of that, GCM outputs carry systematic biases relative to observations <span class="citation" data-cites="collins2013long">(<a href="#ref-collins2013long" role="doc-biblioref">Collins et al. 2013</a>)</span>, and their coarse resolution makes them unsuitable for local climate analysis on their own <span class="citation" data-cites="lowres_incapable_local">(<a href="#ref-lowres_incapable_local" role="doc-biblioref">Volosciuk et al. 2015</a>)</span>.</p>
+<p>Turning coarse climate model output into high-resolution regional information is called <strong>downscaling</strong>. There are two broad routes:</p>
+<ul>
+<li><strong>Dynamical downscaling</strong> runs a <em>regional climate model</em> (RCM) over a limited area at roughly 10 km resolution, using the GCM fields as boundary conditions. This is physically grounded but very expensive <span class="citation" data-cites="gutowski2020ongoingneed">(<a href="#ref-gutowski2020ongoingneed" role="doc-biblioref">Gutowski et al. 2020</a>)</span>, and the RCM inherits whatever biases the driving GCM has <span class="citation" data-cites="liang2008regional">(<a href="#ref-liang2008regional" role="doc-biblioref">Liang et al. 2008</a>)</span>.</li>
+<li><strong>Statistical downscaling</strong> learns an empirical map from coarse fields to fine fields. Once trained, it costs almost nothing to run. Classical tools like random forests have long been solid baselines, and CNNs and U-Nets have pushed accuracy further <span class="citation" data-cites="cnnrodrigues2018 lin2023deep">(<a href="#ref-cnnrodrigues2018" role="doc-biblioref">Rodrigues and Netto 2018</a>; <a href="#ref-lin2023deep" role="doc-biblioref">Lin et al. 2023</a>)</span>.</li>
+</ul>
+<p>Most statistical downscaling models are <em>deterministic</em>: one coarse input, one high-resolution output. But the mapping is not one-to-one. Many fine-scale weather patterns are consistent with the same coarse field, and that spread is exactly what matters for extremes. A deterministic model trained with squared error learns the conditional mean, which shows up as smooth, blurry fields that systematically underestimate local variability. Generative models, such as GANs and diffusion models, can instead sample from the full conditional distribution <span class="citation" data-cites="ling_diffusion_2024">(<a href="#ref-ling_diffusion_2024" role="doc-biblioref">Ling et al. 2024</a>)</span>.</p>
+<p>For my semester paper at the Seminar for Statistics at ETH Zurich, Gianfranco Basile and I (equal contribution), supervised by Maybritt Schillinger and Nicolai Meinshausen, looked at a question that matters a lot in practice but rarely gets tested directly: <strong>if you train a generative downscaling model on some climate models, does it still work on a climate model it has never seen?</strong> Climate projections are built from ensembles of many GCMs, and a downscaler that only works for the GCMs it was trained on is of limited use. We also asked whether the mapping holds up in time, from the training period out to the end of the 21st century.</p>
+<p>Our main findings:</p>
+<ol type="1">
+<li>Both generative methods beat a deterministic baseline by a wide margin in <strong>energy score</strong>, a proper scoring rule for multivariate distributions, while matching it in <strong>mean squared error</strong>.</li>
+<li>The learned mappings <strong>transfer surprisingly well to an unseen GCM</strong> and to the 2090s.</li>
+<li>A simple <strong>stochastic MLP trained with the energy score</strong> matches or beats a diffusion model, at a fraction of the compute.</li>
+</ol>
+<p>The full paper is available as a <a href="../../research/JHSchlegel_Semester-Paper.pdf"><i class="bi bi-file-earmark-pdf"></i> PDF</a>.</p>
+</section>
+<section id="problem-setup" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="problem-setup"><span class="header-section-number">2</span> Problem Setup</h2>
+<p>Let <span class="math inline">\(\mathcal{X} \subseteq \mathbb{R}^{c_\text{in} \times 36 \times 20}\)</span> be the space of coarse GCM inputs and <span class="math inline">\(\mathcal{Y} \subseteq \mathbb{R}^{c_\text{out} \times 128 \times 128}\)</span> the space of high-resolution RCM fields. The input has <span class="math inline">\(c_\text{in} = 2\)</span> channels, the target variable plus a pressure variable. The output has <span class="math inline">\(c_\text{out} = 1\)</span> channel, either <strong>temperature</strong> or <strong>precipitation</strong>. We write <span class="math inline">\(\mathbf{X}\)</span> and <span class="math inline">\(\mathbf{Y}\)</span> for the random coarse and fine fields, and given <span class="math inline">\(N\)</span> paired samples <span class="math inline">\(\{(\mathbf{x}_i, \mathbf{y}_i)\}_{i=1}^N\)</span> we want to learn the <strong>conditional distribution</strong></p>
+<p><span class="math display">\[
+\mathbb{P}(\mathbf{Y} \mid \mathbf{X}),
+\]</span></p>
+<p>and not just its mean <span class="math inline">\(\mathbb{E}[\mathbf{Y} \mid \mathbf{X}]\)</span>. That is the key difference from classical regression-based downscaling.</p>
+<p>It is also useful to define an intermediate object: a <strong>coarsened regional field</strong> <span class="math inline">\(\mathbf{Z}\)</span>, obtained by average-pooling <span class="math inline">\(\mathbf{Y}\)</span> with a <span class="math inline">\(16 \times 16\)</span> kernel. This gives an <span class="math inline">\(8 \times 8\)</span> summary of the high-resolution field on the regional domain. <span class="math inline">\(\mathbf{Z}\)</span> does not come from the GCM. It is an aggregate of the RCM output, so it already contains the regional model’s view of large-scale structure. As we will see, splitting the problem into “predict <span class="math inline">\(\mathbf{Z}\)</span> from <span class="math inline">\(\mathbf{X}\)</span>” and “predict <span class="math inline">\(\mathbf{Y}\)</span> from <span class="math inline">\(\mathbf{Z}\)</span>” turns out to be a good idea.</p>
+<p>Finally, we add a sinusoidal encoding of the date to each input <span class="math inline">\(\mathbf{x}_i\)</span>, to capture seasonality, as well as a one-hot encoding of the GCM–RCM pair.</p>
+<section id="why-squared-error-is-not-enough-the-energy-score" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="why-squared-error-is-not-enough-the-energy-score"><span class="header-section-number">2.1</span> Why Squared Error Is Not Enough: The Energy Score</h3>
+<p>To train and compare generative models we need a loss that rewards getting the whole distribution right, not just the mean. We use the <strong>energy score</strong> <span class="citation" data-cites="Gneiting01032007">(<a href="#ref-Gneiting01032007" role="doc-biblioref">Gneiting and Raftery 2007</a>)</span>, a multivariate generalization of the CRPS <span class="citation" data-cites="Matheson76 Szekely2003">(<a href="#ref-Matheson76" role="doc-biblioref">Matheson and Winkler 1976</a>; <a href="#ref-Szekely2003" role="doc-biblioref">Szekely 2003</a>)</span>. I covered it in more depth in my <a href="../../posts/30-01-2026_proper-scoring-rules/index.html">post on proper scoring rules</a>. Written as a loss (lower is better), for a predictive distribution <span class="math inline">\(P\)</span> and an observed field <span class="math inline">\(\mathbf{y}\)</span>:</p>
+<p><span class="math display">\[
+\mathcal{L}_\text{energy}(P, \mathbf{y}) = \mathbb{E}_{P}\,\|\mathbf{Y} - \mathbf{y}\| - \frac{1}{2}\, \mathbb{E}_{P}\,\|\mathbf{Y} - \mathbf{Y}'\|,
+\]</span></p>
+<p>where <span class="math inline">\(\mathbf{Y}, \mathbf{Y}' \sim P\)</span> are independent and <span class="math inline">\(\|\cdot\|\)</span> is the Euclidean norm over all pixels. The two terms pull in opposite directions:</p>
+<ul>
+<li>The <strong>accuracy term</strong> <span class="math inline">\(\mathbb{E}\|\mathbf{Y} - \mathbf{y}\|\)</span> pulls samples toward the observation.</li>
+<li>The <strong>spread term</strong> <span class="math inline">\(-\tfrac{1}{2}\mathbb{E}\|\mathbf{Y} - \mathbf{Y}'\|\)</span> rewards samples that differ from each other.</li>
+</ul>
+<p>The energy score is <strong>strictly proper</strong>: its expected value is minimized only when <span class="math inline">\(P\)</span> equals the true conditional distribution. A model cannot game it by collapsing to a point prediction (the spread term is then zero, and the accuracy term is generally larger than it would be under the right distribution), and it cannot game it by adding arbitrary noise (the accuracy term grows faster than the spread term rewards it). In practice we draw <span class="math inline">\(m\)</span> samples <span class="math inline">\(\hat{\mathbf{y}}_1, \ldots, \hat{\mathbf{y}}_m\)</span> per input and use the unbiased estimator</p>
+<p><span class="math display">\[
+\widehat{\mathcal{L}}_\text{energy} = \frac{1}{m}\sum_{j=1}^m \|\hat{\mathbf{y}}_j - \mathbf{y}\| - \frac{1}{2m(m-1)}\sum_{j \neq k} \|\hat{\mathbf{y}}_j - \hat{\mathbf{y}}_k\|.
+\]</span></p>
+<p>This estimator is differentiable in the samples, so if the samples come from a neural network driven by noise we can backpropagate through it directly. That is the core idea behind the first model.</p>
+</section>
+</section>
+<section id="model-1-coarse-from-super" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="model-1-coarse-from-super"><span class="header-section-number">3</span> Model 1: Coarse-from-Super</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/coarse_from_super.png" class="img-fluid figure-img" style="width:85.0%"></p>
+<figcaption>The Coarse-from-Super workflow. The coarse model maps the global field <span class="math inline">\(\mathbf{X}\)</span> to a coarsened regional field <span class="math inline">\(\mathbf{Z}\)</span>; the super model then generates the full regional field <span class="math inline">\(\mathbf{Y}\)</span> from <span class="math inline">\(\mathbf{Z}\)</span>.</figcaption>
+</figure>
+</div>
+<p>The Coarse-from-Super (CfS) model splits downscaling into two stochastic sub-problems, each handled by a residual MLP with <strong>noise injection</strong>: in every residual block, a vector <span class="math inline">\(\boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})\)</span> is concatenated with the hidden features. Because noise enters at every stage, the network is an implicit generative model. Feed it the same input twice and you get two different samples. This is the same recipe as <em>engression</em> <span class="citation" data-cites="shen2024engression">(<a href="#ref-shen2024engression" role="doc-biblioref">Shen and Meinshausen 2024</a>)</span>: a noise-driven neural network trained only with the energy score, with no likelihood, no adversary, and no diffusion process.</p>
+<ol type="1">
+<li><strong>Super model</strong> <span class="math inline">\(f_\text{super}(\mathbf{Z}, \boldsymbol{\eta})\)</span>: maps the <span class="math inline">\(8 \times 8\)</span> coarsened regional field to the full <span class="math inline">\(128 \times 128\)</span> field. Six layers (three residual blocks), hidden dimension 500, and a 100-dimensional noise vector.</li>
+<li><strong>Coarse model</strong> <span class="math inline">\(f_\text{coarse}(\mathbf{X}, \boldsymbol{\epsilon})\)</span>: maps the flattened GCM input to the coarsened regional field. Six layers, hidden dimension 64, and a 10-dimensional noise vector.</li>
+</ol>
+<p>Training happens in two stages. First, the super model is trained on pairs <span class="math inline">\((\mathbf{z}_i, \mathbf{y}_i)\)</span> with the energy loss, and then <strong>frozen</strong>. Second, the coarse model is trained end-to-end through the frozen super model:</p>
+<p><span class="math display">\[
+\hat{\mathbf{Z}} = f_\text{coarse}(\mathbf{X}, \boldsymbol{\epsilon}), \qquad \hat{\mathbf{Y}} = f_\text{super}(\hat{\mathbf{Z}}, \boldsymbol{\eta}),
+\]</span></p>
+<p><span class="math display">\[
+\mathcal{L}(\mathbf{X}, \mathbf{Z}, \mathbf{Y}) = \lambda_\text{coarse}\, \mathcal{L}_\text{energy}(\mathbf{Z}, \hat{\mathbf{Z}}) + (1 - \lambda_\text{coarse})\, \mathcal{L}_\text{energy}(\mathbf{Y}, \hat{\mathbf{Y}}),
+\]</span></p>
+<p>with <span class="math inline">\(\lambda_\text{coarse} = 0.9\)</span>. The first term asks the coarse model to get the large-scale regional pattern right. The second checks that, once the super model fills in the details, the full field is also well calibrated.</p>
+<p>Why bother with the intermediate step? The jump from a GCM field to a <span class="math inline">\(128 \times 128\)</span> RCM field mixes two different problems. One is <strong>translation</strong>: the GCM and the RCM do not agree on where it rains, so large-scale patterns have to be corrected. The other is <strong>super-resolution</strong>: given the large-scale regional pattern, fill in the orographic and convective detail. Separating them lets each sub-model focus on one job. The super model, in particular, never sees a GCM. It only learns RCM-internal structure, which is plausibly the part that transfers across GCMs.</p>
+<p>Both stages use AdamW <span class="citation" data-cites="loshchilov2019adamw">(<a href="#ref-loshchilov2019adamw" role="doc-biblioref">Loshchilov and Hutter 2019</a>)</span> with learning rate <span class="math inline">\(3 \times 10^{-4}\)</span>, an exponential decay of 0.99 per epoch, a batch size of 512, and 300 epochs. Inputs and outputs are square-root transformed before normalization, which tames the heavy right tail of precipitation.</p>
+</section>
+<section id="model-2-corrector-diffusion-corrdiff" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="model-2-corrector-diffusion-corrdiff"><span class="header-section-number">4</span> Model 2: Corrector Diffusion (CorrDiff)</h2>
+<p>The second approach follows CorrDiff, introduced by <span class="citation" data-cites="corrdiff2024">Mardani et al. (<a href="#ref-corrdiff2024" role="doc-biblioref">2024</a>)</span> for km-scale weather downscaling. Their observation was that a plain conditional diffusion model trained to sample <span class="math inline">\(\mathbf{Y} \mid \mathbf{X}\)</span> directly converges slowly and gives poor samples, because it has to learn both the large-scale mean and the fine-scale variability from scratch. CorrDiff splits the field into a deterministic part and a stochastic part:</p>
+<p><span class="math display">\[
+\mathbf{Y} = \underbrace{\mathbb{E}[\mathbf{Y} \mid \mathbf{X}]}_{\text{regression } \boldsymbol{\mu}(\mathbf{X})} + \underbrace{\mathbf{R}}_{\text{stochastic residual}}, \qquad \mathbf{R} := \mathbf{Y} - \boldsymbol{\mu}(\mathbf{X}).
+\]</span></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/corrdiff.png" class="img-fluid figure-img" style="width:70.0%"></p>
+<figcaption>The CorrDiff workflow. A deterministic regression predicts the conditional mean <span class="math inline">\(\boldsymbol{\mu}(\mathbf{X})\)</span>; an EDM diffusion model, conditioned on the coarse input, generates the residual. Their sum is a high-resolution sample.</figcaption>
+</figure>
+</div>
+<section id="step-1-deterministic-regression" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="step-1-deterministic-regression"><span class="header-section-number">4.1</span> Step 1: Deterministic Regression</h3>
+<p>The original CorrDiff uses a large U-Net for the mean. Given our compute budget, we used a deterministic MLP <span class="math inline">\(f_\theta\)</span> with the same architecture as the CfS super model, but without noise injection, trained with plain squared error:</p>
+<p><span class="math display">\[
+\mathcal{L}_\text{reg}(\theta) = \mathbb{E}_{(\mathbf{x}, \mathbf{y})}\big[\|\mathbf{y} - f_\theta(\mathbf{x})\|_2^2\big].
+\]</span></p>
+<p>Its minimizer is the conditional mean, so after training we can compute residuals <span class="math inline">\(\hat{\mathbf{r}}_i = \mathbf{y}_i - f_\theta(\mathbf{x}_i)\)</span>. These residuals are roughly zero-mean, much smaller in scale than the raw fields, and contain almost no large-scale structure. That makes them a far easier target for a diffusion model. This regressor, on its own, is also our <strong>deterministic baseline</strong>.</p>
+</section>
+<section id="step-2-an-elucidated-diffusion-model-for-the-residual" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="step-2-an-elucidated-diffusion-model-for-the-residual"><span class="header-section-number">4.2</span> Step 2: An Elucidated Diffusion Model for the Residual</h3>
+<p>The residual distribution <span class="math inline">\(\mathbb{P}(\mathbf{R} \mid \mathbf{X})\)</span> is modeled with an Elucidated Diffusion Model (EDM) <span class="citation" data-cites="karras2022edm">(<a href="#ref-karras2022edm" role="doc-biblioref">Karras et al. 2022</a>)</span>. (If SDE-based diffusion is new to you, my <a href="../03-04-2025_intro_to_sde/index.html">introduction to SDEs</a> covers the basics.) The forward process gradually corrupts a residual with Gaussian noise,</p>
+<p><span class="math display">\[
+d\mathbf{r} = \sqrt{2\dot\sigma(t)\sigma(t)}\, d\mathbf{W}_t,
+\]</span></p>
+<p>where <span class="math inline">\(\sigma(t)\)</span> is the noise schedule (EDM uses <span class="math inline">\(\sigma(t) = t\)</span>). Sampling runs the corresponding reverse-time SDE</p>
+<p><span class="math display">\[
+d\mathbf{r} = -2\dot\sigma(t)\sigma(t)\, \nabla_{\mathbf{r}} \log p(\mathbf{r} \mid \sigma(t), \mathbf{c})\, dt + \sqrt{2\dot\sigma(t)\sigma(t)}\, d\bar{\mathbf{W}}_t,
+\]</span></p>
+<p>which needs the <strong>score</strong> <span class="math inline">\(\nabla_{\mathbf{r}} \log p(\mathbf{r} \mid \sigma, \mathbf{c})\)</span>. The conditioning <span class="math inline">\(\mathbf{c}\)</span> consists of the nearest-neighbor-upsampled GCM input <span class="math inline">\(\mathbf{x}\)</span> and a learned embedding <span class="math inline">\(\psi(t_\text{target})\)</span> of the date. The score is not available in closed form, but it can be written in terms of an optimal denoiser <span class="math inline">\(D\)</span>:</p>
+<p><span class="math display">\[
+\nabla_{\mathbf{r}} \log p(\mathbf{r} \mid \sigma, \mathbf{c}) = \frac{D(\mathbf{r}; \sigma, \mathbf{c}) - \mathbf{r}}{\sigma^2}.
+\]</span></p>
+<p>So we only need to train a network <span class="math inline">\(D_\phi\)</span> to remove noise, using the standard denoising score matching objective, averaged over noise levels:</p>
+<p><span class="math display">\[
+\mathcal{L}_\text{diff}(\phi) = \mathbb{E}_{\mathbf{r}}\, \mathbb{E}_{\sigma \sim p_\sigma}\, \mathbb{E}_{\boldsymbol{\eta} \sim \mathcal{N}(0, \sigma^2 \mathbf{I})} \big[\|D_\phi(\mathbf{r} + \boldsymbol{\eta}; \sigma, \mathbf{x}, \psi(t_\text{target})) - \mathbf{r}\|_2^2\big].
+\]</span></p>
+<p>Conditioning on <span class="math inline">\(\mathbf{x}\)</span> is done by concatenating it with the noisy residual along the channel dimension. For <span class="math inline">\(D_\phi\)</span> we used a reduced DDPM++ U-Net <span class="citation" data-cites="song2021scorebasedgenerativemodelingstochastic">(<a href="#ref-song2021scorebasedgenerativemodelingstochastic" role="doc-biblioref">Song et al. 2021</a>)</span>: base width 64 with channel multipliers <span class="math inline">\([1, 2, 2, 2]\)</span> (resolutions <span class="math inline">\(128 \to 64 \to 32 \to 16\)</span>), four residual blocks per level, self-attention at <span class="math inline">\(16 \times 16\)</span>, and dropout of 0.1. It was trained for 30 epochs with AdamW, a 10-epoch linear warm-up followed by cosine annealing, and gradient clipping at norm 10.</p>
+</section>
+<section id="sampling" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="sampling"><span class="header-section-number">4.3</span> Sampling</h3>
+<p>At test time, a high-resolution sample is the regression mean plus a sampled residual. Since <span class="math inline">\(f_\theta\)</span> only has to be evaluated once, drawing an ensemble of <span class="math inline">\(M\)</span> members is cheap on the regression side:</p>
+<p><span class="math display">\[
+\mathbf{y}_{\text{new}, j} = f_\theta(\mathbf{x}_\text{new}) + \tilde{\mathbf{r}}_{\text{new}, j}, \qquad j = 1, \ldots, M.
+\]</span></p>
+<p>Residuals are generated with EDM’s second-order Heun sampler using <span class="math inline">\(N = 40\)</span> steps, which we found sufficient for good precipitation samples. Below is a compact sketch of the sampler. We fixed <span class="math inline">\(S_\text{churn} = 0\)</span> because we did not have the compute for a grid search. Note what that implies: with no churn, the noise inflation step does nothing, and the sampler reduces to a <strong>deterministic ODE solver</strong> for the probability-flow ODE. All of the randomness in a CorrDiff sample then comes from the initial draw <span class="math inline">\(\mathbf{r}_0 \sim \mathcal{N}(0, t_0^2 \mathbf{I})\)</span>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">@torch.no_grad</span>()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> corrdiff_sample(denoiser, x_up, date_emb, n_steps<span class="op">=</span><span class="dv">40</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                    sigma_min<span class="op">=</span><span class="fl">0.002</span>, sigma_max<span class="op">=</span><span class="fl">80.0</span>, rho<span class="op">=</span><span class="fl">7.0</span>, s_churn<span class="op">=</span><span class="fl">0.0</span>):</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""EDM stochastic sampler (Karras et al., Alg. 2) for the CorrDiff residual.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">    denoiser(r, sigma, x_up, date_emb) -&gt; D_phi, the denoised residual.</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">    sigma_min / sigma_max / rho are EDM's default discretization settings.</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Noise levels t_0 &gt; t_1 &gt; ... &gt; t_{N-1} &gt; t_N = 0 (EDM's rho-schedule)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    i <span class="op">=</span> torch.arange(n_steps)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> (sigma_max <span class="op">**</span> (<span class="dv">1</span> <span class="op">/</span> rho)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>         <span class="op">+</span> i <span class="op">/</span> (n_steps <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> (sigma_min <span class="op">**</span> (<span class="dv">1</span> <span class="op">/</span> rho) <span class="op">-</span> sigma_max <span class="op">**</span> (<span class="dv">1</span> <span class="op">/</span> rho))) <span class="op">**</span> rho</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> torch.cat([t, torch.zeros(<span class="dv">1</span>)])</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> torch.randn_like(x_up[:, :<span class="dv">1</span>]) <span class="op">*</span> t[<span class="dv">0</span>]  <span class="co"># r_0 ~ N(0, t_0^2 I)</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n_steps):</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># "Churn": temporarily raise the noise level (no-op when s_churn = 0)</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        gamma <span class="op">=</span> <span class="bu">min</span>(s_churn <span class="op">/</span> n_steps, <span class="dv">2</span> <span class="op">**</span> <span class="fl">0.5</span> <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        t_hat <span class="op">=</span> t[k] <span class="op">*</span> (<span class="dv">1</span> <span class="op">+</span> gamma)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        r_hat <span class="op">=</span> r <span class="op">+</span> (t_hat <span class="op">**</span> <span class="dv">2</span> <span class="op">-</span> t[k] <span class="op">**</span> <span class="dv">2</span>).sqrt() <span class="op">*</span> torch.randn_like(r)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Euler step along the probability-flow ODE</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        d <span class="op">=</span> (r_hat <span class="op">-</span> denoiser(r_hat, t_hat, x_up, date_emb)) <span class="op">/</span> t_hat</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> r_hat <span class="op">+</span> (t[k <span class="op">+</span> <span class="dv">1</span>] <span class="op">-</span> t_hat) <span class="op">*</span> d</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Heun (second-order) correction, skipped at the final step</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> t[k <span class="op">+</span> <span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>            d_prime <span class="op">=</span> (r <span class="op">-</span> denoiser(r, t[k <span class="op">+</span> <span class="dv">1</span>], x_up, date_emb)) <span class="op">/</span> t[k <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>            r <span class="op">=</span> r_hat <span class="op">+</span> (t[k <span class="op">+</span> <span class="dv">1</span>] <span class="op">-</span> t_hat) <span class="op">*</span> <span class="fl">0.5</span> <span class="op">*</span> (d <span class="op">+</span> d_prime)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> r</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># High-resolution sample = regression mean + diffusion residual</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="co"># y = f_theta(x) + corrdiff_sample(D_phi, upsample(x), psi(t_target))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Each sample therefore costs <span class="math inline">\(2N - 1 = 79\)</span> U-Net evaluations at full resolution. The CfS model needs two MLP forward passes. Keep that difference in mind when we get to the results.</p>
+</section>
+</section>
+<section id="experimental-design" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="experimental-design"><span class="header-section-number">5</span> Experimental Design</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/gcm_rcm.png" class="img-fluid figure-img" style="width:75.0%"></p>
+<figcaption>The GCM–RCM matrix. Three driving GCMs, each paired with a subset of four RCMs. Not every combination exists.</figcaption>
+</figure>
+</div>
+<p>We use three GCMs, <strong>MPI-ESM-LR</strong>, <strong>MIROC5</strong>, and <strong>CNRM-CM5</strong>, each run at about 100 km resolution <span class="citation" data-cites="kaltenborn2023">(<a href="#ref-kaltenborn2023" role="doc-biblioref">Kaltenborn et al. 2023</a>)</span>. Each one drives a subset of four RCMs: <strong>CCLM4-8-17</strong>, <strong>ALADIN63</strong>, <strong>RegCM4-6</strong>, and <strong>REMO2015</strong>. The RCM output is treated as the high-resolution “ground truth”. So the models learn to reproduce what a regional climate model would have produced. They are not trained or evaluated against station observations.</p>
+<section id="cross-gcm-extrapolation" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="cross-gcm-extrapolation"><span class="header-section-number">5.1</span> Cross-GCM Extrapolation</h3>
+<p>The core experiment is <strong>leave-one-GCM-out</strong>:</p>
+<ul>
+<li><strong>Extrapolation (unseen GCM):</strong> train on all GCM–RCM pairs from <em>two</em> GCMs, and test on every RCM driven by the held-out third GCM.</li>
+<li><strong>Interpolation baseline (known GCM):</strong> train on all pairs from a <em>single</em> GCM, and test on the same GCM.</li>
+</ul>
+<p>Putting the two side by side shows how much we lose by meeting a new GCM at test time. Because some RCMs are much harder to emulate than others, all results are broken down by test RCM.</p>
+</section>
+<section id="temporal-extrapolation" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="temporal-extrapolation"><span class="header-section-number">5.2</span> Temporal Extrapolation</h3>
+<p>The data span 1971–2099 under a climate change scenario. Two decades are held out entirely:</p>
+<ul>
+<li><strong>Test interpolation:</strong> 2030–2039, inside the training range.</li>
+<li><strong>Test extrapolation:</strong> 2090–2099, past the end of the training data (which uses 1971–2029 and 2040–2089).</li>
+</ul>
+<p>The 2090s are the harder test, since the late-century climate is warmer than anything in training. For comparability, every experiment uses 60,000 training and 10,000 validation samples, drawn at random from the training years. For CfS and the deterministic MLP we keep the checkpoint with the best validation score. CorrDiff reuses the selected deterministic regressor and trains the EDM for a fixed 30 epochs.</p>
+</section>
+</section>
+<section id="results" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="results"><span class="header-section-number">6</span> Results</h2>
+<p>In all plots below, columns are the two test periods and rows are the test RCMs. <strong>Colors</strong> mark the test GCM, <strong>triangles</strong> mean the test GCM was seen during training (interpolation baseline), <strong>circles</strong> mean it was held out (extrapolation), and dashed lines connect results from the same training configuration across the three methods.</p>
+<section id="precipitation" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="precipitation"><span class="header-section-number">6.1</span> Precipitation</h3>
+<p>Precipitation is the hard case. It is intermittent, heavy-tailed, and strongly shaped by terrain and convection, which are exactly the small-scale processes a 100 km grid cannot resolve.</p>
+<table>
+<tbody><tr>
+<td style="width:50%; padding:4px;">
+<img src="img/abs_pr_energy.png" width="100%"> <em>(a) Energy loss</em>
+</td>
+<td style="width:50%; padding:4px;">
+<img src="img/abs_pr_mse.png" width="100%"> <em>(b) Mean squared error</em>
+</td>
+</tr>
+</tbody></table>
+<p>The energy loss panel tells a consistent story. <strong>Both generative models beat the deterministic baseline in every single configuration</strong>: every RCM, both test periods, seen and unseen GCMs. The gap is large, typically a 20–30% reduction (e.g.&nbsp;from about 740 to about 550 for ALADIN63 driven by CNRM-CM5 in the 2090s). The deterministic model’s fields are too smooth. It predicts the conditional mean, has no spread, and gets penalized for missing the variability of real precipitation.</p>
+<p>Between the two generative models, <strong>Coarse-from-Super performs on par with or better than CorrDiff</strong> in most configurations, most clearly for RegCM4-6, while being much cheaper to train and sample from. To be fair, CfS has a home advantage here: it is trained directly on the energy score, the same metric used for evaluation, whereas CorrDiff is trained with denoising score matching.</p>
+<p>The MSE panel looks completely different: <strong>all three methods are nearly tied</strong>. The deterministic model is often marginally best. That is expected, since it was trained with squared error and its target, the conditional mean, is by construction the MSE-optimal point prediction. The important point is that the generative models get their large distributional gains <strong>without paying for them in squared error</strong>.</p>
+<p>Three more observations:</p>
+<ul>
+<li><strong>REMO2015 is by far the hardest RCM</strong> in both metrics. It is only driven by MIROC5 in our data, so it has the least training data and the least diversity.</li>
+<li><strong>Seen GCMs (triangles) are generally a little better than unseen ones (circles)</strong>, but the gap is small compared to the gap between methods. Going from a known to an unknown GCM costs far less than going from a generative to a deterministic model.</li>
+<li><strong>The 2090s look almost exactly like the 2030s.</strong> Metrics on the far-future test decade are close to those on the near-future decade, so none of the methods break down as the climate shifts.</li>
+</ul>
+</section>
+<section id="temperature" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="temperature"><span class="header-section-number">6.2</span> Temperature</h3>
+<p>Temperature is smoother in space and time, which makes it an easier downscaling target. Due to compute limits, we only trained the deterministic and Coarse-from-Super models for temperature.</p>
+<table>
+<tbody><tr>
+<td style="width:50%; padding:4px;">
+<img src="img/abs_tas_energy.png" width="100%"> <em>(a) Energy loss</em>
+</td>
+<td style="width:50%; padding:4px;">
+<img src="img/abs_tas_mse.png" width="100%"> <em>(b) Mean squared error</em>
+</td>
+</tr>
+</tbody></table>
+<p>The pattern repeats. Coarse-from-Super lowers the energy loss by roughly 20–35% in every configuration, while MSE stays comparable, with the deterministic model sometimes slightly ahead.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Relative performance against the single-GCM baseline
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>We also normalized each model’s metrics by those of a model trained and tested on the same GCM. A value of <span class="math inline">\(0.2\)</span> means 20% worse than that in-GCM baseline, and negative values mean better.</p>
+<table>
+<tbody><tr>
+<td style="width:50%; padding:4px;">
+<img src="img/rel_pr_energy.png" width="100%"> <em>Precipitation: relative energy loss</em>
+</td>
+<td style="width:50%; padding:4px;">
+<img src="img/rel_pr_mse.png" width="100%"> <em>Precipitation: relative MSE</em>
+</td>
+</tr>
+<tr>
+<td style="width:50%; padding:4px;">
+<img src="img/rel_tas_energy.png" width="100%"> <em>Temperature: relative energy loss</em>
+</td>
+<td style="width:50%; padding:4px;">
+<img src="img/rel_tas_mse.png" width="100%"> <em>Temperature: relative MSE</em>
+</td>
+</tr>
+</tbody></table>
+<p>For precipitation, the relative numbers move around a lot between GCM–RCM pairs, and no method wins consistently. Which pair you test on matters more than which model you use. For temperature, Coarse-from-Super tends to lose a bit more, relative to its own in-GCM baseline, than the deterministic model does. Its <em>absolute</em> energy loss is still much lower. Because temperature is easy, an in-GCM generative model is already very good, so there is more room to fall when the GCM changes. The general lesson is that relative comparisons depend heavily on the choice of baseline, and an absolute gain in distributional accuracy does not always show up as a uniform relative gain.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="reflections" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="reflections"><span class="header-section-number">7</span> Reflections</h2>
+<p>I took away three things from this project.</p>
+<p><strong>Use a proper scoring rule, or you won’t see the difference.</strong> Had we only reported MSE, we would have concluded that the three methods are interchangeable and the deterministic one is cheapest. The energy score shows that the generative models capture a large part of the problem the deterministic model ignores entirely: the variability of the regional field given the coarse input. For a downscaler meant to inform decisions about extremes, that variability is the point.</p>
+<p><strong>The learned mappings transfer better than we expected.</strong> We went in thinking that cross-GCM extrapolation would be the weak spot, since every GCM has its own biases and the RCMs inherit them. Instead, the loss from moving to an unseen GCM was modest and consistent, and performance in the 2090s closely tracked the 2030s. For using statistical downscaling on large multi-model ensembles, this is encouraging.</p>
+<p><strong>Simple stochastic models are underrated.</strong> A pair of noise-injected MLPs trained with the energy score matched a diffusion model that needs 79 U-Net evaluations per sample. That cuts against the common assumption that serious generative downscaling needs a heavy architecture. Our stripped-down CorrDiff, a small MLP for the mean plus a modest U-Net, also produced good samples. So the two-step “mean plus residual” decomposition seems to be doing much of the work, independently of how big the networks are.</p>
+<p>The study has clear limitations. We evaluated against RCM output, not observations, so “accuracy” here means fidelity to a regional climate model. We did not vary the size of the training subsample (fixed at 60,000), did not tune EDM hyperparameters such as <span class="math inline">\(S_\text{churn}\)</span>, and only ran CorrDiff on precipitation. Natural next steps would be to swap the MLP regressor in CorrDiff for a U-Net, as in the original paper, or for a climate foundation model like Prithvi WxC <span class="citation" data-cites="schmude2024prithviwxcfoundationmodel">(<a href="#ref-schmude2024prithviwxcfoundationmodel" role="doc-biblioref">Schmude et al. 2024</a>)</span>, and to test <strong>spatial</strong> transfer to regions outside the training domain, in addition to the GCM and temporal transfer studied here.</p>
+<p>Still, the main result is fairly robust. Two-step generative models produce realistic, well-calibrated high-resolution climate fields, and they keep doing so on climate models and decades they were never trained on.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-collins2013long" class="csl-entry" role="listitem">
+Collins, M., R. Knutti, J. Arblaster, J.-L. Dufresne, T. Fichefet, P. Friedlingstein, X. Gao, et al. 2013. <span>“Long-Term Climate Change: Projections, Commitments and Irreversibility.”</span> In <em>Climate Change 2013: The Physical Science Basis. Contribution of Working Group <span>I</span> to the Fifth Assessment Report of the Intergovernmental Panel on Climate Change</em>, edited by T. F. Stocker, D. Qin, G.-K. Plattner, M. Tignor, S. K. Allen, J. Boschung, A. Nauels, Y. Xia, V. Bex, and P. M. Midgley. Cambridge, United Kingdom; New York, NY, USA: Cambridge University Press.
+</div>
+<div id="ref-Gneiting01032007" class="csl-entry" role="listitem">
+Gneiting, Tilmann, and Adrian E Raftery. 2007. <span>“Strictly Proper Scoring Rules, Prediction, and Estimation.”</span> <em>Journal of the American Statistical Association</em> 102 (477): 359–78. <a href="https://doi.org/10.1198/016214506000001437">https://doi.org/10.1198/016214506000001437</a>.
+</div>
+<div id="ref-gutowski2020ongoingneed" class="csl-entry" role="listitem">
+Gutowski, W. J., P. A. Ullrich, A. Hall, L. R. Leung, T. A. O’Brien, C. M. Patricola, R. W. Arritt, et al. 2020. <span>“The Ongoing Need for High-Resolution Regional Climate Models: Process Understanding and Stakeholder Information.”</span> <em>Bulletin of the American Meteorological Society</em> 101 (5): E664–83. <a href="https://doi.org/10.1175/BAMS-D-19-0113.1">https://doi.org/10.1175/BAMS-D-19-0113.1</a>.
+</div>
+<div id="ref-kaltenborn2023" class="csl-entry" role="listitem">
+Kaltenborn, Julia, Charlotte E. E. Lange, Venkatesh Ramesh, Philippe Brouillard, Yaniv Gurwicz, Chandni Nagda, Jakob Runge, Peer Nowack, and David Rolnick. 2023. <span>“ClimateSet: A Large-Scale Climate Model Dataset for Machine Learning.”</span> <a href="https://arxiv.org/abs/2311.03721">https://arxiv.org/abs/2311.03721</a>.
+</div>
+<div id="ref-karras2022edm" class="csl-entry" role="listitem">
+Karras, Tero, Miika Aittala, Timo Aila, and Samuli Laine. 2022. <span>“Elucidating the Design Space of Diffusion-Based Generative Models.”</span> <a href="https://arxiv.org/abs/2206.00364">https://arxiv.org/abs/2206.00364</a>.
+</div>
+<div id="ref-liang2008regional" class="csl-entry" role="listitem">
+Liang, Xin-Zhong, Kenneth E Kunkel, Gerald A Meehl, Richard G Jones, and Julian XL Wang. 2008. <span>“Regional Climate Models Downscaling Analysis of General Circulation Models Present Climate Biases Propagation into Future Change Projections.”</span> <em>Geophysical Research Letters</em> 35 (8).
+</div>
+<div id="ref-lin2023deep" class="csl-entry" role="listitem">
+Lin, Hai, Jianping Tang, Shuyu Wang, Shuguang Wang, and Guangtao Dong. 2023. <span>“Deep Learning Downscaled High-Resolution Daily Near Surface Meteorological Datasets over East Asia.”</span> <em>Scientific Data</em> 10 (1): 890.
+</div>
+<div id="ref-ling_diffusion_2024" class="csl-entry" role="listitem">
+Ling, Fenghua, Zeyu Lu, Jing-Jia Luo, Lei Bai, Swadhin K Behera, Dachao Jin, Baoxiang Pan, Huidong Jiang, and Toshio Yamagata. 2024. <span>“Diffusion Model-Based Probabilistic Downscaling for 180-Year East Asian Climate Reconstruction.”</span> <em>Npj Climate and Atmospheric Science</em> 7 (1): 131. <a href="https://www.nature.com/articles/s41612-024-00679-1">https://www.nature.com/articles/s41612-024-00679-1</a>.
+</div>
+<div id="ref-loshchilov2019adamw" class="csl-entry" role="listitem">
+Loshchilov, Ilya, and Frank Hutter. 2019. <span>“Decoupled Weight Decay Regularization.”</span> <a href="https://arxiv.org/abs/1711.05101">https://arxiv.org/abs/1711.05101</a>.
+</div>
+<div id="ref-corrdiff2024" class="csl-entry" role="listitem">
+Mardani, Morteza, Noah Brenowitz, Yair Cohen, Jaideep Pathak, Chieh-Yu Chen, Cheng-Chin Liu, Arash Vahdat, et al. 2024. <span>“Residual Corrective Diffusion Modeling for Km-Scale Atmospheric Downscaling.”</span> <a href="https://arxiv.org/abs/2309.15214">https://arxiv.org/abs/2309.15214</a>.
+</div>
+<div id="ref-Matheson76" class="csl-entry" role="listitem">
+Matheson, James E., and Robert L. Winkler. 1976. <span>“Scoring Rules for Continuous Probability Distributions.”</span> <em>Management Science</em> 22 (10): 1087–96. <a href="http://www.jstor.org/stable/2629907">http://www.jstor.org/stable/2629907</a>.
+</div>
+<div id="ref-cnnrodrigues2018" class="csl-entry" role="listitem">
+Rodrigues, Oliveira, E. R., and M. Netto. 2018. <span>“DeepDownscale: A Deep Learning Strategy for High-Resolution Weather Forecast.”</span> In <em>2018 IEEE 14th International Conference on e-Science (e-Science)</em>, 415–22. <a href="https://doi.org/10.1109/eScience.2018.00130">https://doi.org/10.1109/eScience.2018.00130</a>.
+</div>
+<div id="ref-schmude2024prithviwxcfoundationmodel" class="csl-entry" role="listitem">
+Schmude, Johannes, Sujit Roy, Will Trojak, Johannes Jakubik, Daniel Salles Civitarese, Shraddha Singh, Julian Kuehnert, et al. 2024. <span>“Prithvi WxC: Foundation Model for Weather and Climate.”</span> <a href="https://arxiv.org/abs/2409.13598">https://arxiv.org/abs/2409.13598</a>.
+</div>
+<div id="ref-shen2024engression" class="csl-entry" role="listitem">
+Shen, Xinwei, and Nicolai Meinshausen. 2024. <span>“Engression: Extrapolation Through the Lens of Distributional Regression.”</span> <em>Journal of the Royal Statistical Society Series B: Statistical Methodology</em>. <a href="https://doi.org/10.1093/jrsssb/qkae108">https://doi.org/10.1093/jrsssb/qkae108</a>.
+</div>
+<div id="ref-song2021scorebasedgenerativemodelingstochastic" class="csl-entry" role="listitem">
+Song, Yang, Jascha Sohl-Dickstein, Diederik P. Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. 2021. <span>“Score-Based Generative Modeling Through Stochastic Differential Equations.”</span> <a href="https://arxiv.org/abs/2011.13456">https://arxiv.org/abs/2011.13456</a>.
+</div>
+<div id="ref-Szekely2003" class="csl-entry" role="listitem">
+Szekely, Gabor. 2003. <span>“E-Statistics: The Energy of Statistical Samples.”</span> <em>Bowling Green State University, Department of Mathematics and Statistics Technical Report</em>, 3(05):1–18.
+</div>
+<div id="ref-lowres_incapable_local" class="csl-entry" role="listitem">
+Volosciuk, Claudia, Douglas Maraun, Vladimir A. Semenov, and Wonsun Park. 2015. <span>“Extreme Precipitation in an Atmosphere General Circulation Model: Impact of Horizontal and Vertical Model Resolutions.”</span> <em>Journal of Climate</em> 28 (3): 1184–1205. <a href="https://doi.org/10.1175/JCLI-D-14-00337.1">https://doi.org/10.1175/JCLI-D-14-00337.1</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script>
+
+/* ============================================================
+
+   Dark / light mode icon for Quarto's color-scheme toggle.
+
+   Quarto ships the toggle with an empty <i class="bi">; this adds
+
+   a Bootstrap-Icons glyph and swaps it whenever the scheme changes:
+
+       light mode  ->  bi-moon-stars   (click to go dark)
+
+       dark  mode  ->  bi-sun          (click to go light)
+
+   Quarto marks the toggle with the class `alternate` while dark.
+
+   ============================================================ */
+
+(function () {
+
+  function apply() {
+
+    document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
+
+      var icon = toggle.querySelector(".bi");
+
+      if (!icon) return;
+
+      var dark = toggle.classList.contains("alternate");
+
+      icon.classList.remove("bi-sun", "bi-moon-stars");
+
+      icon.classList.add(dark ? "bi-sun" : "bi-moon-stars");
+
+    });
+
+  }
+
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+
+    apply();
+
+    document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
+
+      new MutationObserver(apply).observe(toggle, {
+
+        attributes: true,
+
+        attributeFilter: ["class"]
+
+      });
+
+    });
+
+  });
+
+})();
+
+</script>
+
+<script>
+
+/* ============================================================
+
+   Lightbox — full-screen image viewer with prev/next navigation.
+
+   Targets content images (photography albums + blog figures/plots)
+
+   inside the main document, excluding the portrait, navbar logo,
+
+   listing thumbnails, and images that are already links.
+
+   Wired site-wide via include-after-body in _quarto.yml.
+
+   ============================================================ */
+
+(function () {
+
+  document.addEventListener("DOMContentLoaded", function () {
+
+    function eligible(img) {
+
+      if (!img.closest("#quarto-document-content")) return false;
+
+      if (img.closest(".jhs-hero")) return false;
+
+      if (img.closest(".navbar")) return false;
+
+      if (img.closest(".quarto-listing")) return false;
+
+      if (img.closest("a")) return false;
+
+      return true;
+
+    }
+
+
+
+    var items = Array.prototype.filter.call(
+
+      document.querySelectorAll("#quarto-document-content img"), eligible
+
+    );
+
+    if (!items.length) return;
+
+
+
+    var current = 0;
+
+    var lastFocus = null;
+
+
+
+    // ---- Build the overlay once ----
+
+    var lb = document.createElement("div");
+
+    lb.className = "jhs-lb";
+
+    lb.setAttribute("role", "dialog");
+
+    lb.setAttribute("aria-modal", "true");
+
+    lb.setAttribute("aria-label", "Image viewer");
+
+    lb.hidden = true;
+
+    lb.innerHTML =
+
+      '<button class="jhs-lb-close" aria-label="Close (Esc)"><i class="bi bi-x-lg"></i></button>' +
+
+      '<button class="jhs-lb-prev" aria-label="Previous image"><i class="bi bi-chevron-left"></i></button>' +
+
+      '<figure class="jhs-lb-figure"><img class="jhs-lb-img" alt=""><figcaption class="jhs-lb-caption"></figcaption></figure>' +
+
+      '<button class="jhs-lb-next" aria-label="Next image"><i class="bi bi-chevron-right"></i></button>' +
+
+      '<div class="jhs-lb-counter"></div>';
+
+    document.body.appendChild(lb);
+
+
+
+    var imgEl = lb.querySelector(".jhs-lb-img");
+
+    var capEl = lb.querySelector(".jhs-lb-caption");
+
+    var counterEl = lb.querySelector(".jhs-lb-counter");
+
+    var prevBtn = lb.querySelector(".jhs-lb-prev");
+
+    var nextBtn = lb.querySelector(".jhs-lb-next");
+
+    var closeBtn = lb.querySelector(".jhs-lb-close");
+
+    var figEl = lb.querySelector(".jhs-lb-figure");
+
+
+
+    var single = items.length < 2;
+
+    prevBtn.style.display = single ? "none" : "";
+
+    nextBtn.style.display = single ? "none" : "";
+
+    counterEl.style.display = single ? "none" : "";
+
+
+
+    function show(i) {
+
+      current = (i + items.length) % items.length;
+
+      var img = items[current];
+
+      imgEl.src = img.currentSrc || img.src;
+
+      var alt = img.getAttribute("alt") || "";
+
+      imgEl.alt = alt;
+
+      capEl.textContent = alt;
+
+      capEl.style.display = alt ? "" : "none";
+
+      counterEl.textContent = (current + 1) + " / " + items.length;
+
+    }
+
+    function open(i) {
+
+      lastFocus = document.activeElement;
+
+      show(i);
+
+      lb.hidden = false;
+
+      document.body.classList.add("jhs-lb-open");
+
+      closeBtn.focus();
+
+    }
+
+    function close() {
+
+      lb.hidden = true;
+
+      document.body.classList.remove("jhs-lb-open");
+
+      imgEl.removeAttribute("src");
+
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+
+    }
+
+    function next() { show(current + 1); }
+
+    function prev() { show(current - 1); }
+
+
+
+    // ---- Make eligible images clickable ----
+
+    items.forEach(function (img, i) {
+
+      img.classList.add("jhs-lb-eligible");
+
+      img.addEventListener("click", function () { open(i); });
+
+    });
+
+
+
+    // ---- Controls ----
+
+    closeBtn.addEventListener("click", close);
+
+    nextBtn.addEventListener("click", function (e) { e.stopPropagation(); next(); });
+
+    prevBtn.addEventListener("click", function (e) { e.stopPropagation(); prev(); });
+
+    lb.addEventListener("click", function (e) {
+
+      if (e.target === lb || e.target === figEl) close();
+
+    });
+
+    document.addEventListener("keydown", function (e) {
+
+      if (lb.hidden) return;
+
+      if (e.key === "Escape") close();
+
+      else if (e.key === "ArrowRight") next();
+
+      else if (e.key === "ArrowLeft") prev();
+
+    });
+
+  });
+
+})();
+
+</script>
+
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/jhschlegel\.github\.io");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Jan Schlegel</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JHSchlegel">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/jan-heinrich-schlegel/">
+      <i class="bi bi-linkedin" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
